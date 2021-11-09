@@ -1,0 +1,22 @@
+<div class="row">
+  	<div class="col-md-12">
+	    <div class="portlet light">
+	      	<div class="portlet-body">
+	        <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>	      		
+				  <tabset class="tabbable-line">
+		      		<tab heading="{{'reports.tabs.gastroIngredients' | translate}}"> 
+		      			<report-gastro-ingredients></report-gastro-ingredients>
+		      		</tab>
+		      		<tab heading="{{'reports.tabs.allergens' | translate}}"> 
+		      			<report-print></report-print>
+		      		</tab>
+		      		<tab heading="{{'reports.tabs.libraries' | translate}}"> 
+		      			<report-print-libraries></report-print-libraries>
+		      		</tab>    
+		      		<tab heading="{{'reports.tabs.locationsubproducts' | translate}}"> 
+		      			<report-location-subproducts></report-location-subproducts>
+		      		</tab>   		
+		      </tabset>	
+  		</div>
+	</div>
+</div>

@@ -1,0 +1,52 @@
+<div class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
+  <app-header></app-header>
+  <div class="clearfix"></div>
+  <div class="page-container">
+    <menu style="padding:0px; margin: 0px" (showSideBarMenu)="showSideBarMenu($event)"></menu>
+    <div class="page-content-wrapper">
+      <!-- BEGIN CONTENT BODY -->
+      <div class="page-content marginTransition" [ngClass]="{'hideSideMenu': !showSideMenu}">
+        <!-- BEGIN PAGE HEADER-->
+        <h1 class="page-title"> {{'gastro.heading' | translate}} </h1>
+
+        <!-- END PAGE HEADER-->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="portlet box black">
+              <div class="portlet-body cd-portlet-body">
+                <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-pills cd-navs cd-nav-pills do-not-print"> 
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="menus" >{{'gastro.tabs.menus' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="daily-menu-cartes" >{{'gastro.tabs.dailyMenuCartes' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="buffets" >{{'gastro.tabs.buffets' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="cartes" >{{'gastro.tabs.cartes' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="fixed-price-cartes" >{{'gastro.tabs.fixedPriceCartes' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="catalogs" >{{'gastro.tabs.catalogs' | translate}}</a> 
+                    </li>
+                  </ul>
+                  <div class="tab-content cd-tab-content">  
+                   <router-outlet></router-outlet>
+                  </div>
+                </div>  
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END SAMPLE TABLE PORTLET-->
+      </div>
+      <!-- END CONTENT BODY -->
+    </div>
+  </div>
+  <footer></footer>
+</div>

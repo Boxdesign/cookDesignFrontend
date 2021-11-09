@@ -1,0 +1,299 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportDeleted">
+  <div class="row">
+    <div class="col-md-6">
+
+      <!-- PROVIDERS TABLE -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.deletedProviders' | translate}}</h2>
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="searchProviders($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <div class="col-md-6">
+        </div>
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="providersSortField" [(sortOrder)]="providersSortOrder" [label]="'provider.provider.tableHead.name'" [value]="'provider._id.commercialName'" (onChange)="getSelentaSapDeletedProviders()" ></column-sorter>
+            </th>
+            <th width="210">
+              <i (click)="filterLocationModal.show()" style="cursor: pointer;font-style: normal;">{{'provider.provider.tableHead.location' | translate}}&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+            </th>
+            <th width="200"> {{'buttonGeneric.actions' | translate}}</th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let provider of providers;let i=index">
+            <tr [class.text-muted]="!provider?.active" [class.active]="!provider.active">
+              <td height="70" (click)="viewProvider(provider._id)" class="pointer">
+                <div style="display: block; text-align:center;">
+                  {{(providersCurrentPage-1)*providersPerPage + i + 1}}
+                </div>
+              </td>
+              <td height="70" (click)="viewProvider(provider._id)" class="pointer">
+                {{provider.commercialName}}
+              </td>
+              <td width="210">
+                <a href="javascript:;" (click)="selectProviderToEdit(provider); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{provider.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'provider.provider.form.location' | translate}}</a>
+              </td>
+              <td height="70" width="200">
+                <a href="javascript:;" (click)="editProvider(provider._id)" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+                <a href="javascript:;" (click)="selectProviderToEdit(provider); confirmProviderDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateProvidersPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="providersPerPage" [currentPage]="providersCurrentPage" [totalItems]="totalProviders"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="providersPerPage && providersCurrentPage && totalProviders" class="cd-pagination" [totalItems]="totalProviders" [(ngModel)]="providersCurrentPage" [itemsPerPage]="providersPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="providerPageHasChanged($event)" (numPages)="providersNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="col-md-6">
+
+      <!-- ARTICLES TABLE -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.deletedArticles' | translate}}</h2>
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="searchArticles($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <div class="col-md-6">
+        </div>
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="articlesSortField" [(sortOrder)]="articlesSortOrder" [label]="'provider.article.tableHead.description'" [value]="'article._id.lang.description'" (onChange)="getSelentaSapDeletedArticles()" ></column-sorter>
+            </th>
+            <th width="250" >
+              <column-sorter [(sortField)]="articlesSortField" [(sortOrder)]="articlesSortOrder" [label]="'provider.article.tableHead.provider'" [value]="'article._id.provider.commercialName'" (onChange)="getSelentaSapDeletedArticles()" ></column-sorter>
+            </th>
+            <th width="100">
+              <i (click)="filterLocationModal.show()" style="cursor: pointer;font-style: normal;">{{'provider.article.tableHead.location' | translate}}&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+            </th>
+            <th width="200"> {{'buttonGeneric.actions' | translate}}</th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let article of articles;let i=index">
+            <tr [class.text-muted]="!article?.active" [class.active]="!article?.active">
+              <td height="70" (click)="viewArticle(article._id)" class="pointer">
+                <div style="display: block; text-align:center;">
+                  {{(articlesCurrentPage-1)*articlesPerPage + i + 1}}
+                </div>
+              </td>
+              <td height="70" (click)="viewArticle(article._id)" class="pointer">
+                {{article?.lang[0]?.description}}
+              </td>
+              <td height="70" width="250" (click)="viewArticle(article._id)" class="pointer">
+                {{article?.provider.commercialName}}
+              </td>
+              <td width="100">
+                <a href="javascript:;" (click)="selectArticleToEdit(article); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{article.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'provider.article.form.location' | translate}}</a>
+              </td>
+              <td height="70" width="200">
+                <a href="javascript:;" (click)="editArticle(article._id)" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+                <a href="javascript:;" (click)="selectArticleToEdit(article); confirmArticleDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateArticlesPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="articlesPerPage" [currentPage]="articlesCurrentPage" [totalItems]="totalArticles"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="articlesPerPage && articlesCurrentPage && totalArticles" class="cd-pagination" [totalItems]="totalArticles" [(ngModel)]="articlesCurrentPage" [itemsPerPage]="articlesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="articlePageHasChanged($event)" (numPages)="articlesNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'provider.provider.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.provider.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="provider">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="provider.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--confirm Provider delete MODAL -->
+<div bsModal #confirmProviderDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmProviderDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.provider.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteProvider()" class="form-horizontal" #deleteProviderForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <p>{{'provider.provider.form.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{ provider?.commercialName}}</p>
+                  <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmProviderDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmProviderDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--confirm Article delete MODAL -->
+<div bsModal #confirmArticleDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmArticleDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteArticle()" class="form-horizontal" #deleteArticleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <p>{{'provider.article.form.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{ article?.lang[0]?.description }}</p>
+                  <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmArticleDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmArticleDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

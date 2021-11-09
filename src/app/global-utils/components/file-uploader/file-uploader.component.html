@@ -1,0 +1,157 @@
+	
+<!-- <div class="table-row-button"> -->
+	<div *ngIf="status=='edit'">
+		<input #fileInput style="display: none;" id="image" type='file' (change)="readURL($event)" />
+		<a (click)="fileInput.click();" class="btn default pull-right gold">
+				<i class="fa fa-plus"></i> {{'buttonGeneric.add' | translate}}
+		</a>
+	</div>
+
+<search-box (onSearchEntered)="searchFiles($event)" [inputText]="filterText"></search-box>
+
+<div class="table-scrollable">
+	<table id="file-uploader-table" class="table table-hover">
+		<thead>
+			<tr>
+			  <th>
+			   </th>
+			  <th>
+				<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'provider.provider.tableHead.name'" [value]="'name'"></column-sorter>			   
+			 </th>
+			  <th>
+				<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'provider.provider.tableHead.type'" [value]="'type'"></column-sorter>			   
+			 </th>
+			  <th>
+				<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'provider.provider.tableHead.size'" [value]="'Size'"></column-sorter>			   
+			 </th>		
+			 <th>
+				<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'provider.provider.tableHead.date'" [value]="'LastModified'"></column-sorter>			   
+			 </th>		  
+			  <th>
+			   <label>{{'provider.provider.tableHead.actions' | translate}} </label> 
+			 </th>
+			</tr>
+		</thead>
+		<tbody *ngFor="let file of allFiles | compositionFilterText:filterText | tableSort:sortField:sortOrder:currentPage:itemsPerPage">
+	    <tr >
+	      <td>
+	      </td>
+	      <td>
+	      	<i > {{file.name}}</i>	
+	      </td>
+	      <td>
+	      	<i > {{ file.type | uppercase }}</i>	
+	      </td>
+	      <td>
+	      	<i *ngIf="file.Size < 1048576" > {{(file.Size/1024).toFixed(1)}} KB</i>
+	      	<i *ngIf="file.Size >= 1048576" > {{(file.Size/1048576).toFixed(1)}} MB</i>
+	      </td>	    
+	      <td>
+	      	<i> {{file.LastModified | date: 'medium'}} </i>
+	      </td>	   
+	      <td class="pointer">
+	        <a style="display: inline-block;" (click)=" getFile(file);" class="btn gold btn-sm btn-outline table-row-button">
+						<i class="fa fa-download"></i>
+						{{'buttonGeneric.download' | translate}}
+					</a>
+	        <a *ngIf="status=='edit'" style="display: inline-block;" (click)=" fileSelect(file); renameModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+						<i class="fa fa-edit"></i>
+						{{'buttonGeneric.rename' | translate}}
+					</a>
+					<a *ngIf="status=='edit'" style="display: inline-block;" (click)=" fileSelect(file); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+						<i class="fa fa-trash"></i>
+						{{'buttonGeneric.delete' | translate}}
+					</a>
+	      </td>      
+	    </tr>
+	  </tbody>
+	</table>	
+</div>
+<div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" 
+        						[firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" 
+        						[rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event">
+				</pagination>
+      </div>
+    </div>
+  </div>
+
+  <!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)=" confirmDeleteModal.hide() " aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'messageGeneric.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)=" deleteFile();" class="form-horizontal" #deleteUserForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'messageGeneric.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)=" confirmDeleteModal.hide() " class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)=" confirmDeleteModal.hide(); " class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #renameModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-xs">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="renameModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'messageGeneric.rename' | translate}}</h4>        
+      </div>      
+      <div class="modal-body">
+        <form (ngSubmit)="changeName()" class="form-horizontal" #renameForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                <div class="form-group">
+                  <label class="col-md-4 control-label">{{'messageGeneric.new_name' | translate}}<span class="required"> * </span></label>
+                  <div class="col-md-7">
+                    <input *ngIf="fileSelected" [(ngModel)]="fileSelected.newName" type="text" class="form-control" name="name" placeholder="" required>
+                  </div>
+                </div>                                
+              </div>
+            </div>            
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-4 col-md-12">
+                <button type="submit" (click)="renameModal.hide()" class="btn green" >{{'buttonGeneric.save' | translate}} </button>
+                <button type="button" (click)="renameModal.hide()" class="btn default">{{'buttonGeneric.cancel' | translate}} </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>

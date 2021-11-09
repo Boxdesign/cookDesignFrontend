@@ -1,0 +1,141 @@
+/* You can add global styles to this file, and also import other style files */
+
+// Global settings
+$theme-style: 'square'; 
+$theme-type:  'default'; 
+
+//------------------------- COMPONENTS ------------------------------------------
+// Global settings
+@import './assets/scss/global/_variables';              
+@import './assets/scss/global/components/_mixins';  
+
+@import '/assets/scss/global/components/_reset-rounds';
+
+// General CSS Reset
+@import './assets/scss/global/components/_reset-general';  
+    
+// Material Desing Components
+@import './assets/scss/global/components/_md';                            
+                      
+// General Components  
+@import './assets/scss/global/components/_typography';      
+@import './assets/scss/global/components/_utils';       
+// @import './assets/scss/global/components/_grid';
+@import './assets/scss/global/components/_font-icons';           
+@import './assets/scss/global/components/_alerts';              
+@import './assets/scss/global/components/_badges';        
+@import './assets/scss/global/components/_buttons';                             
+@import './assets/scss/global/components/_carousel';           
+@import './assets/scss/global/components/_charts';                     
+@import './assets/scss/global/components/_chats';                
+@import './assets/scss/global/components/_close';                            
+@import './assets/scss/global/components/_dropdowns';       
+@import './assets/scss/global/components/_feeds';               
+@import './assets/scss/global/components/_form-layouts';                 
+//@import './assets/scss/global/components/_form-repeater';  
+@import './assets/scss/global/components/_inputs';    
+@import './assets/scss/global/components/_icon-buttons';    
+@import './assets/scss/global/components/_input-icons'; 
+@import './assets/scss/global/components/_labels';    
+@import './assets/scss/global/components/_list-groups';  
+@import './assets/scss/global/components/_loaders';  
+@import './assets/scss/global/components/_metro-icons';        
+@import './assets/scss/global/components/_modals';  
+@import './assets/scss/global/components/_notes';    
+@import './assets/scss/global/components/_pagination';   
+@import './assets/scss/global/components/_panels'; 
+@import './assets/scss/global/components/_popovers';  
+@import './assets/scss/global/components/_portlets'; 
+@import './assets/scss/global/components/_progress-bars'; 
+@import './assets/scss/global/components/_statistic-blocks'; 
+@import './assets/scss/global/components/_social-icons'; 
+@import './assets/scss/global/components/_tables'; 
+@import './assets/scss/global/components/_tabs'; 
+@import './assets/scss/global/components/_tiles';  
+@import './assets/scss/global/components/_wells';  
+@import './assets/scss/global/components/_widgets'; 
+@import './assets/scss/global/components/_animate';
+@import './assets/scss/global/components/_headings'; 
+@import './assets/scss/global/components/_timeline'; 
+@import './assets/scss/global/components/_timeline-2'; 
+@import './assets/scss/global/components/_timeline-3'; 
+@import './assets/scss/global/components/_tasks-widget'; 
+@import './assets/scss/global/components/_comments'; 
+@import './assets/scss/global/components/_quick-actions'; 
+
+@import './assets/scss/global/components/_app-widgets'; 
+
+//@import './assets/scss/global/components/_ui-sweetalert'; 
+// @import './assets/scss/global/components/_clipboard'; 
+//@import './assets/scss/global/components/_bootstrap-multiselect'; 
+
+// Elements
+//@import './assets/scss/global/components/elements/steps/_step-1';
+//@import './assets/scss/global/components/elements/lists/_list-1';
+//@import './assets/scss/global/components/elements/ribbons/_ribbon-1';
+//@import './assets/scss/global/components/elements/cards/_card-1';
+//@import './assets/scss/global/components/elements/overlay/_overlay-1';
+
+// Apply flat UI colors to all components
+@import './assets/scss/global/components/_colors';
+
+// System components
+
+@import './assets/scss/global/components/cookie-consent';
+//@import './assets/scss/global/components/sidebar';
+
+@import "./assets/scss/global/components/_mixins.scss";
+@import "./assets/scss/layout/layout.scss";
+@import "./assets/scss/layout/themes/dark.scss";
+@import "./assets/scss/layout/custom.scss";
+
+// ----------------------- LAYOUT ---------------------------------------------// 
+
+//## Main Layout CSS Builder
+
+@import './assets/scss/layout/layout/_print'; // print layout
+@import './assets/scss/layout/layout/_header'; // page header
+@import './assets/scss/layout/layout/_page-container'; // page main container
+@import './assets/scss/layout/layout/_sidebar';  // page sidebar
+@import './assets/scss/layout/layout/_content'; // page consnde
+@import './assets/scss/layout/layout/_footer';   // page footer
+
+
+//------------------------- THEME ------------------------------------------//
+
+@import "./assets/scss/layout/themes/dark.scss";
+@import "./assets/scss/layout/themes/_base.scss";
+@import "./assets/scss/layout/_variables.scss";
+
+//------------------------- PAGES ------------------------------------------//
+@import "./assets/scss/pages/login.scss";
+
+//------------------------- PRIME NG ------------------------------------------//
+@import "./assets/scss/layout/themes/custom-primeng-theme.scss";
+
+//------------------------- FONT AWESOME ------------------------------------------//
+@import "./assets/scss/font-awesome/scss/font-awesome.scss";
+
+//------------------------- CUSTOM ------------------------------------------//
+@import "./assets/scss/layout/custom.scss";
+
+.img-buttons {
+	color: #a8a8a8;
+	cursor: pointer;
+
+	-webkit-transition: color 0.5s;  /* Chrome y Safari */
+	-o-transition: color 0.5s;  /* Opera */
+	-moz-transition: color 0.5s;  /* Mozilla Firefox */
+	-ms-transition: color 0.5s;   /* Internet Explorer */
+	transition: color 0.5s;  /* W3C */
+}
+.img-buttons:hover {
+	color: #2d2d2d;
+}
+
+.page-container {
+	margin-top: 0px !important;
+}
+
+
+

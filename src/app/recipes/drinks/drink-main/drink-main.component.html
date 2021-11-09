@@ -1,0 +1,323 @@
+<div heading="Drink Main">  
+  				<h3 *ngIf="mode=='edit'" class="tab-box-title">{{'recipes.drink.form.editDrink' | translate}}</h3>
+          <h3 *ngIf="mode=='view'" class="tab-box-title">{{'recipes.drink.form.viewDrink' | translate}}</h3>
+          <h6 *ngIf="account&&drink&&mode!='new'">{{'recipes.drink.form.latestUpdate' | translate}}&nbsp;{{drink.updatedAt | date: 'medium'}}&nbsp;{{'recipes.drink.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+  <div class="row">
+    <div class="col-md-9">
+      <div class="form" *ngIf="drink">
+          <div class="form-body">
+          	<div class="row" *ngIf="mode=='new'">
+			    		<div class="col-md-12 tab-box-title" >
+			    			<h2 class="tab-box-title" style="margin-bottom: 20px;">{{'recipes.drink.form.new' | translate}}</h2>
+			    		</div>
+            </div>
+            <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="drinkLang" [forceRefresh]="forceRefresh"></lang-tab>
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12" *ngIf=" mode=='edit' || mode =='view'">
+                    <div class="form-group">
+                      <label for="referenceNumber" class="control-label">{{'recipes.drink.form.referenceNumber' | translate}}</label>
+                      <input for="referenceNumber" disabled class="form-control"  [(ngModel)]="drink.referenceNumber" name="referenceNumber" [disabled]="mode=='view'">
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="name" class="control-label">{{'recipes.drink.form.name' | translate}} <span class="required"> * </span></label>
+                      <input for="name" class="form-control"  [(ngModel)]="drinkLang.name" name="name" [disabled]="mode=='view'">
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="active" class="control-label">{{'recipes.drink.form.active' | translate}} <span class="required"> * </span></label>
+                      <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required [disabled]="mode=='view'">
+                        <option [selected]="drink.active" value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                        <option [selected]="!drink.active" value="no">{{'buttonGeneric.no' | translate}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="measUnit" class="control-label cd-control-label">{{'recipes.drink.form.measUnit' | translate}} <span class="required"> * </span></label>
+                      <select *ngIf="measurementUnits" id="measUnit" class="form-control" (change)="measuringUnitSelected($event.target.value)" name="measurement_unit" required [disabled]="mode=='view'">
+                        <option *ngFor="let measuringUnit of measurementUnits;let i = index" [value]="i" [selected]="measuringUnit._id==drink.measurementUnit._id">{{measuringUnit.lang[0]?.name}}</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="family" class="control-label">{{'recipes.drink.form.family' | translate}} </label>
+                      <select *ngIf="drink.family" id="family" class="form-control" (change)="familySelected($event.target.value)" name="family" [disabled]="mode=='view'">
+                        <option value="">---</option>
+                        <option *ngFor="let fam of families; let i=index" [value]="i" [selected]="fam._id == drink.family">{{fam.lang[0]?.name}}</option>
+                      </select>
+                      <select *ngIf="!drink.family" id="family" class="form-control" (change)="familySelected($event.target.value)" [disabled]="mode=='view'">
+                        <option value="">---</option>
+                        <option *ngFor="let fam of families; let i = index" [value]="i">
+                          {{fam.lang[0]?.name}}
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="subfamily" class="control-label">{{'recipes.drink.form.subfamily' | translate}}</label>
+                      <select class="bs-select form-control" name="subfamily" *ngIf="drink.subfamily"
+                            (change)="subFamilySelected($event.target.value)"
+                            [disabled]="drink.subfamily.length < 1" [disabled]="mode=='view'">
+                      <option value="">---</option>
+                      <option *ngFor="let subfam of subfamilies; let i = index" [selected]="subfam._id == drink.subfamily"
+                              [value]="i">
+                        {{subfam.lang.name}}
+                      </option>
+                    </select>
+                    <select class="bs-select form-control" name="subfamily" *ngIf="!drink.subfamily"
+                            (change)="subFamilySelected($event.target.value)" [disabled]="mode=='view'">
+                      <option value="">---</option>
+                      <option *ngFor="let subfam of subfamilies; let i = index" [value]="i">
+                        {{subfam.lang.name}}
+                      </option>
+                    </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="kitchen" class="control-label">{{'recipes.subproduct.form.spaces' | translate}}</label>
+                      <kitchen-select [mode]="mode" [(recipeKitchens)]="drink.kitchens"></kitchen-select>
+                    </div>
+                  </div>
+                </div>     
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="location" class="control-label">{{'recipes.drink.form.location' | translate}} <span class="required"> * </span></label>
+                      <location-selector *ngIf="userLocations&&(mode!='view')" [locations]="userLocations" [savedLocations]="drink.location" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="mode=='edit' || mode=='new'"></location-selector>
+                      <location-view *ngIf="userLocations&&(mode=='view')" [savedLocations]="drink.location"></location-view>
+                     <!--  <location-selector *ngIf="userLocations && mode!='view'" [locations]="userLocations" [savedLocations]="drink.location" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="editMode"></location-selector>
+                      <location-view *ngIf="userLocations && mode=='view'" [savedLocations]="drink.location"></location-view> -->
+                   </div>
+                  </div>
+                </div>
+                <div class="row" *ngIf="mode!='new'">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="location" class="control-label">{{'recipes.subproduct.form.allergens' | translate}} <span class="required"> * </span></label>
+                      <allergen-view *ngIf="drink.allergensInitialized" class="control-label" [allergens]="drink.allergens"></allergen-view>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+                    <crop-and-upload [(gallery)]="drink.gallery" [folderPath]="'imgs/drink/'" [upload]="upload" (uploadFinished)="imageUploadFinished()" [mode]="mode" ></crop-and-upload>                    
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    
+                    <accordion [closeOthers]="true" style="margin-left: -20px !important;">
+                      
+                      <accordion-group class="accordion" #desc>
+                      
+                          <div  accordion-heading  [ngClass]="{'langFieldSelected': desc?.isOpen, 'noLangFieldSelected': !desc?.isOpen }">
+
+                            {{'recipes.dish.form.desc' | translate}}
+                            <i *ngIf="desc.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                            <i *ngIf="!desc.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                          </div>
+
+                          <textarea style="margin-bottom: 5px !important;" id="desc" class="form-control" [(ngModel)]="drinkLang.description" name="desc" rows="3" [disabled]="mode == 'view' "></textarea>
+
+                      </accordion-group>
+
+                      <accordion-group class="accordion" #gastro >
+
+                        <div *ngIf="drinkLang.gastroCommentLabel==null || drinkLang.gastroCommentLabel==''" accordion-heading  [ngClass]="{'langFieldSelected': gastro?.isOpen, 'noLangFieldSelected': !gastro?.isOpen }">
+
+                          {{'recipes.dish.form.gastroComment' | translate}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('gastroComment'); editLabelModal.show();"></i>
+                          <i *ngIf="gastro.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!gastro.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <div *ngIf="drinkLang.gastroCommentLabel && (drinkLang.gastroCommentLabel!=null || drinkLang.gastroCommentLabel!='')" accordion-heading  [ngClass]="{'langFieldSelected': gastro?.isOpen, 'noLangFieldSelected': !gastro?.isOpen }">
+
+                          {{ drinkLang.gastroCommentLabel | uppercase}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('gastroComment'); editLabelModal.show();"></i>
+                          <i *ngIf="gastro.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!gastro.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <textarea style="margin-bottom: 5px !important;" id="gastroComment" class="form-control" [(ngModel)]="drinkLang.gastroComment" name="gastroComment" rows="3" [disabled]="mode == 'view' "></textarea>
+
+                      </accordion-group>
+
+                      <accordion-group class="accordion" #diet>
+
+                        <div *ngIf="drinkLang.dietLabel==null || drinkLang.dietLabel==''" accordion-heading  [ngClass]="{'langFieldSelected': diet?.isOpen, 'noLangFieldSelected': !diet?.isOpen }">
+
+                          {{'recipes.dish.form.diet' | translate}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('diet'); editLabelModal.show();"></i>
+                          <i *ngIf="diet.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!diet.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <div *ngIf="drinkLang.dietLabel && (drinkLang.dietLabel!=null || drinkLang.dietLabel!='')" accordion-heading  [ngClass]="{'langFieldSelected': diet?.isOpen, 'noLangFieldSelected': !diet?.isOpen }">
+
+                          {{ drinkLang.dietLabel | uppercase}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('diet'); editLabelModal.show();"></i>
+                          <i *ngIf="diet.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!diet.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <textarea style="margin-bottom: 5px !important;" id="diet" class="form-control" [(ngModel)]="drinkLang.diet" name="diet" rows="3" [disabled]="mode == 'view' "></textarea>
+
+                      </accordion-group>
+
+                      <accordion-group class="accordion" #tasting >
+
+                        <div *ngIf="drinkLang.tastingLabel==null || drinkLang.tastingLabel==''" accordion-heading  [ngClass]="{'langFieldSelected': tasting?.isOpen, 'noLangFieldSelected': !tasting?.isOpen }">
+
+                          {{'recipes.dish.form.tasting' | translate}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('tasting'); editLabelModal.show();"></i>
+                          <i *ngIf="tasting.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!tasting.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <div *ngIf="drinkLang.tastingLabel && (drinkLang.tastingLabel!=null || drinkLang.tastingLabel!='')" accordion-heading  [ngClass]="{'langFieldSelected': tasting?.isOpen, 'noLangFieldSelected': !tasting?.isOpen }">
+
+                          {{ drinkLang.tastingLabel | uppercase}}
+                          <i *ngIf="mode!='new'" style="align-content: middle !important;" class="fa fa-pencil" (click)="editableLabel('tasting'); editLabelModal.show();"></i>
+                          <i *ngIf="tasting.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-down"></i>
+                          <i *ngIf="!tasting.isOpen" style="align-content: middle !important;" class="pull-left float-xs-left fa fa-angle-right"></i>
+
+                        </div>
+
+                        <textarea style="margin-bottom: 5px !important;" id="tasting" class="form-control" [(ngModel)]="drinkLang.tasting" name="tasting" rows="3" [disabled]="mode == 'view'"></textarea>
+
+                      </accordion-group>
+
+                    </accordion>
+
+                  </div>
+                </div>    
+              </div>
+            </div>
+          </div>
+          <!-- <div class="form-actions right">
+            		<button type="submit" [disabled]="!drinkLang.name || drink.location.length == 0" class="btn green" (click)="addDrink()">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" routerLink="/recipes/drinks" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+          </div> -->
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODALS-->
+
+<div bsModal #editLabelModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="editLabelModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 *ngIf="mode=='edit'" class="modal-title">{{'recipes.dish.form.newLabel' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" #editLabelForm="ngForm">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-body">
+                <div class="col-xs-12" style="margin-left: 30px !important;">
+                  <div *ngIf="gastroCommentLabel" class="form-group">
+                    <div  class="form-group">
+                      <label class="control-label">{{'recipes.dish.form.newLabel' | translate}}</label>
+                      <input class="form-control"  [(ngModel)]="drinkLang.gastroCommentLabel" name="gastroCommentLabel" [disabled]="mode=='view'">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-12" style="margin-left: 30px !important;">
+                  <div *ngIf="dietLabel" class="form-group">
+                    <div class="form-group">
+                      <label class="control-label">{{'recipes.dish.form.newLabel' | translate}}</label>
+                      <input class="form-control"  [(ngModel)]="drinkLang.dietLabel" name="dietLabel" [disabled]="mode=='view'">
+                    </div>
+                  </div>
+                </div>
+                <div class="col-xs-12" style="margin-left: 30px !important;">
+                  <div *ngIf="tastingLabel"  class="form-group">
+                    <div class="form-group">
+                      <label class="control-label">{{'recipes.dish.form.newLabel' | translate}}</label>
+                      <input class="form-control"  [(ngModel)]="drinkLang.tastingLabel" name="tastingLabel" [disabled]="mode=='view'">
+                    </div>
+                  </div>
+                </div>    
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="editLabelModal.hide(); cleanAndResetFields();" class="btn green">{{'buttonGeneric.accept' | translate}}
+                    </button>
+                    <button type="button" (click)="cleanAndResetFields(); editLabelModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                      translate}}
+                    </button>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

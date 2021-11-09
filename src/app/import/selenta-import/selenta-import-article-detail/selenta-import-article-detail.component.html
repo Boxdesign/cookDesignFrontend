@@ -1,0 +1,76 @@
+
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportArticles">
+	<div class="row">
+		<div class="col-md-12">
+			<h2 class="tab-box-title">{{'selenta-import.sapArticleDetail' | translate}}</h2>
+       <a (click)="goBack()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+		</div>
+  	<div class="col-md-9">
+      <div class="row" *ngIf="selentaArticle">
+        <div class="col-md-6">
+          <h4 class="tab-box-title">{{'selenta-import.sapArticle' | translate}}</h4>
+          <span style="color: #666;">{{ 'selenta-import.MATNR' | translate}} (MATNR): </span>&nbsp;<span>{{ selentaArticle?.article.MATNR }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.MATKL' | translate}} (MATKL): </span>&nbsp;<span>{{ selentaArticle?.article.MATKL }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.MAKTX' | translate}} (MAKTX): </span>&nbsp;<span>{{ selentaArticle?.article.MAKTX }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.MTART' | translate}} (MTART): </span>&nbsp;<span>{{ selentaArticle?.article.MTART }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.MSEH3' | translate}} (MSEH3): </span>&nbsp;<span>{{ selentaArticle?.article.MSEH3 }}</span><br>
+        </div>
+        <div class="col-md-6">
+          <h4 class="tab-box-title">{{'selenta-import.sapProvider' | translate}}</h4>
+          <span style="color: #666;">{{ 'selenta-import.IDNLF' | translate}} (IDNLF): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.IDNLF }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.LIFNR' | translate}} (LIFNR): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.LIFNR }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.NAME1' | translate}} (NAME1): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.NAME1 }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.DMBTR' | translate}} (DMBTR): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.DMBTR }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.BLDAT' | translate}} (BLDAT): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.BLDAT }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.ERFMG' | translate}} (ERFMG): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.ERFMG }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.ERFME' | translate}} (ERFME): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.ERFME }}</span><br>
+          <span style="color: #666;">{{ 'selenta-import.LOEVM' | translate}} (LOEVM): </span>&nbsp;<span>{{ selentaArticle?.article.PROVIDER.LOEVM }}</span><br>
+        </div>
+        <div class="col-md-6">
+          <h4 class="tab-box-title">{{'selenta-import.UMA' | translate}}</h4>
+          <div *ngIf="selentaArticle?.article.UMA.length">
+            <div *ngFor="let uma of selentaArticle?.article.UMA">
+            	<span style="color: #666;">{{ 'selenta-import.UMREN' | translate}} (UMREN):</span>&nbsp;<span>{{uma.UMREN}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.MEINH' | translate}} (MEINH):</span>&nbsp;<span>{{uma.MEINH}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.UMREZ' | translate}} (UMREZ):</span>&nbsp;<span>{{uma.UMREZ}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.MEINS' | translate}} (MEINS):</span>&nbsp;<span>{{uma.MEINS}}</span><br>
+            	<br>
+            </div>
+          </div>
+          <div *ngIf="!selentaArticle?.article.UMA.length">
+          	<div class="col-md-12" style="padding: 0px; color: #666; font-style: italic;">
+          		{{ 'selenta-import.noUMA' | translate}}
+          	</div>
+          </div>
+      	</div>
+        <div class="col-md-6">
+          <h4 class="tab-box-title">{{'selenta-import.ALLERGENS' | translate}}</h4>
+          <div *ngIf="selentaArticle?.article.ALERGENOS?.length">
+            	<span style="color: #666;">{{ 'selenta-import.ZCEREALES_GLUT' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZCEREALES_GLUT}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZCRUSTACEOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZCRUSTACEOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZHUEVOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZHUEVOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZPESCADOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZPESCADOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZCACAHUETES' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZCACAHUETES}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZSOJA' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZSOJA}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZLACTEOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZLACTEOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZFRUTOS_SEC' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZFRUTOS_SEC}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZAPIO' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZAPIO}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZMOSTAZA' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZMOSTAZA}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZSESAMO' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZSESAMO}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZSULFITOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZSULFITOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZALTRAMUCES' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZALTRAMUCES}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.ZMOLUSCOS' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].ZMOLUSCOS}}</span><br>
+            	<span style="color: #666;">{{ 'selenta-import.Z0MG' | translate}}:</span>&nbsp;<span>{{ selentaArticle?.article.ALERGENOS[0].Z0MG}}</span><br>
+          </div>
+          <div *ngIf="!selentaArticle?.article.ALERGENOS || !selentaArticle?.article.ALERGENOS?.length">
+          	<div class="col-md-12" style="padding: 0px; color: #666; font-style: italic;">
+          		{{ 'selenta-import.noALLERGENS' | translate}}
+          	</div>
+          </div>
+      </div>
+    </div>
+   </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>
+

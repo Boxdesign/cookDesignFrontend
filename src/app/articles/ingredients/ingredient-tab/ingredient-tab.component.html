@@ -1,0 +1,45 @@
+<div class="row">
+  	<div class="col-md-12">
+	    <div class="portlet light">
+	      <div *ngIf="ingredientOnEdit" class="portlet-body">
+					<h2 *ngIf="name && mode=='edit' && !ingredientOnEdit.quartering" class="tab-box-title">{{'articles.ingredients.form.edit' | translate:{value: this.name} }}</h2>
+					<h2 *ngIf="name && mode=='view' && !ingredientOnEdit.quartering" class="tab-box-title">{{'articles.ingredients.form.view' | translate:{value: this.name} }}</h2>
+					<h2 *ngIf="name && mode=='edit' && ingredientOnEdit.quartering" class="tab-box-title">{{'articles.ingredients.form.editQuartering' | translate:{value: this.name} }}</h2>
+					<h2 *ngIf="name && mode=='view' && ingredientOnEdit.quartering" class="tab-box-title">{{'articles.ingredients.form.viewQuartering' | translate:{value: this.name} }}</h2>					
+	        <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+				  <button *ngIf="mode=='view' && !ingredientOnEdit.quartering" type="button" (click)="editIngredient()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+				  <button *ngIf="mode=='view' && ingredientOnEdit.quartering" type="button" (click)="editParentIngredient()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+					<button style="margin-left: 10px;" *ngIf="mode=='view' && ingredientOnEdit.quartering" type="button" (click)="viewParentIngredient()" class="btn green pointer">{{'buttonGeneric.viewParentIngredient' | translate}}</button>				  
+					<tabset class="tabbable-line">
+		      		<tab heading="{{'articles.ingredients.tabs.ingredient' | translate}}">  
+		      			<ingredient-main [id]="id" (passRedirectOn)="redirectOn=$event"></ingredient-main>
+		      		</tab>
+		      		<tab *ngIf="!ingredientOnEdit.quartering" heading="{{'articles.ingredients.tabs.quartering' | translate}}"> 
+		      			<quartering [ingredientId]="id"></quartering>
+		      		</tab>
+		      		<tab heading="{{'articles.ingredients.tabs.provider' | translate}}"> 
+		      			<ingredient-provider (passRedirectOn)="redirectOn=$event"></ingredient-provider>
+		      		</tab>
+		      		<tab *ngIf="mode=='view'" heading="{{'articles.ingredients.tabs.locationCost' | translate}}"> 
+		      			<location-cost-table [costs]="locPrices"></location-cost-table>
+		      		</tab>	
+		      		<tab *ngIf="mode=='view'" heading="{{'articles.ingredients.tabs.locationAllergens' | translate}}"> 
+		      			<location-allergen-table [ingId]="id"></location-allergen-table>
+		      		</tab>	
+		      		<tab *ngIf="mode=='view'" heading="{{'recipes.product.tabs.includedIn' | translate}}"> 
+      					<where-is-included [id]="id" [type]="'ingredient'" (redirectOn)="setRedirectOn($event)"></where-is-included>
+      				</tab> 
+      				<!-- <tab *ngIf="mode == 'edit' && isAdmin" heading="{{'articles.ingredients.tabs.refreshLocationCost' | translate}}">
+      					<location-cost-refresh [model]="'ingredient'" [id]="id"></location-cost-refresh>
+      				</tab> -->
+      				<tab *ngIf="mode=='view' || mode == 'edit'">
+								<ng-template tabHeading>
+									<i class="fa fa-print fa-lg" aria-hidden="true"></i>
+						    </ng-template>
+								<ingredient-print *ngIf="ingredientOnEdit" [(ingredientOnEdit)]="ingredientOnEdit"></ingredient-print>
+							</tab>     		
+		      </tabset>	
+  		</div>
+	</div>
+</div>
+<p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" [closable]="false" width="425"></p-confirmDialog>

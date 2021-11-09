@@ -1,0 +1,22 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-body">
+				<h2 *ngIf="mode=='new'" class="tab-box-title">{{'provider.menu.addArticle'}}</h2>
+				<h2 *ngIf="mode=='edit'&& article" class="tab-box-title">{{'provider.menu.editArticle' | translate }}</h2>	
+				<h2 *ngIf="mode=='view'&& article" class="tab-box-title">{{'provider.menu.viewArticle' | translate }}</h2>
+        <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+        <button *ngIf="mode=='view'" type="button" (click)="editArticle()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+				<tabset class="tabbable-line">
+					<tab heading="{{'provider.article.tabs.main' | translate}}">
+						<article-main></article-main>
+					</tab>	
+					<tab heading="{{'provider.article.tabs.quality' | translate}}">
+						<article-quality ></article-quality>
+					</tab>			
+				</tabset>
+			</div>
+		</div>
+	</div>
+</div>
+<p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" [closable]="false" width="425"></p-confirmDialog>

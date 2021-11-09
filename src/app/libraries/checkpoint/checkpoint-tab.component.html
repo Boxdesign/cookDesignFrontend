@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-md-12">
+      <div class="portlet light">
+          <div class="portlet-body">
+            <tabset class="tabbable-line">
+            	<tab heading="{{'library.checkpoint.critical' | translate}}"> 
+            		<checkpoint-table [type]="'critical'" [title]="titleCritical"></checkpoint-table>
+            	</tab>
+            	<tab heading="{{'library.checkpoint.gastronomic' | translate}}"> 
+            		<checkpoint-table [type]="'gastronomic'" [title]="titleGastronomic"></checkpoint-table>
+            	</tab>
+            </tabset>
+
+<!--             <div class="tabbable-line">
+                <ul class="nav nav-tabs">
+                  <li class="active">
+                    <a href="#critical" data-toggle="tab">{{'library.checkpoint.critical' | translate}}</a>
+                  </li>
+                  <li>
+                      <a href="#gastronomic" data-toggle="tab">{{'library.checkpoint.gastronomic' | translate}}</a>
+                  </li>
+                </ul>
+                <div class="tab-content">
+                  <div class="tab-pane active fade in" id="critical">
+                    <checkpoint-table [type]="'critical'" [title]="titleCritical"></checkpoint-table>
+                  </div>
+                  <div class="tab-pane fade in" id="gastronomic">
+                    <checkpoint-table [type]="'gastronomic'" [title]="titleGastronomic"></checkpoint-table>
+                  </div>
+              </div>
+            </div> -->
+        </div>
+      </div>
+  </div>
+</div>

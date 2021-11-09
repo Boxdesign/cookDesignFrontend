@@ -1,0 +1,254 @@
+
+<!--New Ingredient Form-->
+<div class="row">
+    <div class="col-md-9">
+      <div class="portlet light">
+          <div class="portlet-body">
+            <h2 class="tab-box-title">{{'articles.ingredients.form.new' | translate}}</h2>
+              <div class="portlet-body form">
+                <lang-tab  (langsObj)="langObjRefreshed($event)" [fieldsObj]="ingredientLang"
+                          [forceRefresh]="forceRefresh"></lang-tab>
+                <form (ngSubmit)="uploadImage() " class="horizontal-form cd-form"  #addIngredientForm="ngForm">
+                  <div class="form-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="name" class="control-label">{{'articles.ingredients.form.name' | translate}} <span class="required"> * </span></label>
+                              <input id="name" for="name" class="form-control"  [(ngModel)]="ingredientLang.name" name="name">
+
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="active" class="control-label">{{'articles.ingredients.form.active' | translate}} <span class="required"> * </span></label>
+                              <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required>
+                                <option value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                                <option value="no">{{'buttonGeneric.no' | translate}}</option>
+                              </select>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="measUnit" class="control-label cd-control-label">{{'articles.ingredients.form.measUnit' | translate}} <span class="required"> * </span></label>
+                              <select id="measUnit" class="form-control" (change)="measuringUnitSelected($event.target.value)" name="measurement_unit" required>
+                                <option *ngFor="let measuringUnit of measurementUnits;let i = index" [value]="i">{{measuringUnit.lang[0]?.name}}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="equalsName" class="control-label">{{'articles.ingredients.form.equiUnit' | translate}}</label>
+                              <input id="equalsName" class="form-control" [(ngModel)]="ingredientLang.equivalenceUnitName" placeholder="{{'articles.ingredients.form.equiUnitNamePlaceholder' | translate}}" name="equalsName">
+
+                            </div>
+                          </div>
+                          <!-- <div class="col-md-2">
+                            <div class="form-group">
+                              <label for="equalsSign" class="control-label">&nbsp;</label>
+                              <input id="equalsSign" style="text-align: center;" class="form-control" value="=" disabled>
+                            </div>
+                          </div> -->
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="equalsQty" class="control-label">{{'articles.ingredients.form.equiQty' | translate}}</label>
+                              <div class="input-group">
+                                  <input id="equalsQty" type="number" min="0" step="any" class="form-control"  placeholder="{{'articles.ingredients.form.equiUnitQtyPlaceholder' | translate}}" [(ngModel)]="ingredient.equivalenceQty" name="measurement_unitShown">
+                                  <span *ngIf="ingredient.measuringUnit" class="input-group-addon" id="addon1">{{ingredient.measuringUnit.lang[0]?.shortName}}</span>
+                                  <span *ngIf="!ingredient.measuringUnit" class="input-group-addon" id="addon2">-</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="family" class="control-label">{{'articles.ingredients.form.family' | translate}} <span class="required"> * </span> </label>
+                              <select *ngIf="families" id="family" class="form-control" (change)="familySelected($event.target.value)" name="family" required>
+                                <option *ngFor="let fam of families; let i=index" [value]="i">{{fam.lang[0]?.name}}</option>
+                              </select>
+                              <select *ngIf="!families" id="family" class="form-control">
+                                <option></option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="subfamily" class="control-label">{{'articles.ingredients.form.subfamily' | translate}}</label>
+                              <select id="subfamily" *ngIf="subfamilies" class="form-control" (change)="subFamilySelected($event.target.value)" name="subfamily" [disabled]="subfamilies.length < 1">
+                                <option [selected]="defaultOption" [value]=""></option>
+                                <option *ngFor="let subfam of subfamilies; let i=index" [value]="subfam._id">{{subfam.lang.name}}</option>
+                              </select>
+                              <select *ngIf="!subfamilies" id="family" class="form-control">
+                                <option></option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="refPrice" class="control-label">{{'articles.ingredients.form.refPrice' | translate}} <span class="required"> * </span></label>
+                              <div class="input-group">
+                                <input type="number" id="refPrice" class="form-control" [(ngModel)]="ingredient.referencePrice" name="refPrice" step="any" min="0">
+                                <span *ngIf="ingredient.measuringUnit" class="input-group-addon" id="addon1">€/{{ingredient.measuringUnit.lang[0]?.shortName}}</span>
+                                <span *ngIf="!ingredient.measuringUnit" class="input-group-addon" id="addon2">-</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="form-group">
+                              <label for="avgPrice" class="control-label">{{'articles.ingredients.form.avgPrice' | translate}}</label>
+                              <div class="input-group">
+                                <input id="avgPrice" class="form-control" name="avgPrice" disabled>
+                                <span *ngIf="ingredient.measuringUnit" class="input-group-addon" id="addon1">€/{{ingredient.measuringUnit.lang[0]?.shortName}}</span>
+                                <span *ngIf="!ingredient.measuringUnit" class="input-group-addon" id="addon2">-</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="row">
+                            <div class="col-xs-12" style="margin-left: 14px;">
+                              <div class="form-group">
+                                <label class="control-label">{{'articles.ingredients.form.allergens' | translate}}</label>
+                              </div>
+                            </div>
+                          </div>
+                           <div class="row" style="margin-left: 3px;">
+                              <div *ngIf="allergens">
+                                <div class="col-md-4 col-xs-4" *ngFor="let allergen of allergens" (click)="allergenSelected(allergen)">
+                                    <img *ngIf="allergen.gallery" [src]="allergen.gallery.sizes[0].url" alt="">
+                                    <img *ngIf="!allergen.gallery" src="../../../assets/img/noImageCircle.png" alt="" >
+                                  <div class="mt-card-content allergen-card-content">
+                                <span [ngSwitch]="allergen.level">
+                                  <span style="color:grey; font-size: 10px;" *ngSwitchDefault>{{'library.allergen.null' | translate}}</span>
+                                  <span style="color:grey; font-size: 10px;" *ngSwitchCase="0">{{'library.allergen.null' | translate}}</span>
+                                  <span style="color:orange; font-size: 10px;" *ngSwitchCase="1">{{'library.allergen.traces' | translate}}</span>
+                                  <span style="color:red; font-size: 10px;" *ngSwitchCase="2">{{'library.allergen.full' | translate}}</span>
+                               </span>
+                                  <p style="font-size: 12px;" class="mt-card-desc font-grey-mint">{{allergen.lang[0]?.name}}</p>
+                                </div>
+                                </div>
+                              </div>
+                            <div *ngIf="!allergens">
+                              <p>{{'library.allergen.none' | translate}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <crop-and-upload [(gallery)]="imageObject" [folderPath]="'imgs/ingredients/'" [upload]="upload" (uploadFinished)="imageUploadFinished()"></crop-and-upload>                            
+                          </div>
+                          </div>                        
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                            <label for="temp" class="control-label">{{'articles.ingredients.form.temp' | translate}} </label> 
+                            <div>
+                              <label class="mt-checkbox mt-checkbox-outline grey"> 
+                                <input type="checkbox" name="temporality" [(ngModel)]="ingredient.temporality.isActive">   
+                              <span class="green-form"></span>{{'articles.ingredients.form.temporality' | translate}}
+                              </label>                              
+                            </div>                    
+                              <div class="row" *ngIf="ingredient.temporality.isActive">
+                                <div style="padding-left: 30px;" class="col-md-4" *ngFor="let month of months">                                  
+                                  <label class="mt-checkbox mt-checkbox-outline grey">
+                                    <input type="checkbox" name="{{month}}" [(ngModel)]="ingredient.temporality.month[month]">  
+                                    <span class="green-form"></span>{{'articles.ingredients.form.months.' + month | translate}}
+                                  </label>                                                        
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="desc" class="control-label">{{'articles.ingredients.form.desc' | translate}}</label>
+                              <textarea id="desc" class="form-control" [(ngModel)]="ingredientLang.description" name="desc" rows="3"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="tastingNote" class="control-label">{{'articles.ingredients.form.tastingNote' | translate}}</label>
+                              <textarea id="tastingNote" class="form-control" [(ngModel)]="ingredientLang.tastingNote" name="tastingNote" rows="2"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="region" class="control-label">{{'articles.ingredients.form.region' | translate}}</label>
+                              <textarea id="region" class="form-control" [(ngModel)]="ingredientLang.region" name="region" rows="1"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="alcoholPercentage" class="control-label">{{'articles.ingredients.form.alcoholPercentage' | translate}}</label>
+                              <textarea id="alcoholPercentage" class="form-control" [(ngModel)]="ingredientLang.alcoholPercentage" name="alcoholPercentage" rows="1"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-actions right">
+                    <button type="submit" [disabled]="!addIngredientForm.form.valid || !ingredient.measuringUnit || !ingredient.family" class="btn green">{{'buttonGeneric.save' | translate}}
+                    </button>
+                    <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                  </div>
+                </form>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+ <simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+ <p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" [closable]="false" width="425"></p-confirmDialog>
+
+ <div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

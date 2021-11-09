@@ -1,0 +1,82 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportArticles">
+  <div class="row">
+  	<div class="col-md-12">
+
+  	<!-- SELENTA ARTICLES -->
+  		<div class="row">
+    		<div class="col-md-12">
+					<h2 class="tab-box-title">{{'selenta-import.sapArticles' | translate}}</h2>
+				</div>
+			</div>
+			<div class="row">
+		    <div class="col-md-6">
+		      <search-box (onSearchEntered)="filterSelentaArticles($event)" [inputText]="selentaArticlesFilterText" [label]="searchBoxLabel"></search-box>
+		    </div>
+		  </div>
+		  <div class="table-scrollable">
+		    <table class="table table-hover">
+		      <thead>
+		      <tr>
+		        <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="selentaArticlesSortField" [(sortOrder)]="selentaArticlesSortOrder" [label]="'selenta-import.reference'" [value]="'article.MATNR'" (onChange)="getSelentaSapArticles()" ></column-sorter>
+            </th>
+		        <th>
+              <column-sorter [(sortField)]="selentaArticlesSortField" [(sortOrder)]="selentaArticlesSortOrder" [label]="'selenta-import.description'" [value]="'article.MAKTX'" (onChange)="getSelentaSapArticles()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaArticlesSortField" [(sortOrder)]="selentaArticlesSortOrder" [label]="'selenta-import.provider'" [value]="'article.PROVIDER.NAME1'" (onChange)="getSelentaSapArticles()" ></column-sorter>
+            </th>
+		        <th>{{'selenta-import.articleLinked' | translate}}</th>
+		      </tr>
+		      </thead>
+		      <tbody *ngFor="let selentaArticle of selentaArticles; let in=index" >
+		        <tr>
+		          <td height="70" width="5%" (click)="viewSelentaArticle(selentaArticle);" class="pointer">
+		            <div style="display: block; text-align:center;">
+		              {{(selentaArticlesCurrentPage-1)*selentaArticlesPerPage + in + 1}}
+		            </div>
+		          </td>
+              <td height="70" width="20%" (click)="viewSelentaArticle(selentaArticle);" class="pointer">
+                {{(selentaArticle.article.MATNR).slice(-9)}}
+              </td>
+		          <td height="70" width="40%" (click)="viewSelentaArticle(selentaArticle);" class="pointer">
+		            {{selentaArticle.article.MAKTX}}
+		          </td>
+              <td height="70" width="15%" (click)="viewSelentaArticle(selentaArticle);" class="pointer">
+                {{selentaArticle.article.PROVIDER?.NAME1}}
+              </td>
+		          <td height="70" width="20%">
+                <a href="javascript:;" (click)="navigateTo(selentaArticle.article.cookDesignId);">{{selentaArticle.article.cookDesignId}}</a>
+		          </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		  </div>
+		  <div class="row">
+		    <div class="col-md-5">
+		      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateSelentaArticlesPerPage($event)"></items-per-page>
+		      <span class="pagination-separator">|</span>
+		      <pagination-snippet [itemsPerPage]="selentaArticlesPerPage" [currentPage]="selentaArticlesCurrentPage" [totalItems]="selentaTotalArticles"></pagination-snippet>
+		    </div>
+		    <div class="col-md-7">
+		      <div class="pull-right">
+		        <pagination *ngIf="selentaArticlesPerPage && selentaArticlesCurrentPage && selentaTotalArticles" class="cd-pagination" [totalItems]="selentaTotalArticles" [(ngModel)]="selentaArticlesCurrentPage" [itemsPerPage]="selentaArticlesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="selentaPageHasChanged($event)" (numPages)="selentaArticlesNumPages = $event"></pagination>
+		      </div>
+		    </div>
+		  </div>
+  	</div>
+		
+	</div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../selenta-import-new-articles" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

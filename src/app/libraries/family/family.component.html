@@ -1,0 +1,31 @@
+<div class="row">
+    <div class="col-md-12">
+      <div class="portlet light">
+          <div class="portlet-body">
+            <tabset class="tabbable-line">
+              <tab heading="{{'library.family.tabs.ingredients' | translate}}">  
+                  <family-table [familyCategory]="'ingredient'" [subfamiliesEnabled]="true" [title]="titleIngredient"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.utensils' | translate}}">  
+                  <family-table [familyCategory]="'utensil'" [subfamiliesEnabled]="true" [title]="titleUtensil"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.packaging' | translate}}">  
+                  <family-table [familyCategory]="'packaging'" [subfamiliesEnabled]="true" [title]="titlePackaging"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.recipes' | translate}}">  
+                  <family-table [familyCategory]="'recipe'" [subfamiliesEnabled]="true" [title]="titleRecipe"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.gastroOffering' | translate}}">  
+                  <family-table [familyCategory]="'gastroOffering'" [subfamiliesEnabled]="true" [title]="titleGastroOffering"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.menu' | translate}}">  
+                  <family-table [familyCategory]="'menu'" [subfamiliesEnabled]="false" [title]="titleMenu"></family-table>
+              </tab>
+              <tab heading="{{'library.family.tabs.season' | translate}}">  
+                  <family-table [familyCategory]="'season'" [subfamiliesEnabled]="false" [title]="titleSeason"></family-table>
+              </tab>
+            </tabset>
+        </div>
+      </div>
+  </div>
+</div>

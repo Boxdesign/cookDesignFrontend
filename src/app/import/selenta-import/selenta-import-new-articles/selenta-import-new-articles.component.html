@@ -1,0 +1,328 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportNewArticles">
+  <div class="row">
+  	<div class="col-md-6">
+
+  	<!-- SELENTA NEW ARTICLES -->
+  		<div class="row">
+    		<div class="col-md-12">
+					<h2 class="tab-box-title">{{'selenta-import.newSapArticles' | translate}}</h2>
+				</div>
+			</div>
+			<div class="row">
+		    <div class="col-md-6">
+		      <search-box (onSearchEntered)="filterSelentaArticles($event)" [label]="searchBoxLabel"></search-box>
+		    </div>
+        <div class="col-md-6">
+          <a href="javascript:;" routerLink="../selenta-import-articles" class="btn default pull-right gold">{{'selenta-import.tabs.articles' | translate}}</a>
+        </div>
+		  </div>
+		  <div class="table-scrollable">
+		    <table class="table table-hover">
+		      <thead>
+		      <tr>
+		        <th><div style="display: block; text-align:center;">#</div></th>
+		        <th>
+              <column-sorter [(sortField)]="selentaArticlesSortField" [(sortOrder)]="selentaArticlesSortOrder" [label]="'selenta-import.description'" [value]="'article.MAKTX'" (onChange)="getSelentaSapNewArticles()" ></column-sorter>
+            </th>
+		        <th>
+              <column-sorter [(sortField)]="selentaArticlesSortField" [(sortOrder)]="selentaArticlesSortOrder" [label]="'selenta-import.provider'" [value]="'article.PROVIDER.NAME1'" (onChange)="getSelentaSapNewArticles()" ></column-sorter>
+            </th>
+		      </tr>
+		      </thead>
+		      <tbody *ngFor="let selentaArticle of selentaNewArticles; let in=index" >
+		        <tr [class.selected]="(selentaArticle?._id === selentaArticleSelected?._id) && (selentaArticle?.article.PROVIDER._id === selentaArticleSelected?.article.PROVIDER._id)">
+		          <td height="70" (click)="selectSelentaArticle(selentaArticle)" class="pointer">
+		            <div style="display: block; text-align:center;">
+		              {{(selentaArticlesCurrentPage-1)*selentaArticlesPerPage + in + 1}}
+		            </div>
+		          </td>
+		          <td height="70" (click)="selectSelentaArticle(selentaArticle)" class="pointer">
+		            {{selentaArticle.article.MAKTX}}
+		          </td>
+		          <td height="70" (click)="selectSelentaArticle(selentaArticle)" class="pointer">
+		            {{selentaArticle.article.PROVIDER?.NAME1}}
+		          </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		  </div>
+		  <div class="row">
+		    <div class="col-md-5">
+		      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateSelentaArticlesPerPage($event)"></items-per-page>
+		      <span class="pagination-separator">|</span>
+		      <pagination-snippet [itemsPerPage]="selentaArticlesPerPage" [currentPage]="selentaArticlesCurrentPage" [totalItems]="selentaTotalArticles"></pagination-snippet>
+		    </div>
+		    <div class="col-md-7">
+		      <div class="pull-right">
+		        <pagination *ngIf="selentaArticlesPerPage && selentaArticlesCurrentPage && selentaTotalArticles" class="cd-pagination" [totalItems]="selentaTotalArticles" [(ngModel)]="selentaArticlesCurrentPage" [itemsPerPage]="selentaArticlesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="selentaPageHasChanged($event)" (numPages)="selentaArticlesNumPages = $event"></pagination>
+		      </div>
+		    </div>
+		  </div>
+  	</div>
+		
+		<div class="col-md-6">
+
+			<!-- ARTICLES TABLE -->
+			<div class="row">
+		    <div class="col-md-12">
+		      <h2 class="tab-box-title">{{'selenta-import.unlinkedArticles' | translate}}</h2>
+		   </div>
+		  </div>
+			<div class="row">
+		    <div class="col-md-6">
+		      <search-box (onSearchEntered)="searchArticles($event)" [label]="searchBoxLabel"></search-box>
+		    </div>
+		    <div class="col-md-6">
+		      <a href="javascript:;" (click)="addArticle()" class="btn default pull-right gold"> <i class="fa fa-plus"></i> {{'provider.article.add' | translate}}
+		      </a>
+		    </div>
+		  </div>
+		  <div class="table-scrollable">
+		    <table class="table table-hover">
+		      <thead>
+		      <tr>
+		        <th><div style="display: block; text-align:center;">#</div></th>
+		        <th>
+              <column-sorter [(sortField)]="articlesSortField" [(sortOrder)]="articlesSortOrder" [label]="'provider.article.tableHead.description'" [value]="'lang.description'" (onChange)="getArticles()" ></column-sorter>
+            </th>
+		        <th>
+              <column-sorter [(sortField)]="articlesSortField" [(sortOrder)]="articlesSortOrder" [label]="'provider.article.tableHead.provider'" [value]="'provider.commercialName'" (onChange)="getArticles()" ></column-sorter>
+            </th>
+		        <th>
+		          <i (click)="filterLocationModal.show()" style="cursor: pointer;font-style: normal;">{{'provider.article.tableHead.location' | translate}}&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+		        </th>
+		        <th width="280"> {{'buttonGeneric.actions' | translate}}</th>
+		      </tr>
+		      </thead>
+		      <tbody *ngFor="let article of articles;let i=index">
+		        <tr [class.text-muted]="!article.active" [class.active]="!article.active">
+		          <td height="70" (click)="viewArticle(article._id)" class="pointer">
+		            <div style="display: block; text-align:center;">
+		              {{(articlesCurrentPage-1)*articlesPerPage + i + 1}}
+		            </div>
+		          </td>
+		          <td height="70" (click)="viewArticle(article._id)" class="pointer">
+		            {{article.lang[0]?.description}}
+		          </td>
+		          <td height="70" (click)="viewArticle(article._id)" class="pointer">
+		            {{article.provider.commercialName}}
+		          </td>
+		          <td>
+		            <a href="javascript:;" (click)="selectArticleToEdit(article); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{article.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'provider.article.form.location' | translate}}</a>
+		          </td>
+		          <td height="70" width="280">
+		            <a href="javascript:;" (click)="editArticle(article._id)" class="btn gold btn-sm btn-outline table-row-button">
+		              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+		            <a href="javascript:;" (click)="selectArticleToEdit(article); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+		              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+		            <a href="javascript:;" (click) ="articleSelected=article; linkArticleModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+		              <i class="fa fa-trash"></i> {{'selenta-import.link' | translate}} </a>
+		          </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		  </div>
+		  <div class="row">
+		    <div class="col-md-5">
+		      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+		      <span class="pagination-separator">|</span>
+		      <pagination-snippet [itemsPerPage]="articlesPerPage" [currentPage]="articlesCurrentPage" [totalItems]="totalArticles"></pagination-snippet>
+		    </div>
+		    <div class="col-md-7">
+		      <div class="pull-right">
+		        <pagination *ngIf="articlesPerPage && articlesCurrentPage && totalArticles" class="cd-pagination" [totalItems]="totalArticles" [(ngModel)]="articlesCurrentPage" [itemsPerPage]="articlesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="articlesNumPages = $event"></pagination>
+		      </div>
+		    </div>
+		  </div>
+
+
+		</div>
+	</div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.article.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'provider.article.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="article">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.article.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="article.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;"></div>
+	          </div>
+	        </div>
+	      </form>
+	    </div>
+	  </div>
+	</div>
+</div>
+
+
+<!--confirm delete MODAL -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteArticle()" class="form-horizontal" #deleteArticleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <p>{{'provider.article.form.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{ article?.lang[0]?.description }}</p>
+                  <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--LINK article MODAL -->
+<div bsModal #linkArticleModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" style="width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="linkArticleModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'selenta-import.linkArticles' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="linkArticles()" class="form-horizontal" #linkArticleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                <b *ngIf="selentaArticleSelected">{{'selenta-import.linkArticlesMessage' | translate}}</b>
+                <b *ngIf="!selentaArticleSelected" style="color: red;">{{ 'selenta-import.linkArticlesError' | translate }}</b>
+
+                <div class="row" *ngIf="selentaArticleSelected">
+                  <div class="col-md-6">
+                    <h4 class="tab-box-title">{{'selenta-import.newSapArticle' | translate}}</h4>
+                    <div class="col-md-3" style="padding: 0px; color: #666;">
+                      {{'selenta-import.description' | translate}}:<br>
+                      {{'selenta-import.provider' | translate}}:<br>
+                    </div>
+                    <div class="col-md-9" style="padding: 0px;"> 
+                      {{ selentaArticleSelected?.article.MAKTX }}<br>
+                      {{ selentaArticleSelected?.article.PROVIDER.NAME1 }}<br>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="tab-box-title">{{'selenta-import.unlinkedArticle' | translate}}</h4>
+                    <div class="col-md-3" style="padding: 0px; color: #666;">
+                      {{'selenta-import.description' | translate}}:<br>
+                      {{'selenta-import.provider' | translate}}:<br>
+                    </div>
+                    <div class="col-md-9" style="padding: 0px;"> 
+                      {{ articleSelected?.lang[0]?.description }}<br>
+                      {{ articleSelected?.provider.commercialName }}<br>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-7">                  
+                    <b *ngIf="selentaArticleSelected && articleSelected?.provider.externalReference && (articleSelected?.provider.externalReference != selentaArticleSelected?.article.PROVIDER.LIFNR)" style="color: red;">ERROR: {{ 'selenta-import.linkArticlesProvidersError' | translate }}</b>
+                    <b *ngIf="selentaArticleSelected && !articleSelected?.provider.externalReference " style="color: red;">ERROR: {{ 'selenta-import.linkArticlesUnlinkedProviderError' | translate }}</b>
+                  </div>
+                  <div class="col-md-5">
+                    <button type="submit" (click)="linkArticleModal.hide();" class="btn green" [disabled]="!selentaArticleSelected || (selentaArticleSelected && articleSelected?.provider.externalReference && (articleSelected?.provider.externalReference != selentaArticleSelected?.article.PROVIDER.LIFNR)) || (selentaArticleSelected && !articleSelected?.provider.externalReference)">{{'selenta-import.link' | translate}}
+                    </button>
+                    <button type="button" (click)="linkArticleModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

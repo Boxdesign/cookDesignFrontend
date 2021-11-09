@@ -1,0 +1,103 @@
+
+<!--New Menu Form-->
+<div class="row">
+    <div class="col-md-9">
+      <div class="portlet light">
+          <div class="portlet-body" [ngSwitch]="menuType">
+            <h2 *ngSwitchCase="'menu'" class="tab-box-title">{{'gastro.menu.form.newMenu' | translate}}</h2>
+            <h2 *ngSwitchCase="'dailyMenuCarte'" class="tab-box-title">{{'gastro.menu.form.newDailyMenuCarte' | translate}}</h2>
+            <h2 *ngSwitchCase="'buffet'" class="tab-box-title">{{'gastro.menu.form.newBuffet' | translate}}</h2>
+            <h2 *ngSwitchCase="'carte'" class="tab-box-title">{{'gastro.menu.form.newCarte' | translate}}</h2>
+            <h2 *ngSwitchCase="'fixedPriceCarte'" class="tab-box-title">{{'gastro.menu.form.newFixedPriceCarte' | translate}}</h2>
+            <h2 *ngSwitchCase="'catalog'" class="tab-box-title">{{'gastro.menu.form.newCatalog' | translate}}</h2>
+              <div class="portlet-body form">
+                <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="menuLang"
+                          [forceRefresh]="forceRefresh"></lang-tab>
+                <form (ngSubmit)="addMenu()" class="horizontal-form cd-form"  #addMenuForm="ngForm">
+                  <div class="form-body">
+                    <div class="row">
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="name" class="control-label">{{'gastro.menu.form.name' | translate}} <span class="required"> * </span></label>
+                              <input for="name" class="form-control"  [(ngModel)]="menuLang.name" name="name" required>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="active" class="control-label">{{'gastro.menu.form.active' | translate}} <span class="required"> * </span></label>
+                              <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required>
+                                <option value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                                <option value="no">{{'buttonGeneric.no' | translate}}</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="type" class="control-label">{{'gastro.menu.form.type' | translate}} <span class="required"> * </span> </label>
+                              <select *ngIf="menuTypes" id="type" class="form-control" (change)="menuTypeSelected($event.target.value)" name="type" required>
+                                <option *ngFor="let menuType of menuTypes; let i=index" [value]="i">{{menuType.lang[0]?.name}}</option>
+                              </select>
+                              <select *ngIf="!menuTypes" id="type" class="form-control" disabled>
+                                <option>---</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+						            <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="season" class="control-label">{{'gastro.menu.form.season' | translate}} <span class="required"> * </span></label>
+                              <select *ngIf="menuSeasons" id="season" class="form-control" (change)="menuSeasonSelected($event.target.value)" name="season" required>
+                                <option *ngFor="let menuSeason of menuSeasons; let i=index" [value]="i">{{menuSeason.lang[0]?.name}}</option>
+                              </select>
+                              <select *ngIf="!menuSeasons" id="season" class="form-control" disabled>
+                                <option>---</option>
+                              </select>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="location" class="control-label">{{'gastro.menu.form.location' | translate}} <span class="required"> * </span></label>
+                              <location-selector *ngIf="userLocations" [locations]="userLocations" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="editMode"></location-selector>
+                           </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="col-md-6">
+                        <div class="row">
+                          <div class="col-md-12">
+                            <div class="form-group">
+                              <label for="desc" class="control-label">{{'gastro.menu.form.desc' | translate}}</label>
+                              <textarea id="desc" class="form-control" [(ngModel)]="menuLang.description" name="desc" rows="10"></textarea>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="form-actions right" [ngSwitch]="menuType">
+                    <button type="submit" [disabled]="!addMenuForm.form.valid || selectedLocations.length == 0" class="btn green">{{'buttonGeneric.save' | translate}}
+                    </button>
+                    <button *ngSwitchCase="'menu'" type="button" routerLink="/gastro-offering/menus" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                    <button *ngSwitchCase="'dailyMenuCarte'" type="button" routerLink="/gastro-offering/daily-menu-cartes" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                    <button *ngSwitchCase="'buffet'" type="button" routerLink="/gastro-offering/buffets" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                    <button *ngSwitchCase="'carte'" type="button" routerLink="/gastro-offering/cartes" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                    <button *ngSwitchCase="'fixedPriceCarte'" type="button" routerLink="/gastro-offering/fixed-price-cartes" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                    <button *ngSwitchCase="'catalog'" type="button" routerLink="/gastro-offering/catalogs" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                  </div>
+              </form>
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <simple-notifications [options]="options"></simple-notifications>
+  <p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" [closable]="false" width="425"></p-confirmDialog>

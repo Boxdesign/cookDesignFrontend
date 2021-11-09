@@ -1,0 +1,77 @@
+<div class="media-images">
+  <tabset class="tabbable-line" >
+    <tab heading="{{'media-files.images' | translate}}">
+      <div class="col-md-12" style="margin-top: 15px;">
+        <small><cite *ngIf="images&&images.length==0">{{'media-files.noImages' | translate}}</cite></small>
+      </div>
+      <div class="col-md-5" *ngFor="let image of images; let i=index;" >
+          <img [src]="image.sizes[1].url"  (click)="selectImage(i); viewImageModal.show()" class="pointer" style="max-height: 100%; max-width: 100%" alt="">
+          <span *ngIf="!viewMode && !viewEdit" (click)="deleteImage(i)" class="pointer"><span tooltip="{{'media-files.delete' | translate}}" [tooltipAppendToBody]="true">&times;</span></span>
+      </div>
+      <input *ngIf="!viewMode && !viewEdit" type="file" class="col-md-12 btn btn-sm btn-outline" ng2FileSelect [uploader]="uploader" accept="image/*">
+    </tab>
+    <tab heading="{{'media-files.videos' | translate}}">
+      <div class="col-md-12" style="margin-top: 15px;">
+        <small><cite *ngIf="videos&&videos.length==0">{{'media-files.noVideos' | translate}}</cite></small>
+      </div>
+      <div class="col-md-5" *ngFor="let video of videos; let i=index;">
+          <img [src]="video.thumbnailUrl" (click)="selectVideo(i); viewVideoModal.show()" class="pointer" style="max-height: 100%; max-width: 100%" alt="">
+          <span *ngIf="!viewMode && !viewEdit" (click)="deleteVideo(i)" class="pointer"><span href="#" tooltip="{{'media-files.delete' | translate}}" [tooltipAppendToBody]="true">&times;</span></span>
+       </div>
+      <div class="col-md-12" style="margin-top:15px; margin-bottom:15px;">
+        <div class="input-group" *ngIf="!viewMode && !viewEdit">
+            <input id="video" type="text" class="form-control" name="videoUrl" [(ngModel)]="videoUrl">
+            <span class="input-group-btn">
+                <button class="btn green" type="button" (click)="addVideo()" [disabled]="!videoUrl">{{'media-files.addUrl' | translate}}</button>
+            </span>
+        </div>
+      </div>      
+    </tab>
+  </tabset>
+</div>
+
+
+<!-- show image -->
+<div bsModal #viewImageModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewImageModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'media-files.viewImage' | translate}}</h4>
+      </div>
+      <div id="addCookingStepModal" class="modal-body">
+        <img *ngIf="imageSelected" [src]="imageSelected.sizes[1].url">
+        <div class="form-actions right">
+          <button type="button" (click)="viewImageModal.hide()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- show video -->
+<div bsModal #viewVideoModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button"  data-dismiss="modal" class="close" (click)="viewVideoModal.hide(); stopVideo()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'media-files.viewVideo' | translate}}</h4>
+      </div>
+      <div id="addCookingStepModal" class="modal-body">
+        <div class="videoWrapper">
+          <iframe width="560" height="349" *ngIf="videoSelected"
+                  [src]="videoSelected.sanitizedUrl" allowfullscreen webkitallowfullscreen mozallowfullscreen>
+          </iframe>
+        </div>
+        <!-- To Do : Add video frame -->
+        <div class="form-actions right">
+          <button type="button"  data-dismiss="modal" (click)="viewVideoModal.hide(); stopVideo()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,32 @@
+    <!-- Add modal -->
+    <p-dialog header="{{ 'buttonGeneric.add' | translate }}" [(visible)]="dialog_add_show" modal="modal" (onAfterShow)="setFocus('add')">
+      <input #addInputElement [(ngModel)]="dialog_add_value"/>
+      <footer>
+          <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+              <button type="button" pButton icon="fa-close" (click)="dialog_add_show=false" label="{{ 'buttonGeneric.cancel' | translate }}"></button>
+              <button type="button" pButton icon="fa-check" (click)="addValue()" label="{{ 'buttonGeneric.add' | translate }}"></button>
+          </div>
+      </footer>
+    </p-dialog>
+
+    <!-- edit modal -->
+    <p-dialog header="{{ 'buttonGeneric.edit' | translate }}" [(visible)]="dialog_edit_show" modal="modal" (onAfterShow)="setFocus('edit')">
+      <input #editInputElement [(ngModel)]="dialog_edit_value"/>
+      <footer>
+          <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+              <button type="button" pButton icon="fa-close" (click)="dialog_edit_show=false" label="{{ 'buttonGeneric.cancel' | translate }}"></button>
+              <button type="button" pButton icon="fa-check" (click)="editValue()" label="{{ 'buttonGeneric.edit' | translate }}"></button>
+          </div>
+      </footer>
+    </p-dialog>
+
+    <!-- delete confirmation modal -->
+    <p-confirmDialog header="{{ 'messageGeneric.confirmDelete' | translate }}" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" width="425"></p-confirmDialog>
+
+    <!-- list box -->
+    <div style="text-align: right">
+    <p-listbox [options]="options" [(ngModel)]="selected" [style]="{'width':'100%', 'margin-bottom':'4px'}"></p-listbox>
+    <button pButton icon="fa-plus" (click)="addClick()" [disabled]="disabled"></button>
+    <button pButton icon="fa-pencil" (click)="editClick()" [disabled]="disabled || selected==null"></button>
+    <button pButton icon="fa-trash" (click)="confirm()" [disabled]="disabled || selected==null"></button>
+    </div>

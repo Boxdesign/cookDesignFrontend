@@ -1,0 +1,144 @@
+<loading-gif [loading]="loading" [updating]="updating"></loading-gif>
+<div *ngIf="!loading"  heading="Ingredients">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'articles.tabs.ingredients' | translate}}</h2>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchIngredients($event)" [label]="searchBoxLabel" [inputText]="filterText"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addIngredient()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'articles.ingredients.add' | translate}}</a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="ingredients-table" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th></th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.tableHead.name'" [value]="'lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.tableHead.cost'" [value]="'referencePrice'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.tableHead.family'" [value]="'family.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th (click)="toggleActiveState()" class="pointer">
+        	<span *ngIf="!filterActive"> <i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.state' | translate}} </span>
+        	<span *ngIf="filterActive&&active"> <i class="fa fa-check" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.active' | translate}} </span>
+        	<span *ngIf="filterActive&&!active"> <i class="fa fa-times" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.inactive' | translate}} </span>
+        </th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let ingredient of allIngredients;let i=index">
+        <!-- Not a quartering ingredient -->
+        <tr *ngIf="!ingredient.quartering" [class.text-muted]="!ingredient.active" [class.active]="!ingredient.active">
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer"><div style="display: block; text-align:center;">{{(currentPage-1)*itemsPerPage + i + 1}}</div></td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer">
+            <div style="display: block; text-align:center;">
+              <img *ngIf="ingredient.gallery" [src]="ingredient.gallery.sizes[0].url" alt="" >
+              <img *ngIf="!ingredient.gallery" src="../../../assets/img/noImageCircle.png" alt="" >
+            </div>
+          </td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer">{{ingredient.lang.name}}
+            <span *ngIf="ingredient.quartering" class="label label-sm label-cd label-mini pull-right"> {{'articles.ingredients.quartering.badge' | translate }}</span>
+          </td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer">{{ingredient.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{ingredient.measurementUnit.lang[0]?.shortName}}</td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer">{{ingredient.family.lang.name}}</td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer"><span *ngIf="ingredient.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+            <span *ngIf="!ingredient.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+          </td>
+          <td>
+            <!-- <a href="javascript:;" (click)="viewIngredient(ingredient._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+            <a href="javascript:;" (click)="selectIngredientToEdit(ingredient); editIngredient(ingredient._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a href="javascript:;" (click)="printIngredient(ingredient)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-print"></i> {{'buttonGeneric.print' | translate}} </a>
+            <a href="javascript:;" (click)="selectIngredientToEdit(ingredient); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+          </td>
+        </tr>
+        <!-- Quartering ingredient -->
+        <tr *ngIf="ingredient.quartering" [class.text-muted]="!ingredient.active" [class.active]="!ingredient.active">
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)"  class="pointer"><div style="display: block; text-align:center;">{{i+1}}</div></td>
+          <td (click)="viewIngredient(ingredient._id); selectIngredientToEdit(ingredient)" class="pointer">
+           <div style="display: block; text-align:center;">
+             <img *ngIf="ingredient.gallery" [src]="ingredient.gallery.sizes[0].url" alt="">
+             <img *ngIf="!ingredient.gallery" src="../../../assets/img/noImageCircle.png" alt="">
+           </div>
+          </td>
+          <td (click)="viewIngredient(ingredient._id);  selectIngredientToEdit(ingredient)" class="pointer">{{ingredient.lang.name}}
+            <span *ngIf="ingredient.quartering" class="label label-sm label-cd label-mini pull-right"> {{'articles.ingredients.quartering.badge' | translate }}</span>
+          </td>
+          <td (click)="viewIngredient(ingredient._id);  selectIngredientToEdit(ingredient)"  class="pointer">{{ingredient.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{ingredient.measurementUnit.lang[0]?.shortName}}</td>
+          <td (click)="viewIngredient(ingredient._id);  selectIngredientToEdit(ingredient)"  class="pointer">{{ingredient.family.lang.name}}</td>
+          <td (click)="viewIngredient(ingredient._id);  selectIngredientToEdit(ingredient)"  class="pointer"><span *ngIf="ingredient.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+            <span *ngIf="!ingredient.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+          </td>
+          <td>
+            <!-- <a href="javascript:;" (click)="viewQuartering(ingredient.quartering._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+            <a href="javascript:;" (click)="editQuartering(ingredient.quartering._id); selectIngredientToEdit(ingredient)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination *ngIf="itemsPerPage && currentPage && totalItems" class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="notificationOptions" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+<ingredient-print [printEvent]="print" [hidden]="true"></ingredient-print>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteIngredient()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

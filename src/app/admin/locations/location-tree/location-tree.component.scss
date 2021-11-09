@@ -1,0 +1,19 @@
+  .location-selector {
+    width: 100%;
+    border: 1px solid rgba(161, 162, 4, 0.31);
+    font-weight: 400;
+    font-family: "Lato" !important;
+    color: #606051;
+    background: rgba(255, 255, 255, 0.64);
+    padding: 12px;
+    font-size: 14px;
+  }
+
+  .li-selector {
+    margin-top: 5px;
+  }
+  
+  input[type='checkbox'] {
+    width:15px;
+    height:15px;
+  }

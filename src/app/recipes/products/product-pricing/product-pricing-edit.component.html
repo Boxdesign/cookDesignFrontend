@@ -1,0 +1,208 @@
+<div heading="Pricing">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.product.pricing.simulator' | translate}} <i *ngIf="simulatorOpen" (click)="simulatorOpen=false" class="fa fa-arrow-circle-o-down" aria-hidden="true"></i> <i *ngIf="!simulatorOpen" (click)="simulatorOpen=true" class="fa fa-arrow-circle-o-right" aria-hidden="true"></i></h3>
+		</div>
+	</div> 
+	<div *ngIf="product&&simulatorOpen" class="row">
+		<div class="col-md-12">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<tabset class="tabbable-line">
+						<tab heading="{{'recipes.product.pricing.costOverPricePercentage' | translate}}">
+							<div class="row" style="margin-top:15px">
+								<!-- <h4 style="margin-left: 12px; color: #a0a127">{{'recipes.product.pricing.costOverPricePercentage' | translate}}</h4> -->
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.totalCost' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost"> {{product.compositionCost + product.packagingCost | currency:'EUR':'symbol':'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost)">---</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<label class="control-label">{{'recipes.product.pricing.costOverPricePercentage' | translate}}:</label>
+									<div class="input-group">
+										<input id="costOverPriceSimulation" type="number" step="any" min="0" class="form-control" [(ngModel)]="costOverPriceSimulation" name="costOverPriceSimulation" [disabled]="mode=='view'">
+										<span class="input-group-addon" id="addon1">%</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.priceSimulationWithoutTax' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost&&costOverPriceSimulation"> {{(product.compositionCost + product.packagingCost)/(costOverPriceSimulation/100) | currency:'EUR':'symbol':'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost&&costOverPriceSimulation)">---</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.priceSimulationWithTax' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost&&costOverPriceSimulation"> {{(product.compositionCost + product.packagingCost)/(costOverPriceSimulation/100)*(1+salesTax/100) | currency:'EUR':'symbol':'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost&&costOverPriceSimulation)">---</span>
+									</div>
+								</div>
+							</div>
+						</tab>
+						<tab heading="{{'recipes.product.pricing.priceSimulationWithTax' | translate}}">
+							<div class="row" style="margin-top:15px">
+								<!-- <h4 style="margin-left: 12px; color: #a0a127">{{'recipes.product.pricing.priceSimulationWithTax' | translate}}</h4> -->
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.totalCost' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost"> {{product.compositionCost + product.packagingCost | currency:'EUR':'symbol':'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost)">---</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.costOverPricePercentage' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost&&priceSimulationWithTax&&salesTax"> {{(product.compositionCost + product.packagingCost)/(priceSimulationWithTax / (1+salesTax/100)) | percent:'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost&&priceSimulationWithTax&&salesTax)">---</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.pricing.priceSimulationWithoutTax' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="product.compositionCost&&product.packagingCost&&priceSimulationWithTax&&salesTax"> {{priceSimulationWithTax / (1+salesTax/100) | currency:'EUR':'symbol':'1.2-2'}}</span><span class="form-control disabled" *ngIf="!(product.compositionCost&&product.packagingCost&&priceSimulationWithTax&&salesTax)">---</span>
+									</div>
+								</div>
+								<div class="col-lg-2 col-md-3 col-sm-6 col-xs-12">
+									<label class="control-label">{{'recipes.product.pricing.priceSimulationWithTax' | translate}}:</label>
+									<div class="input-group">
+										<input id="priceSimulationWithTax" type="number" step="any" min="0" class="form-control" [(ngModel)]="priceSimulationWithTax" name="priceSimulationWithTax" [disabled]="mode=='view'">
+										<span class="input-group-addon" id="addon1">€</span>
+									</div>
+								</div>
+							</div>
+						</tab>
+					</tabset>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.product.pricing.titleRefPrices' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="product" class="row">			
+		<div class="col-md-6">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<div class="row">
+						<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+							<div class="form-group">
+								<label class="control-label">{{'recipes.product.pricing.refPrice' | translate}}:</label>
+								<div class="input-group">
+									<input id="refPrice" type="number" step="any" min="0" class="form-control" [(ngModel)]="product.refPrice" name="refPrice" [disabled]="mode=='view'">
+									<span class="input-group-addon" id="addon2">€</span>
+								</div>
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-6 col-sm-6 col-xs-12">
+							<div class="form-group">
+								<label class="control-label">{{'recipes.product.pricing.maxCostOverPricePercentage' | translate}}:</label>
+								<div class="input-group">
+									<input id="maxCostOverPricePercentage" type="number" step="any" min="0" class="form-control" [(ngModel)]="product.maxCostOverPricePercentage" name="maxCostOverPricePercentage" [disabled]="mode=='view'">
+									<span class="input-group-addon" id="addon2">%</span>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<search-box (onSearchEntered)="searchProducts($event)" [label]="searchBoxLabel"></search-box>
+		</div>
+		<div class="col-md-6">
+			<a href="javascript:;" (click)="addClick(); pricingRateModal.show()" class="btn default pull-right gold" [class.hide-view-mode]="mode=='view'"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>
+		</div>
+	</div>
+	<div class="table-scrollable">
+		<table id="product-pricing-table" class="table table-hover">
+			<thead>
+				<tr>
+					<th> {{'recipes.product.pricing.tableHead.pricingRate' | translate}} </th>
+					<th> {{'recipes.product.pricing.tableHead.price' | translate}} </th>
+					<th> {{'recipes.product.pricing.tableHead.totalCost' | translate}} </th>
+					<th> {{'recipes.product.pricing.tableHead.margin' | translate}}</th>					
+					<th> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let pricingRate of product.pricing; let i = index;">
+					<td (click)="status='view'; selectPricingRateToEdit(pricingRate, i); pricingRateModal.show()" class="pointer">
+					{{pricingRate.name}}</td>					
+					<td (click)="status='view'; selectPricingRateToEdit(pricingRate, i); pricingRateModal.show()" class="pointer">
+						<span *ngIf="pricingRate.price"> {{pricingRate.price | currency:'EUR':'symbol':'1.2-2'}} </span>
+						<span *ngIf="!pricingRate.price"> --- </span>
+					</td>
+					<td>{{product.compositionCost + product.packagingCost | currency:'EUR':'symbol':'1.2-2'}} </td> 
+					<td *ngIf="pricingRate.price!=0" (click)="status='view'; selectPricingRateToEdit(pricingRate, i); pricingRateModal.show()" class="pointer">
+					{{((product.compositionCost + product.packagingCost)/pricingRate.price)*100 | number:'1.2-2'}} %</td>
+					<td *ngIf="pricingRate.price==0" (click)="status='view'; selectPricingRateToEdit(pricingRate, i); pricingRateModal.show()" class="pointer">
+					---</td>
+					<td>
+		              <a href="javascript:;" (click)="status='edit'; selectPricingRateToEdit(pricingRate, i); pricingRateModal.show()"
+		                 class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="mode=='view'">
+								  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+					  <a href="javascript:;" (click)="selectPricingRateToEdit(pricingRate, i); deletePricingRate(i)"
+					  class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="mode=='view'">
+					  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+					</td>
+				</tr>
+	  		</tbody>
+		</table>
+	</div>
+</div>
+
+<!--MODALS-->
+
+<!--add -->
+<div bsModal #pricingRateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="pricingRateModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 *ngIf="status=='new'" class="modal-title">{{'recipes.product.pricing.new' | translate}}</h4>
+				<h4 *ngIf="status=='edit'" class="modal-title">{{'recipes.product.pricing.edit' | translate}}</h4>
+				<h4 *ngIf="status=='view'" class="modal-title">{{'recipes.product.pricing.view' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="savePricingRate()" class="form-horizontal" #pricingRateForm="ngForm">
+					<div class="row">
+						<div class="col-md-7">
+							<div class="form-body">
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.pricing.tableHead.pricingRate' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<input type="text" class="form-control" [(ngModel)]="pricingRate.name" name="name" placeholder="" required [disabled]="status=='view'">
+									</div>
+								</div>								
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.pricing.tableHead.price' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<div class="input-group">
+											<input type="number" class="form-control" [(ngModel)]="pricingRate.price" name="price" placeholder="" step="any" min="0" required [disabled]="status=='view'">
+											<span class="input-group-addon" id="addon1">€</span>
+										</div>
+									</div>
+								</div>								
+							</div>
+							<div class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button type="submit" (click)="pricingRateModal.hide()" class="btn green"
+										[disabled]="!pricingRateForm.form.valid || status =='view'">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button type="button" (click)="cleanAndResetFields(); pricingRateModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

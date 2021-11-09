@@ -1,0 +1,68 @@
+<div class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
+  <app-header></app-header>
+  <div class="clearfix"></div>
+  <div class="page-container">
+    <menu style="padding:0px; margin: 0px" (showSideBarMenu)="showSideBarMenu($event)"></menu>
+    <div class="page-content-wrapper">
+      <!-- BEGIN CONTENT BODY -->
+      <div class="page-content marginTransition" [ngClass]="{'hideSideMenu': !showSideMenu}">
+        <!-- BEGIN PAGE HEADER-->
+        <h1 class="page-title"> {{'library.heading' | translate}} </h1>
+
+        <!-- END PAGE HEADER-->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="portlet box black">       
+              <div class="portlet-body cd-portlet-body">
+                <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-pills cd-navs cd-nav-pills">                  
+                    <li routerLinkActive="active">
+                      <a href="#family" routerLink="family">{{'library.tabs.family' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#measurement-units" routerLink="measurement-unit">{{'library.tabs.measUnit' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#process" routerLink="process">{{'library.tabs.process' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#packaging" routerLink="packformat">{{'library.tabs.packformat' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#utensil" routerLink="utensil">{{'library.tabs.utensil' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#checkpoints" routerLink="checkpoint">{{'library.tabs.checkpoint' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#allergens" routerLink="allergen">{{'library.tabs.allergen' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#kitchen" routerLink="kitchen">{{'library.tabs.spaces' | translate}}</a>
+                    </li>
+                    <!-- <li routerLinkActive="active">
+                      <a href="#workRoom" routerLink="workRoom">{{'library.tabs.workRoom' | translate}}</a>
+                    </li>     -->                 
+                    <!-- <li routerLinkActive="active">
+                      <a href="#mealElement" routerLink="mealElement">{{'library.tabs.mealElement' | translate}}</a>
+                    </li>
+                    <li routerLinkActive="active">
+                      <a href="#nutitrionalCompnent" routerLink="nutitrionalCompnent">{{'library.tabs.nutritionalComponent' |
+                        translate}}</a>
+                    </li> -->                                  
+                  </ul>
+                  <div class="tab-content cd-tab-content">                    
+                    <router-outlet></router-outlet>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END SAMPLE TABLE PORTLET-->
+      </div>
+      <!-- END CONTENT BODY -->
+    </div>
+  </div>
+  <footer></footer>
+</div>

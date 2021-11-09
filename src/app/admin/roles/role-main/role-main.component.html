@@ -1,0 +1,153 @@
+<div heading="Role">	
+	<div class="row">
+		<div class="col-md-9">
+			<div class="portlet-body form">
+				<form (ngSubmit)="saveRole()" class="horizontal-form cd-form"  #roleMainForm="ngForm" *ngIf="role">
+					<div class="form-body">
+						<div class="row">
+							<div class="col-md-12">
+								<h3 *ngIf="mode=='edit'" class="tab-box-title" style="margin-bottom: 20px;">{{'admin.role.editRole' | translate}}</h3>
+								<h3 *ngIf="mode=='view'" class="tab-box-title">{{'admin.role.viewRole' | translate}}</h3>
+								<h3 *ngIf="mode=='new'" class="tab-box-title" style="margin-bottom: 20px;">{{'admin.role.new' | translate}}</h3>
+								<h6 *ngIf="account&&user&&mode!='new'">{{'admin.role.latestUpdate' | translate}}&nbsp;{{user.updatedAt | date: 'medium'}}&nbsp;{{'admin.role.by' | translate}}&nbsp;{{account.name}} </h6>
+								<button *ngIf="mode=='view'" type="button" (click)="editRole()" style="margin-bottom: 20px;" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+							</div>
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-6">
+										<div class="form-group">
+											<label for="name" class="control-label">{{'admin.role.name' | translate}} <span class="required"> * </span></label>
+											<input for="name" class="form-control"  [(ngModel)]="role.name" name="name" [disabled]="mode=='view'" pInputText required="">
+										</div>
+									</div>
+								</div> 
+							</div>
+							<div class="col-md-12">
+								<hr>
+								<div class="form-group">
+									<label for="name" class="control-label">{{'admin.role.appPermissions' | translate}}</label>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div *ngFor="let entity of role.entities; let index=i;">
+									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-6" *ngIf="entity.type=='application'" >
+										<!-- Application entites -->
+										<div class="panel panel-default">
+										  <div class="panel-heading">
+										    <h3 class="panel-title">{{entity.name | uppercase}}</h3>
+										  </div>
+										  <div class="panel-body">
+										    <span *ngIf="entity.permissions&&mode!='view'">
+										    	<ul class="list-group">
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.read' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.read" class="pull-right pointer" (click)="entity.permissions.read=!entity.permissions.read"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.read" class="pull-right pointer" (click)="entity.permissions.read=!entity.permissions.read"><i class="fa fa-times red" aria-hidden="true"></i></span>										    			
+											    	</li>
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.edit' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.edit" class="pull-right pointer" (click)="entity.permissions.edit=!entity.permissions.edit"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.edit" class="pull-right pointer" (click)="entity.permissions.edit=!entity.permissions.edit"><i class="fa fa-times red" aria-hidden="true"></i></span>											    	
+											    	</li>
+											    	<li class="list-group-item">
+												    	<label> {{'admin.role.permission.delete' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.delete" class="pull-right pointer" (click)="entity.permissions.delete=!entity.permissions.delete"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.delete" class="pull-right pointer" (click)="entity.permissions.delete=!entity.permissions.delete"><i class="fa fa-times red" aria-hidden="true"></i></span>												    
+											    	</li>
+											    </ul>
+										    </span>
+										    <span *ngIf="entity.permissions&&mode=='view'">
+										    	<ul class="list-group">
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.read' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.read" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.read" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>										    			
+											    	</li>
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.edit' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.edit" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.edit" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>											    	
+											    	</li>
+											    	<li class="list-group-item">
+												    	<label> {{'admin.role.permission.delete' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.delete" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.delete" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>												    
+											    	</li>
+											    </ul>
+										    </span>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12">
+								<hr>
+								<div class="form-group">
+									<label for="name" class="control-label">{{'admin.role.systemPermissions' | translate}} - <span class="required"> {{'admin.role.warning' | translate}} </span></label> 
+								</div>
+							</div>
+							<div class="col-md-12">
+								<div *ngFor="let entity of role.entities">
+									<div class="col-lg-3 col-md-4 col-sm-6 col-xs-6" *ngIf="entity.type=='system'" >
+										<!-- Application entites -->
+										<div class="panel panel-default">
+										  <div class="panel-heading">
+										    <h3 class="panel-title">{{entity.name | uppercase}}</h3>
+										  </div>
+										  <div class="panel-body">
+										    <span *ngIf="entity.permissions&&mode!='view'">
+										    	<ul class="list-group">
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.read' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.read" class="pull-right pointer" (click)="entity.permissions.read=!entity.permissions.read"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.read" class="pull-right pointer" (click)="entity.permissions.read=!entity.permissions.read"><i class="fa fa-times red" aria-hidden="true"></i></span>										    			
+											    	</li>
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.edit' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.edit" class="pull-right pointer" (click)="entity.permissions.edit=!entity.permissions.edit"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.edit" class="pull-right pointer" (click)="entity.permissions.edit=!entity.permissions.edit"><i class="fa fa-times red" aria-hidden="true"></i></span>											    	
+											    	</li>
+											    	<li class="list-group-item">
+												    	<label> {{'admin.role.permission.delete' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.delete" class="pull-right pointer" (click)="entity.permissions.delete=!entity.permissions.delete"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.delete" class="pull-right pointer" (click)="entity.permissions.delete=!entity.permissions.delete"><i class="fa fa-times red" aria-hidden="true"></i></span>												    
+											    	</li>
+											    </ul>
+										    </span>
+										    <span *ngIf="entity.permissions&&mode=='view'">
+										    	<ul class="list-group">
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.read' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.read" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.read" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>										    			
+											    	</li>
+											    	<li class="list-group-item">
+											    		<label> {{'admin.role.permission.edit' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.edit" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.edit" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>											    	
+											    	</li>
+											    	<li class="list-group-item">
+												    	<label> {{'admin.role.permission.delete' | translate | uppercase}} </label>
+											    		<span *ngIf="entity.permissions.delete" class="pull-right"><i class="fa fa-check green" aria-hidden="true"></i> </span>
+											    		<span *ngIf="!entity.permissions.delete" class="pull-right"><i class="fa fa-times red" aria-hidden="true"></i></span>												    
+											    	</li>
+											    </ul>
+										    </span>											
+										  </div>
+										</div>
+									</div>
+								</div>
+							</div>						
+						</div>
+					</div>
+					<div class="form-actions right">
+							<button *ngIf="mode!='view'" type="submit" [disabled]="!role.name" class="btn green">{{'buttonGeneric.save' | translate}}
+							</button>
+							<button type="button" routerLink="/admin/role" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>

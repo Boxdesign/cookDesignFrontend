@@ -1,0 +1,26 @@
+.releaseTag {
+	display:  inline-block;
+	margin-left: 45px;
+	margin-top: 38px;
+	font-size: 0.8em;
+	color: #333333;
+	cursor: pointer
+}
+
+.releaseTag:hover {
+    text-decoration: underline;
+}
+
+.box {
+  border: 1px solid #a1a204;
+  background-color: #fff;
+  height: 400px;
+  max-height: 400px;
+  padding: 20px;
+  overflow: auto;
+}
+
+li {
+	margin-bottom: 10px;
+}
+

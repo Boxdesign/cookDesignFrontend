@@ -1,0 +1,68 @@
+<div heading="Production">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.dish.production.title' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="dish" class="row">
+		<div class="col-md-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">								
+										<label for="netWeight" class="control-label">{{'recipes.dish.production.netWeightProductionDish' | translate}}:</label>
+										<div class="input-group">
+											<input id="netWeight" type="number" step="0.001" min="0" class="form-control" [(ngModel)]="dish.simulationNetWeight" name="simulationNetWeight" [disabled]="mode=='view'">
+											<span class="input-group-addon" id="addon1">{{'recipes.dish.composition.numServingsAbbrev' | translate}}</span>
+										</div>	
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">								
+										<label class="control-label">{{'recipes.dish.composition.weightPerServing' | translate}}:</label>
+										<div class="input-group">
+											<input *ngIf="dish.weightPerServing" id="weightPerServing" type="number" step="any" min="0" class="form-control" [(ngModel)]="dish.weightPerServing" name="weightPerServing" readonly>
+											<input *ngIf="!dish.weightPerServing"  type="number" step="any" min="0" class="form-control" value="0" readonly>
+											<span *ngIf="dish.measurementUnit" class="input-group-addon" id="addon1">{{dish.measurementUnit.lang[0]?.shortName}}</span>
+											<span *ngIf="!dish.measurementUnit" class="input-group-addon" id="addon2">-</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="table-scrollable">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th> {{'recipes.dish.composition.tableHead.element' | translate}} </th>
+					<th> {{'recipes.dish.composition.tableHead.grossWeight' | translate}}</th>
+					<th> {{'recipes.dish.composition.tableHead.wastePercentage' | translate}}</th>
+					<th> {{'recipes.dish.composition.tableHead.netWeight' | translate}}</th>
+					<th> {{'recipes.dish.production.tableHead.oneGrossValue' | translate}}</th>
+					<th> {{'recipes.dish.production.simulationValue' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let composition of dish.composition; let i = index;">
+				<tr>
+					<td> {{composition.name}}</td>
+					<td> {{composition.grossWeight | number:'1.3-3'}} {{composition.measuringUnitShortName}} </td>
+					<td> {{composition.wastePercentage | number:'1.2-2'}}</td>
+					<td> {{composition.grossWeight*(1-(composition.wastePercentage/100)) | number:'1.3-3'}} {{composition.measuringUnitShortName}} </td>
+					<td><span *ngIf="dish"> {{(composition.grossWeight/dish.numServings) | number:'1.3-3'}} {{composition.measuringUnitShortName}}</span><span *ngIf="!dish">---</span></td>
+					<td>
+						<span *ngIf="dish.simulationNetWeight"> {{((composition.grossWeight/dish.numServings) * dish.simulationNetWeight) | number:'1.3-3'}} {{composition.measuringUnitShortName}}</span>
+						<span *ngIf="!dish.simulationNetWeight">---</span>
+					</td>
+				</tr>
+	  	</tbody>
+		</table>
+	</div>
+</div>

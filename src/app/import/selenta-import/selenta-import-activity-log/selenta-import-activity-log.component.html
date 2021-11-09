@@ -1,0 +1,42 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportActivityLog">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'selenta-import.activityLog' | translate}}</h2>
+    </div>
+  </div>
+	<div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="filterSelentaArticles($event)" [inputText]="selentaArticlesFilterText" [label]="searchBoxLabel"></search-box>
+      <div style="margin-bottom: 12px"></div>
+    </div>
+  </div>  
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+      	<div *ngIf="updatedArticles.length">
+	        <p *ngFor="let updatedArticle of updatedArticles">
+	          <a href="javascript:;" (click)="goToArticle(updatedArticle)">{{ updatedArticle.article.MATNR }}</a> &nbsp;-&nbsp; 
+	          {{ updatedArticle.article.updatedDate | date:'medium'}} &nbsp;-&nbsp; 
+	          <b style="color:#555;"> {{ updatedArticle.article.MAKTX }} </b> &nbsp;-&nbsp; 
+	          <a href="javascript:;" (click)="navigateTo(updatedArticle.article.cookDesignId);">id: {{updatedArticle.article.cookDesignId}} </a> &nbsp;-&nbsp; 
+	          <b style="color:#00008B;">{{updatedArticle.issue.description}}</b>&nbsp;
+	          <span *ngIf="updatedArticle.article.costWarning" class="warning"><i class="fa fa-exclamation"></i></span>
+	        </p>
+	      </div>
+      	<div *ngIf="!updatedArticles.length">
+      		{{'selenta-import.noResults' | translate}}
+      	</div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>

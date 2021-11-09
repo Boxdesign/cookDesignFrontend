@@ -1,0 +1,101 @@
+<label for="image" class="control-label">{{'articles.ingredients.form.image' | translate}}</label>
+<div (click)="fileInput.click()" style="display: inline-block; padding-left: 5px;" class="img-buttons" > 
+  <i *ngIf="(imageBase64 || gallery) && mode!='view'" class="fa fa-pencil" aria-hidden="true"></i> 
+  <i *ngIf="(!imageBase64 && !gallery && mode!='view')" class="fa fa-plus" aria-hidden="true"></i>                      
+</div>
+  <!-- <i class="fa fa-plus" style="color: red" (click)="imageCropper()" > </i> -->                      
+  <!-- <i class="fa fa-crop img-buttons" style="color: red" (click)="cropImage.show();" > </i>  -->                     
+<span style="visibility: hidden; position: absolute; overflow: hidden; width: 0px; height:0px;border:none;margin:0; padding:0">                      
+  <input #fileInput class="btn btn-default"  id="image" accept="image/png, image/jpeg, image/gif" type='file' (change)="readURL($event)"  [disabled]="mode == 'view'"/>
+</span>
+  <div *ngIf="(imageBase64 || gallery) && mode!='view'" class="img-buttons" style="display: inline-block;" (click)="confirmDeleteModal.show()"> 
+    <i class="fa fa-trash" aria-hidden="true"></i> 
+  </div> 
+                                       
+<div class="image-zone">
+  <div *ngIf="preview" style="max-width: 100%">
+    <img [src]="preview" alt="" class="col-xs-12" style="margin-bottom: 20px; padding-left: 0px;">
+    <!-- <angular-cropper class="col-xs-12" style="margin-bottom: 20px; padding-left: 0px;" #angularCropper [cropperOptions]="cropperOptions" [imageUrl]="imageBase64"></angular-cropper>                       -->
+  </div>
+  <div *ngIf="!preview && gallery">
+    <img [src]="gallery.sizes[1].url" alt="" class="col-xs-12" style="margin-bottom: 20px; padding-left: 0px;">
+  </div>
+  <div *ngIf="!preview && !gallery">
+    <img src="../../../../../assets/img/img_placeholder_food.png" alt="" class="col-xs-12" style="margin-bottom: 20px; padding-left: 0px;">
+  </div>
+</div>
+
+
+<div bsModal #cropImage="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cropImage.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Editar imagen</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="imageCropper()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                <div *ngIf="imageBase64">
+                  <div class="angular-cropper-wrapper">
+                  	<div class="cropper">
+                    	<img #image [src]="imageBase64" (load)="imageLoaded($event)" alt="" class="cropper-hidden">
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="imageCropper()" class="btn green">{{'buttonGeneric.accept' | translate}}
+                    </button>
+                    <button type="button" (click)="imageCancel();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

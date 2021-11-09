@@ -1,0 +1,450 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportNewFamilies">
+  <div class="row">
+    <div class="col-md-6">
+
+    <!-- SELENTA NEW Families -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.newSapFamilies' | translate}}</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="filterSelentaFamilies($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <!-- <div class="col-md-6">
+          <a href="javascript:;" routerLink="../selenta-import-families" class="btn default pull-right gold">{{'selenta-import.tabs.families' | translate}}</a>
+        </div> -->
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="selentaFamiliesSortField" [(sortOrder)]="selentaFamiliesSortOrder" [label]="'selenta-import.family.tableHead.name'" [value]="'DESCRIPCIO'" (onChange)="getSelentaSapNewFamilies()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaFamiliesSortField" [(sortOrder)]="selentaFamiliesSortOrder" [label]="'selenta-import.family.tableHead.SAPCode'" [value]="'GRUP_ARTICLES'" (onChange)="getSelentaSapNewFamilies()" ></column-sorter>
+            </th>
+            <th>
+            	<column-sorter [(sortField)]="selentaFamiliesSortField" [(sortOrder)]="selentaFamiliesSortOrder" [label]="'selenta-import.family.tableHead.type'" [value]="'type'" (onChange)="getSelentaSapNewFamilies()" ></column-sorter>
+            </th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let selentaFamily of selentaNewFamilies; let in=index" >
+            <tr [class.selected]="(selentaFamily?._id === selentaFamilySelected?._id)">
+              <td height="70" width="10%" (click)="selectSelentaFamily(selentaFamily)" class="pointer">
+                <div style="display: block; text-align:center">
+                  {{(selentaFamiliesCurrentPage-1)*selentaFamiliesPerPage + in + 1}}
+                </div>
+              </td>
+              <td height="70" width="40%" (click)="selectSelentaFamily(selentaFamily)" class="pointer">
+                {{selentaFamily.family.DESCRIPCIO}}
+              </td>
+              <td height="70" (click)="selectSelentaFamily(selentaFamily)" class="pointer">
+                {{selentaFamily.family.GRUP_ARTICLES}}
+              </td>
+              <td width="15%" (click)="selectSelentaFamily(family)" class="pointer">
+              		<span *ngIf="selentaFamily.family.type == 'subfamily'">{{'selenta-import.family.subfamily' | translate | uppercase}}</span>
+              		<span *ngIf="selentaFamily.family.type == 'family'">{{'selenta-import.family.family' | translate | uppercase }}</span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateSelentaFamiliesPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="selentaFamiliesPerPage" [currentPage]="selentaFamiliesCurrentPage" [totalItems]="selentaTotalFamilies"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="selentaFamiliesPerPage && selentaFamiliesCurrentPage && selentaTotalFamilies" class="cd-pagination" [totalItems]="selentaTotalFamilies" [(ngModel)]="selentaFamiliesCurrentPage" [itemsPerPage]="selentaFamiliesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="selentaPageHasChanged($event)" (numPages)="selentaFamiliesNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+
+      <!--cookDesign Families TABLE -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.unlinkedFamilies' | translate}}</h2>
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="searchCookDesignFamilies($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <!-- <div class="col-md-6">
+          <a href="javascript:;" (click)="addFamily()" class="btn default pull-right gold"> <i class="fa fa-plus"></i> {{'library.family.family.addFamily' | translate}}
+          </a>
+        </div> -->
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="familiesSortField" [(sortOrder)]="familiesSortOrder" [label]="'selenta-import.family.tableHead.name'" [value]="'lang.name'" (onChange)="getSelentaCookDesignFamilies()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="familiesSortField" [(sortOrder)]="familiesSortOrder" [label]="'selenta-import.family.tableHead.externalCode'" [value]="'externalCode'" (onChange)="getSelentaCookDesignFamilies()" ></column-sorter>
+            </th>
+            <th>
+            	<column-sorter [(sortField)]="familiesSortField" [(sortOrder)]="familiesSortOrder" [label]="'selenta-import.family.tableHead.type'" [value]="'type'" (onChange)="getSelentaCookDesignFamilies()" ></column-sorter>
+            </th>
+            <th> {{'buttonGeneric.actions' | translate}}</th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let family of selentaCookDesignFamilies;let i=index">
+            <tr>
+              <td height="70" width="5%" (click)="viewFamily(family.family.familyId._id)" class="pointer">
+                <div style="display: block; text-align:center;">
+                  {{(cookDesignFamiliesCurrentPage-1)*cookDesignFamiliesPerPage + i + 1}}
+                </div>
+              </td>
+              <td height="70" *ngIf="family.family.type == 'family'" (click)="selectFamilyToEdit(family); editFamilyModal.show(); status = 'view'" class="pointer">
+                {{family.family.familyId.lang[0]?.name | uppercase }}
+              </td>
+              <td height="70" *ngIf="family.family.type == 'subfamily'" (click)="selectFamilyToEdit(family); editFamilyModal.show(); status = 'view'" class="pointer">
+                {{family.family.subfamily[0].lang[0]?.name | uppercase }}
+              </td>
+              <td height="70" width="10%" *ngIf="family.family.type == 'family'" (click)="selectFamilyToEdit(family); editFamilyModal.show(); status = 'view'" class="pointer">
+                {{family.family.externalCode}}
+              </td>
+              <td height="70" width="10%" *ngIf="family.family.type == 'subfamily'" (click)="selectFamilyToEdit(family); editFamilyModal.show(); status = 'view'" class="pointer">
+                {{family.family.subfamily[0].externalCode}}
+              </td>
+              <td width="10%" (click)="selectFamilyToEdit(family); editFamilyModal.show()" class="pointer">
+              		<span *ngIf="family.family.type == 'subfamily'">{{'selenta-import.family.subfamily' | translate | uppercase}}</span>
+              		<span *ngIf="family.family.type == 'family'">{{'selenta-import.family.family' | translate | uppercase }}</span>
+              </td>
+              <td height="70" width="280">
+                <a href="javascript:;" (click)="status = 'edit'; selectFamilyToEdit(family); editFamilyModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+                <a href="javascript:;" (click)="selectFamilyToEdit(family); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+                <a href="javascript:;" (click)="selectFamilyToEdit(family); linkFamilyModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'selenta-import.link' | translate}} </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="cookDesignFamiliesPerPage" [currentPage]="cookDesignFamiliesCurrentPage" [totalItems]="cookDesignTotalFamilies"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="cookDesignFamiliesPerPage && cookDesignFamiliesCurrentPage && cookDesignTotalFamilies" class="cd-pagination" [totalItems]="cookDesignTotalFamilies" [(ngModel)]="cookDesignFamiliesCurrentPage" [itemsPerPage]="cookDesignFamiliesPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="cookDesignFamiliesNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--MODALS-->
+
+<!--location filter -->
+<!-- <div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'Family.Family.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'Family.Family.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div> -->
+
+<!--location view -->
+<!-- <div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'Family.Family.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="Family">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'Family.Family.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="Family.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->
+
+
+<!--confirm delete MODAL -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'selenta-import.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteFamily()" class="form-horizontal" #deleteFamilyForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body" *ngIf="family&&family.family.type=='family'">
+                  <p>{{'selenta-import.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{family.family.familyId.lang[0]?.name | uppercase}}</p>
+                  <br>
+                  <p>{{ family.family.externalCode}}</p>
+                  <br>
+              </div>
+              <div class="form-body" *ngIf="family&&family.family.type=='subfamily'">
+                  <p>{{'selenta-import.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{family.family.subfamily[0].lang[0]?.name | uppercase}}</p>
+                  <br>
+                  <p>{{ family.family.subfamily[0].externalCode}}</p>
+                  <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--LINK Family MODAL -->
+<div bsModal #linkFamilyModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" style="width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="linkFamilyModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'selenta-import.linkFamilies' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="linkFamilies()" class="form-horizontal" #linkFamilyForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                <b *ngIf="selentaFamilySelected">{{'selenta-import.linkFamiliesMessage' | translate}}</b>
+                <b *ngIf="!selentaFamilySelected" style="color: red;">{{ 'selenta-import.linkFamiliesError' | translate }}</b>
+
+                <div class="row" *ngIf="selentaFamilySelected">
+                  <div class="col-md-6" *ngIf="selentaFamilySelected && selentaFamilySelected.family.type=='family'">
+                    <h4 class="tab-box-title">{{'selenta-import.newSapFamily' | translate}}</h4>
+                    <div class="col-md-4" style="padding: 0px; color: #666;">
+                      {{'selenta-import.DESCRIPCIO' | translate}}:<br>
+                      {{'selenta-import.GRUP_ARTICLES' | translate}}:<br>
+                    </div>
+                    <div class="col-md-8" style="padding: 0px;"> 
+                      {{ selentaFamilySelected?.family.DESCRIPCIO }}<br>
+                      {{ selentaFamilySelected?.family.GRUP_ARTICLES }}<br>
+                    </div>
+                  </div>
+                  <div class="col-md-6" *ngIf="selentaFamilySelected && selentaFamilySelected.family.type == 'subfamily'">
+                    <h4 class="tab-box-title">{{'selenta-import.newSapSubfamily' | translate}}</h4>
+                    <div class="col-md-4" style="padding: 0px; color: #666;">
+                      {{'selenta-import.SubDESCRIPCIO' | translate}}:<br>
+                      {{'selenta-import.GRUP_ARTICLES' | translate}}:<br>
+                    </div>
+                    <div class="col-md-8" style="padding: 0px;"> 
+                      {{ selentaFamilySelected?.family.DESCRIPCIO }}<br>
+                      {{ selentaFamilySelected?.family.GRUP_ARTICLES }}<br>
+                    </div>
+                  </div>
+                  <div class="col-md-6" *ngIf="family && family.family.type=='family'">
+                    <h4 class="tab-box-title">{{'selenta-import.unlinkedFamily' | translate}}</h4>
+                    <div class="col-md-4" style="padding: 0px; color: #666;">
+                      {{'selenta-import.family.family' | translate}}:<br>
+                      {{'selenta-import.externalCode' | translate}}:<br>
+                    </div>
+                    <div class="col-md-8" style="padding: 0px;"> 
+                      {{ family?.family.familyId.lang[0]?.name}}<br>
+                      {{ family?.family.externalCode}}<br>
+                    </div>
+                  </div>
+                  <div class="col-md-6" *ngIf="family && family.family.type=='subfamily'">
+                    <h4 class="tab-box-title">{{'selenta-import.unlinkedSubfamily' | translate}}</h4>
+                    <div class="col-md-4" style="padding: 0px; color: #666;">
+                    	{{'selenta-import.family.family' | translate}}:<br>
+                      {{'selenta-import.family.subfamily' | translate}}:<br>
+                      {{'selenta-import.externalCode' | translate}}:<br>
+                    </div>
+                    <div class="col-md-8" style="padding: 0px;">
+                    	{{ family?.family.familyId.lang[0]?.name}}<br>
+                      {{ family?.family.subfamily[0].lang[0]?.name}}<br>
+                      {{ family?.family.subfamily[0].externalCode}}<br>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-7 col-md-5">
+                    <button type="submit" (click)="linkFamilyModal.hide();" class="btn green" [disabled]="!selentaFamilySelected">{{'selenta-import.link' | translate}}
+                    </button>
+                    <button type="button" (click)="linkFamilyModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--edit Family -->
+
+<div bsModal #editFamilyModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="editFamilyModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.family.edit' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <lang-tab *ngIf="family && family.family.type=='family'" (langsObj)="familiesLangObjRefreshed($event)" [fieldsObj]="familyTmp"
+                  [forceRefresh]="forceFamilyRefreshForEdit"> </lang-tab>
+        <lang-tab *ngIf="family && family.family.type=='subfamily'" (langsObj)="subFamiliesLangObjRefreshed($event)" [fieldsObj]="subfamilyTmp" 
+        					[forceRefresh]="forceSubFamilyRefreshForEdit"> </lang-tab>
+        <form (ngSubmit)="editFamilyOrSubfamily()" class="form-horizontal" #editFamilyForm="ngForm">
+          <div class="form-body" *ngIf="family">
+	          <div class="form-group">
+	            <label class="col-md-3 control-label">{{'library.family.tableHead.referenceNumber' | translate}}</label>
+	            <div class="col-md-4">
+	              <input *ngIf="family" type="text" class="form-control" [(ngModel)]="family.family.familyId.referenceNumber" name="referenceNumber"
+	                     placeholder="" disabled>
+	            </div>
+	          </div>
+	          <div class="form-group">
+	            <label class="col-md-3 control-label">{{'library.family.tableHead.externalCode' | translate}}</label>
+	            <div class="col-md-4">
+	              <input *ngIf="family" type="text" class="form-control" [(ngModel)]="family.family.familyId.externalCode" name="externalCode"
+	                     placeholder="" [disabled]="status=='view' || family.family.type=='subfamily'">
+	            </div>
+	          </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.name' | translate}}</label>
+              <div class="col-md-4" *ngIf="family.family.type=='family'">
+                <input type="text" class="form-control" [(ngModel)]="familyTmp.name" name="name"
+                       placeholder="" required [disabled]="status=='view' || family.family.type=='subfamily'">
+              </div>
+              <div class="col-md-4" *ngIf="family.family.type=='subfamily'">
+                <input type="text" class="form-control" [(ngModel)]="family.family.familyId.lang[0].name" name="name"
+                       placeholder="" required [disabled]="status=='view' || family.family.type=='subfamily'">
+              </div>
+            </div>
+            <div class="form-group" *ngIf="family.family.type == 'subfamily'">
+              <label class="col-md-3 control-label">{{'library.family.tableHead.nameSub' | translate}}</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="subfamilyTmp.name" name="subfamilyName"
+                       placeholder="" required [disabled]="status=='view'">
+              </div>
+            </div>
+            <div class="form-group" *ngIf="family.family.type == 'subfamily'">
+              <label class="col-md-3 control-label">{{'library.family.tableHead.externalCodeSub' | translate}}</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="family.family.subfamily[0].externalCode" name="subfamilyExternalCode"
+                       placeholder="" required [disabled]="status=='view'">
+              </div>
+            </div>
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="editFamilyModal.hide()" class="btn green"
+                        [disabled]="!editFamilyForm.form.valid || status == 'view'">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="editFamilyModal.hide()" class="btn default">{{'buttonGeneric.cancel'
+                  |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

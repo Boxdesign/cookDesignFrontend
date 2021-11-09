@@ -1,0 +1,7 @@
+<div class="tabbable-line" style="margin-bottom: 20px;">
+	<ul class="nav nav-tabs" *ngIf="languages" >
+	  <li *ngFor="let lang of languages" (click)="languageSelected(lang)" [class.active]="currentLangCode == lang.langCode">
+	    <a id="{{lang.langCode}}"> {{'language.'+ lang.langCode | translate}} </a>
+	  </li>
+	</ul>
+</div>

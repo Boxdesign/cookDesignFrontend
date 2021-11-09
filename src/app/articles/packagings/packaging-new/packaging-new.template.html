@@ -1,0 +1,172 @@
+
+<!--New Packaging Form-->
+<!-- <div class="row">
+    <div class="col-md-9">
+      <div class="portlet light">
+          <div class="portlet-body">
+            <div class="row">
+              <div class="col-md-12">
+                <div class="portlet light">
+                  <div id="packaging-title" class="portlet-title">
+                    <div class="caption">
+                        <h2 class="tab-box-title">{{'articles.packagings.form.new' | translate}}</h2>
+                    </div>
+                  </div>
+                  <div class="portlet-body form"> -->
+      <div class="row">
+        <div class="col-md-9">
+          <div class="portlet light">
+              <div class="portlet-body">
+                <h2 class="tab-box-title">{{'articles.packagings.form.new' | translate}}</h2>
+                  <div class="portlet-body form">
+                    <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="packagingLang"
+                              [forceRefresh]="forceRefresh"></lang-tab>
+                    <form (ngSubmit)="uploadImage()" class="horizontal-form cd-form"  #addPackagingForm="ngForm">
+                      <div class="form-body">
+                        <div class="row">
+                          <div class="col-md-6">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label for="name" class="control-label">{{'articles.packagings.form.name' | translate}} <span class="required"> * </span></label>
+                                  <input id="name" for="name" class="form-control"  [(ngModel)]="packagingLang.name" name="name">
+
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="active" class="control-label">{{'articles.packagings.form.active' | translate}} <span class="required"> * </span></label>
+                                  <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required>
+                                    <option value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                                    <option value="no">{{'buttonGeneric.no' | translate}}</option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="measUnit" class="control-label cd-control-label">{{'articles.packagings.form.measUnit' | translate}} <span class="required"> * </span></label>
+                                  <select id="measUnit" class="form-control" (change)="measuringUnitSelected($event.target.value)" name="measurement_unit" required>
+                                    <option *ngFor="let measuringUnit of measurementUnits;let i = index" [value]="i">{{measuringUnit.lang[0]?.name}}</option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label for="family" class="control-label">{{'articles.packagings.form.family' | translate}} <span class="required"> * </span> </label>
+                                  <select *ngIf="families" id="family" class="form-control" (change)="familySelected($event.target.value)" name="family" required>
+                                    <option *ngFor="let fam of families; let i=index" [value]="i">{{fam.lang[0]?.name}}</option>
+                                  </select>
+                                  <select *ngIf="!families" id="family" class="form-control">
+                                    <option></option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label for="subfamily" class="control-label">{{'articles.packagings.form.subfamily' | translate}}</label>
+                                  <select id="subfamily" *ngIf="subfamilies" class="form-control" (change)="subFamilySelected($event.target.value)" name="subfamily" [disabled]="subfamilies.length < 1">
+                                    <option [selected]="defaultOption" [value]=""></option>
+                                    <option *ngFor="let subfam of subfamilies; let i=index" [value]="subfam._id">{{subfam.lang.name}}</option>
+                                  </select>
+                                  <select *ngIf="!subfamilies" id="family" class="form-control">
+                                    <option></option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="refPrice" class="control-label">{{'articles.packagings.form.refPrice' | translate}} <span class="required"> * </span></label>
+                                  <div class="input-group">
+                                    <input type="number" id="refPrice" class="form-control" [(ngModel)]="packaging.referencePrice" name="refPrice" step="any" min="0">
+                                    <span *ngIf="packaging.measuringUnit" class="input-group-addon" id="addon1">€/{{packaging.measuringUnit.lang[0]?.shortName}}</span>
+                                    <span *ngIf="!packaging.measuringUnit" class="input-group-addon" id="addon2">-</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div class="col-md-6">
+                                <div class="form-group">
+                                  <label for="avgPrice" class="control-label">{{'articles.packagings.form.avgPrice' | translate}}</label>
+                                  <div class="input-group">
+                                    <input id="avgPrice" class="form-control" name="avgPrice" disabled>
+                                    <span *ngIf="packaging.measuringUnit" class="input-group-addon" id="addon1">€/{{packaging.measuringUnit.lang[0]?.shortName}}</span>
+                                    <span *ngIf="!packaging.measuringUnit" class="input-group-addon" id="addon2">-</span>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-md-6">
+                            <div class="row">
+                              <div class="col-md-12">
+                                <crop-and-upload [(gallery)]="imageObject" [folderPath]="'imgs/packagings/'" [upload]="upload" (uploadFinished)="imageUploadFinished()"></crop-and-upload>                               
+                              </div>
+                            </div>                            
+                            <div class="row">
+                              <div class="col-md-12">
+                                <div class="form-group">
+                                  <label for="desc" class="control-label">{{'articles.packagings.form.desc' | translate}}</label>
+                                  <textarea id="desc" class="form-control" [(ngModel)]="packagingLang.description" name="desc" rows="3"></textarea>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div class="form-actions right">
+                        <button type="submit" [disabled]="!addPackagingForm.form.valid || !packaging.family || !packaging.measuringUnit" class="btn green">{{'buttonGeneric.save' | translate}}
+                        </button>
+                        <button type="button" routerLink="/articles/packagings" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+                      </div>
+                    </form>
+<!--                   </div>
+                </div>
+              </div> -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <simple-notifications [options]="notificationOptions" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+     <p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" [closable]="false" width="425"></p-confirmDialog>
+
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

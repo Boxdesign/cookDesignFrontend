@@ -1,0 +1,168 @@
+<div heading="Pack Formats">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'library.tabs.packformat' | translate}}</h2>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchPackagings($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addClick(); cleanFields(); packagingModal.show()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>  
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="packformat-table" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">{{'library.packformat.tableHead.image' | translate}}</div></th>
+        <th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'library.packformat.tableHead.name'" [value]="'lang.name'" (onChange)="getPackaging()" ></column-sorter></th>
+        <th> {{'library.packformat.tableHead.desc' | translate}}</th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let packaging of packagings">
+
+      <tr>
+        <td (click)="viewClick(); selectPackagingToEdit(packaging); packagingModal.show()" class="pointer">
+          <div *ngIf="packaging.gallery" style="display: block; text-align:center;">
+            <img [src]="packaging.gallery.sizes[0].url" alt="">
+          </div>
+          <div *ngIf="!packaging.gallery" style="display: block; text-align:center;">
+            <img src="../../../../../assets/img/noImageCircle.png" alt="">
+          </div>
+        </td>
+        <td (click)="viewClick(); selectPackagingToEdit(packaging); packagingModal.show()" class="pointer">{{packaging.lang[0]?.name}}</td>
+        <td (click)="viewClick(); selectPackagingToEdit(packaging); packagingModal.show()" class="pointer">{{packaging.lang[0]?.description}}</td>
+        <td>
+          <!-- <a href="javascript:;" (click)="selectPackagingToEdit(packaging); packagingModal.show()"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+             <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+          <a href="javascript:;" (click)="editClick(); selectPackagingToEdit(packaging); packagingModal.show()"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          <a href="javascript:;" (click)="deletePackaging(packaging._id)"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page><span class="pagination-separator">|</span> <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options" ></simple-notifications>
+
+<!--MODALS-->
+
+<!--packagingModal -->
+
+<div bsModal #packagingModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="packagingModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 *ngIf="this.status=='new'" class="modal-title">{{'library.packformat.new' | translate}}</h4>
+        <h4 *ngIf="this.status=='edit'" class="modal-title">{{'library.packformat.edit' | translate}}</h4>
+        <h4 *ngIf="this.status=='view'" class="modal-title">{{'library.packformat.view' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="packagingTmp"
+                  [forceRefresh]="forceRefresh"> </lang-tab>        
+        <form (ngSubmit)="uploadImage()" class="form-horizontal" #editPackForm="ngForm">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-body">
+                <div *ngIf="this.status!='new' && packaging" class="form-group">
+                  <label class="col-md-3 control-label">{{'library.packformat.tableHead.referenceNumber' | translate}}</label>
+                  <div class="col-md-9">
+                    <input type="number" class="form-control" [(ngModel)]="packaging.referenceNumber" name="referenceNumber"
+                           placeholder="" disabled>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.packformat.tableHead.name' | translate}}<span class="required">*</span></label>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control" [(ngModel)]="packagingTmp.name" name="name"
+                           placeholder="" required [disabled]="status=='view'">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.packformat.tableHead.desc' | translate}}</label>
+                  <div class="col-md-9">
+                    <textarea class="form-control" name="desc" [(ngModel)]="packagingTmp.description" cols="30" rows="10"
+                     [disabled]="status == 'view'"></textarea>
+                  </div>
+                </div>              
+              </div>
+            </div>
+            <div class="col-md-5">
+              <crop-and-upload [(gallery)]="imageObject" [folderPath]="'imgs/pack-format/'" [upload]="upload" (uploadFinished)="savePackaging()" [mode]="status" ></crop-and-upload>              
+            </div>
+          </div>
+          <div *ngIf="this.status!='view'" class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="packagingModal.hide()" class="btn green"
+                        [disabled]="!editPackForm.form.valid">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="packagingModal.hide()" class="btn default">{{'buttonGeneric.cancel'
+                  |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

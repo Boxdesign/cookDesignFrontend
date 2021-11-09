@@ -1,0 +1,211 @@
+<div heading="Checkpoints">
+  <div class="row">
+    <div class="col-md-12">
+        <h2 class="tab-box-title">{{title}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchCheckpoints($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+        <a href="javascript:;" (click)="addClick(); addCheckpointModal.show()" class="btn default pull-right gold"> 
+        <i class="fa fa-plus"></i> {{'buttonGeneric.add' | translate}} </a>  
+    </div>
+  </div>
+  <div id="checkpoint-table" class="table-scrollable">
+    <table class="table table-hover">
+      <thead>
+      <tr>
+        <th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'library.checkpoint.tableHead.name'" [value]="'lang.name'" (onChange)="getCheckpoints()" ></column-sorter></th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let checkpoint of checkpoints">
+      <tr>
+        <td (click)="selectCheckpointToEdit(checkpoint); viewCheckpointModal.show()" class="pointer">{{checkpoint.lang.name}}</td>
+        <td>
+          <!-- <a href="javascript:;" (click)="selectCheckpointToEdit(checkpoint); viewCheckpointModal.show()"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+            <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+          <a href="javascript:;" (click)="selectCheckpointToEdit(checkpoint); editCheckpointModal.show()"
+             class="btn gold btn-sm btn-outline uppercase table-row-button">
+            <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          <a href="javascript:;" (click)="deleteCheckpoint(checkpoint._id)"
+             class="btn gold btn-sm btn-outline uppercase table-row-button">
+            <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10"
+                      (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage"
+                          [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false"
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+ <simple-notifications [options]="notificationOptions"></simple-notifications>
+
+
+<!--MODALS-->
+
+
+<!--añadir -->
+<div bsModal #addCheckpointModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="addCheckpointModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.checkpoint.newCheck' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+         <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="checkpointTmp"
+                  [forceRefresh]="forceRefresh"></lang-tab>
+        <form (ngSubmit)="addCheckpoint()" class="form-horizontal" #newCheckForm="ngForm">
+
+          <div class="form-body">
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.name' | translate}}<span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="checkpointTmp.name" name="name" placeholder="" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.desc' | translate}}</label>
+              <div class="col-md-4">
+                <textarea class="form-control" name="desc" [(ngModel)]="checkpointTmp.description" cols="30" rows="10"></textarea>
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="addCheckpointModal.hide()" class="btn green"
+                        [disabled]="!newCheckForm.form.valid">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="addCheckpointModal.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--edit -->
+
+<div bsModal #editCheckpointModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="editCheckpointModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.checkpoint.editCheck' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="checkpointTmp"
+                  [forceRefresh]="forceRefreshForEdit"></lang-tab>
+        <form (ngSubmit)="editCheckpoint()" class="form-horizontal" #editCheckForm="ngForm" *ngIf="checkpointOnEdit">
+
+          <div class="form-body">
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.referenceNumber' | translate}}</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" [(ngModel)]="checkpointOnEdit.referenceNumber" name="referenceNumber" placeholder="" disabled>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.name' | translate}}<span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="checkpointTmp.name" name="name" placeholder="" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.desc' | translate}}</label>
+              <div class="col-md-4">
+                <textarea class="form-control" name="desc" [(ngModel)]="checkpointTmp.description" cols="30" rows="10"></textarea>
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="editCheckpointModal.hide()" class="btn green"
+                        [disabled]="!editCheckForm.form.valid">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="editCheckpointModal.hide()" class="btn default">{{'buttonGeneric.cancel'
+                  |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--view Checkpoint-->
+
+<div bsModal #viewCheckpointModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewCheckpointModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.checkpoint.view' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewCheckpoint()" class="form-horizontal" #viewCheckForm="ngForm" *ngIf="checkpointOnEdit">
+          <div class="form-body">
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.referenceNumber' | translate}}</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" [(ngModel)]="checkpointOnEdit.referenceNumber" name="referenceNumber" placeholder="" disabled>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.name' | translate}}</label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="checkpointTmp.name" name="name" placeholder="" readonly required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.checkpoint.tableHead.desc' | translate}}</label>
+              <div class="col-md-4">
+                <textarea class="form-control" name="desc" [(ngModel)]="checkpointTmp.description" cols="30" rows="10" readonly></textarea>
+              </div>
+            </div>     
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

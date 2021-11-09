@@ -1,0 +1,98 @@
+<div heading="dish versions">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'recipes.tabs.dishVersions' | translate}}</h2>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchDishes($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <!-- <a href="javascript:;" (click)="addSubproduct()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'recipes.subproduct.add' | translate}}</a> -->
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="dishversions-table" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th></th> <!-- Image -->
+        <th> {{'recipes.dish.tableHead.name' | translate}} <column-sorter (onSorterClicked)="sortColumn($event,'name')"></column-sorter></th>
+        <th>{{'recipes.dish.tableHead.updated' | translate}}</th>
+        <th>{{'recipes.dish.tableHead.weightPerServing' | translate}} </th>
+        <th>{{'recipes.dish.tableHead.cost' | translate}} </th>
+        <th>{{'recipes.dish.tableHead.family' | translate}} </th>
+        <th>{{'recipes.dish.tableHead.location' | translate}} </th>
+        <th>{{'recipes.dish.tableHead.active' | translate}} </th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let dishVersion of dishVersions;let i=index">
+        <tr [class.text-muted]="!dishVersion.versions.active" [class.active]="!dishVersion.versions.active">
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <div *ngIf="dishVersion.versions.gallery" style="display: block; text-align:center;">
+              <img [src]="dishVersion.versions.gallery.sizes[0].url" alt="">
+            </div>
+            <div *ngIf="!dishVersion.versions.gallery" style="display: block; text-align:center;">
+              <img src="../../../assets/img/noImageCircle.png" alt="">
+            </div>
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            {{dishVersion.versions.lang.name}}
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">{{dishVersion.versions.updatedAt | date: 'medium'}}<br>{{dishVersion.versions.last_account.user.firstName + ' ' + dishVersion.versions.last_account.user.lastName}}</td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <span *ngIf="dishVersion.versions.weightPerServing">{{dishVersion.versions.weightPerServing | number:'1.2-2'}}{{dishVersion.measurementUnit.lang[0]?.shortName}}</span>
+            <span *ngIf="!dishVersion.versions.weightPerServing">---</span>
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <span *ngIf="dishVersion.versions.costPerServing">{{dishVersion.versions.costPerServing | currency:'EUR':'symbol':'1.2-2'}}/{{dishVersion.measurementUnit.lang[0]?.shortName}}</span>
+            <span *ngIf="!dishVersion.versions.costPerServing">---</span>
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <span *ngFor="let fam of families" [class.hidden]="!(fam._id==dishVersion.family)">
+              {{fam.lang[0]?.name}}
+            </span>
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            Locations
+          </td>
+          <td (click)="viewDishVersion(dishVersion._id, dishVersion.versions._id)" class="pointer">
+            <span *ngIf="dishVersion.versions.active">
+              <i class="fa fa-check cd-gold" aria-hidden="true"></i>
+            </span>
+            <span *ngIf="!dishVersion.versions.active">
+              <i class="fa fa-times cd-gold" aria-hidden="true"></i>
+            </span>
+          </td>
+          <td>
+            <a href="javascript:;" (click)="editDishVersion(dishVersion._id, dishVersion.versions._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a *ngIf="!dishVersion.versions.active" href="javascript:;" (click)="deleteDishVersion(dishVersion._id, dishVersion.versions._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+            <a *ngIf="!dishVersion.versions.active" href="javascript:;" (click)="changeToActive(dishVersion._id, dishVersion.versions._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-check cd-gold" aria-hidden="true"></i> {{'buttonGeneric.active' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>

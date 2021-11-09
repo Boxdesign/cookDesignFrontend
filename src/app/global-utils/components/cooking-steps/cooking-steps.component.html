@@ -1,0 +1,320 @@
+<div heading="CookingSteps">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 *ngIf="recipeType=='subproduct'" class="tab-box-title">{{'recipes.subproduct.cookingStep.title' | translate}}</h3>
+			<h3 *ngIf="recipeType=='product'" class="tab-box-title">{{'recipes.product.cookingStep.title' | translate}}</h3>
+			<h3 *ngIf="recipeType=='dish'" class="tab-box-title">{{'recipes.dish.cookingStep.title' | translate}}</h3>
+			<h3 *ngIf="recipeType=='drink'" class="tab-box-title">{{'recipes.drink.cookingStep.title' | translate}}</h3>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<search-box (onSearchEntered)="searchCookingSteps($event)" [label]="searchBoxLabel"></search-box>
+		</div>
+		<div class="col-md-6">
+			<a *ngIf="mode!='view'" href="javascript:;" (click)="addClick(); cookingStepModal.show()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>
+		</div>
+	</div> 
+	<div class="table-scrollable">
+		<table class="table table-hover steps-list">
+			<thead>
+				<tr>
+					<th> </th> <!-- Up arrow -->
+					<th> </th> <!-- Down arrow -->
+					<th> </th>
+					<th> {{'recipes.subproduct.cookingStep.tableHead.process' | translate}} </th>
+					<th> {{'recipes.subproduct.cookingStep.tableHead.description' | translate}}</th>
+					<th> {{'recipes.subproduct.cookingStep.tableHead.utensil' | translate}} </th>
+					<th> {{'recipes.subproduct.cookingStep.tableHead.time' | translate}}</th>
+					<th> {{'recipes.subproduct.cookingStep.tableHead.temperature' | translate}}</th>
+					<th> pcq </th>
+					<th> pcg </th>
+					<th> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let cookingStep of recipe.cookingSteps; let i = index;">
+					<td><i (click)="moveStepUp(cookingStep, i)" *ngIf="cookingStep.stepUp && mode!='view'" class="fa fa-chevron-up cd-gold pointer" aria-hidden="true"></i></td>
+					<td><i (click)="moveStepDown(cookingStep, i)" *ngIf="cookingStep.stepDown && mode!='view'" class="fa fa-chevron-down cd-gold pointer" aria-hidden="true"></i></td>		
+					<td> {{i+1}} </td>		
+					<td (click)="viewClick(); selectCookingStep(cookingStep, i); cookingStepModal.show()" class="pointer">{{cookingStep.process.lang[0]?.name}}</td>
+					<td (click)="viewClick(); selectCookingStep(cookingStep, i); cookingStepModal.show()" class="pointer">{{cookingStep.lang[0]?.description}}</td>
+					<td>
+						<div href="javascript:;" (click)=" selectUtensilForView(cookingStep, i); utensilModal.show()" style="text-decoration: none; color: #333333; text-align: center;" tooltip="{{'Ver Tecnología/Herramienta' | translate}}">&nbsp;{{cookingStep.utensil.lang[0]?.name}}</div>
+					<td (click)="viewClick(); selectCookingStep(cookingStep, i); cookingStepModal.show()" class="pointer"><span *ngIf="cookingStep.time">{{cookingStep.time}}</span><span *ngIf="!cookingStep.time">0</span> <span *ngIf="cookingStep.timeUnit">{{'recipes.subproduct.cookingStep.form.timeUnits.' + cookingStep.timeUnit | translate }}</span> <span *ngIf="!cookingStep.timeUnit">{{'recipes.subproduct.cookingStep.form.timeUnits.minutes' | translate }}</span></td>
+					<td (click)="viewClick(); selectCookingStep(cookingStep, i); cookingStepModal.show()" class="pointer">{{cookingStep.temperature}}&deg;C</td>
+					<td>
+						<critical-gastro-checkpoint *ngIf="cookingStep.criticalCheckpoint && criticalCheckpoints" [criticalCheckpoints]="criticalCheckpoints" [checkpoint]="cookingStep.criticalCheckpoint"></critical-gastro-checkpoint>
+					</td>
+					<td>
+						<critical-gastro-checkpoint *ngIf="cookingStep.gastroCheckpoint && gastroCheckpoints" [gastroCheckpoints]="gastroCheckpoints" [checkpoint]="cookingStep.gastroCheckpoint"></critical-gastro-checkpoint>
+					</td>
+
+					<td>
+						<a *ngIf="mode!='view'" href="javascript:;" (click)="editClick(); selectCookingStep(cookingStep, i); cookingStepModal.show();"
+						class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="viewMode">
+						<i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+						<a *ngIf="mode!='view'" href="javascript:;" (click)="deleteCookingStep(i)"
+						class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="viewMode">
+						<i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+					</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</div>
+
+<!--Modals -->
+<div bsModal #cookingStepModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<!-- Model header -->
+			<div class="modal-header">
+				<button type="button" class="close" (click)="cookingStepModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 *ngIf="status=='new'" class="modal-title">{{'admin.user.account.new' | translate}}</h4>
+				<h4 *ngIf="status=='edit'" class="modal-title">{{'admin.user.account.edit' | translate}}</h4>
+				<h4 *ngIf="status=='view'" class="modal-title">{{'admin.user.account.view' | translate}}</h4>
+			</div>
+			<!-- Modal body -->
+			<div class="modal-body">
+				<form (ngSubmit)="saveCookingStep()" class="form-horizontal" #cookingStepForm="ngForm" *ngIf="cookingStep">
+					<lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="cookingStepLang" [forceRefresh]="forceLangRefresh"></lang-tab>
+					<div class="form-body">
+						<div class="row">							
+							<div class="col-md-6">
+								<div class="form-group">
+									<div class="col-md-10 col-md-offset-1">
+										<label class="control-label">{{'recipes.subproduct.cookingStep.form.process' | translate}}<span class="required">*</span></label>
+										<ng-select class="cd-select" [allowClear]="true"
+										              [active] = "activeProcess"
+										              (selected)="processSelected($event)" 
+										              [disabled]="status=='view'"
+           	                      (typed)="processSearchChanged($event)" #selectProcess>
+										</ng-select>
+										<!-- <select class="form-control" (change)="processSelected($event.target.value, true)" name="process" [disabled]="status=='view'">
+											<option [selected]="process._id==cookingStep.process._id" *ngFor="let process of processes; let i = index" [value]="i">{{process.lang[0]?.name | uppercase}}</option>
+										</select> -->
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10 col-md-offset-1">
+										<label class="control-label">{{'recipes.subproduct.cookingStep.form.utensil' | translate}}<span class="required">*</span></label>
+										<ng-select class="cd-select" [allowClear]="true"
+										              [active] = "activeUtensil"
+										              (selected)="utensilSelected($event)" 
+										              [disabled]="status=='view'"
+           	                      (typed)="utensilSearchChanged($event)" #selectUtensil>
+										</ng-select>
+										<!-- <select class="form-control" (change)="utensilSelected($event.target.value, true)" name="utensil" [disabled]="status=='view'">
+											<option [selected]="utensil._id==cookingStep.utensil._id" *ngFor="let utensil of utensils; let i = index" [value]="i" >{{utensil.lang[0]?.name | uppercase}}</option>
+										</select> -->
+									</div>
+								</div>
+								<div class="form-group">
+										<div class="col-md-5 col-md-offset-1">
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.time' | translate}}</label>
+											<div class="input-group">
+												<input style="width: 50%" type="number" class="form-control" [(ngModel)]="cookingStep.time" name="time" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<select *ngIf="cookingStepsTimeUnits" [disabled]="status=='view'" style="width: 50%" id="timeUnit" class="selectpicker form-control" [(ngModel)]="cookingStep.timeUnit" name="timeUnit" >
+									                <option [selected]="time==cookingStep.timeUnit" *ngFor="let time of cookingStepsTimeUnits" value="{{time}}">{{'recipes.subproduct.cookingStep.form.timeUnits.' + time +'Abbreviate' | translate}}</option>									               
+									            </select> 
+
+												<!-- <span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.timeUnit' | translate}}</span> -->
+											</div>											
+										</div>
+										<div class="col-md-5">
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.timeUser' | translate}}</label>
+											<div class="input-group">
+												<input style="width: 50%" type="number" class="form-control" [(ngModel)]="cookingStep.timeUser" name="timeUser" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<select *ngIf="cookingStepsTimeUnits" [disabled]="status=='view'" style="width: 50%" id="timeUnitUser" class="selectpicker form-control" [(ngModel)]="cookingStep.timeUnitUser" name="timeUnit" >
+									                <option [selected]="time==cookingStep.timeUnitUser" *ngFor="let time of cookingStepsTimeUnits" value="{{time}}">{{'recipes.subproduct.cookingStep.form.timeUnits.' + time +'Abbreviate' | translate}}</option>									               
+									            </select> 
+
+												<!-- <span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.timeUnit' | translate}}</span> -->
+											</div>											
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-5 col-md-offset-1">									
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.temperatureProbe' | translate}}</label>
+											<div class="input-group">
+												<input type="number" class="form-control" [(ngModel)]="cookingStep.temperatureProbe" name="temperatureProbe" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.temperatureProbeUnit' | translate}}</span>
+											</div>
+										</div>	
+										<div class="col-md-5">
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.temperature' | translate}}</label>
+											<div class="input-group">
+												<input type="number" class="form-control" [(ngModel)]="cookingStep.temperature" name="temperature" placeholder="" step="any" [disabled]="status=='view'">
+												<span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.temperatureUnit' | translate}}</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-5 col-md-offset-1">									
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.pressure' | translate}}</label>
+											<div class="input-group">
+												<input type="number" class="form-control" [(ngModel)]="cookingStep.pressure" name="pressure" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.pressureUnit' | translate}}</span>
+											</div>
+										</div>
+										<div class="col-md-5">
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.vacuum' | translate}}</label>
+											<div class="input-group">
+												<input type="number" class="form-control" [(ngModel)]="cookingStep.vacuum" name="vacuum" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.vacuumUnit' | translate}}</span>
+											</div>
+										</div>
+									</div>
+									<div class="form-group">
+										<div class="col-md-5 col-md-offset-1">									
+											<label class="control-label">{{'recipes.subproduct.cookingStep.form.power' | translate}}</label>
+											<div class="input-group">
+												<input type="number" class="form-control" [(ngModel)]="cookingStep.power" name="power" placeholder="" step="any" min="0" [disabled]="status=='view'">
+												<span class="input-group-addon" id="addon1">{{'recipes.subproduct.cookingStep.form.powerUnit' | translate}}</span>
+											</div>
+										</div>
+									</div>
+								<div class="form-group">
+									<div class="col-md-10 col-md-offset-1">
+									<label for="desc" class="control-label">{{'recipes.subproduct.cookingStep.form.desc' | translate}}</label>
+									<textarea id="desc" class="form-control" [(ngModel)]="cookingStepLang.description" name="description" rows="6" [disabled]="status=='view'"></textarea>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="form-group">
+									<div class="col-md-10">
+									<label class="control-label">{{'recipes.subproduct.cookingStep.form.criticalCheckpoint' | translate}}</label>
+									<select class="col-md-6 form-control" [(ngModel)]="cookingStep.criticalCheckpoint" name="criticalCheckpoint._id" [disabled]="status=='view'">
+										<option value="null">{{'recipes.subproduct.cookingStep.form.selectOption' | translate}}</option>
+										<option *ngFor="let criticalCheckpoint of criticalCheckpoints" [value]="criticalCheckpoint._id">{{criticalCheckpoint.lang?.name | uppercase}}</option>
+									</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10">
+									<label for="desc" class=" control-label">{{'recipes.subproduct.cookingStep.form.criticalCheckpointNote' | translate}}</label>
+									<textarea id="desc" class="form-control" [(ngModel)]="cookingStepLang.criticalCheckpointNote" name="criticalCheckpointNote" rows="1" [disabled]="status=='view'"></textarea>
+								</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10">
+										<label class="control-label">{{'recipes.subproduct.cookingStep.form.gastroCheckpoint' | translate}}</label>
+										<select class="form-control" [(ngModel)]="cookingStep.gastroCheckpoint" name="gastroCheckpoint._id" [disabled]="status=='view'">
+											<option [value]="null">{{'recipes.subproduct.cookingStep.form.selectOption' | translate}}</option>
+											<option  *ngFor="let gastroCheckpoint of gastroCheckpoints;" [value]="gastroCheckpoint._id">{{gastroCheckpoint.lang?.name | uppercase}}</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<div class="col-md-10">
+										<label for="desc" class="control-label">{{'recipes.subproduct.cookingStep.form.gastroCheckpointNote' | translate}}</label>
+										<textarea id="desc" class="form-control" [(ngModel)]="cookingStepLang.gastroCheckpointNote" name="gastroCheckpointNote" rows="1" [disabled]="status=='view'"></textarea>
+									</div>
+								</div>
+								<div class="col-md-10">
+									<media-files *ngIf="cookingStep.images&&cookingStep.videos" [(images)]="cookingStep.images" [(videos)]="cookingStep.videos" [viewEdit]="status=='view'"></media-files>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- Modal actions -->
+					<div *ngIf="status!='view'" class="form-actions">
+						<div class="row">
+							<div class="col-md-offset-8 col-md-7">
+								<button *ngIf="status=='new'" type="submit" (click)="cookingStepModal.hide()" class="btn green" [disabled]="!cookingStepForm.form.valid || !cookingStep.process || !cookingStep.utensil">{{'buttonGeneric.save' | translate}}
+								</button>
+								<button *ngIf="status=='edit'" type="submit" (click)="cookingStepModal.hide()" class="btn green" [disabled]="!cookingStepForm.form.valid || !cookingStep.process || !cookingStep.utensil">{{'buttonGeneric.save' | translate}}
+								</button>
+								<button type="button" (click)="cookingStepModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+									translate}}
+								</button>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!-- view utensil-->
+
+<div bsModal #utensilModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="utensilModal.hide(); closeUtensil()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.utensil.view' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form  class="form-horizontal" #utensilForm="ngForm" *ngIf="utensilViewReady">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-body">
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.measUnit.tableHead.name' | translate}}</label>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control" [(ngModel)]="utensilView.lang[0].name" name="name" placeholder=""
+                           readonly>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.family' | translate}}</label>
+                  <div class="col-md-9">
+                    <select class="form-control" name="family" disabled>
+                      <option *ngIf="utensilView.family"
+                              [value]="utensilView.family.lang[0].name">
+                        {{utensilView.family.lang[0]?.name}}
+                      </option>
+                      <option *ngIf="!utensilView.family"
+                              [value]="">
+                      </option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.subfamily' | translate}}</label>
+                  <div class="col-md-9">
+                    <select class="bs-select form-control" name="subfamily"
+                            disabled>
+                      <option *ngIf="utensilView.subfamily"
+                              [value]="utensilView.subfamily.lang[0]?.name">
+                        {{utensilView.subfamily.lang[0]?.name}}
+                      </option>
+                      <option *ngIf="!utensilView.subfamily"
+                              [value]="">
+                      </option>
+
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.access' | translate}}</label>
+                  <div class="col-md-9">
+                    <textarea class="form-control" name="desc" [(ngModel)]="utensilView.lang[0].accessories" cols="30" rows="10"
+                              readonly></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-5">
+                <div *ngIf="utensilView && utensilView.gallery">
+                  <img [src]="utensilView.gallery.sizes[1].url" alt="">
+               </div>
+               <div *ngIf="utensilView && !utensilView.gallery">
+                  <img src="../../../../../assets/img/img_placeholder_food.png" width="80%" height="80%" alt="">
+               </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

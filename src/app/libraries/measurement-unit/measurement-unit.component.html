@@ -1,0 +1,326 @@
+<div heading="Measuring Units">
+  <div class="row">
+    <div class="col-md-8">
+      <h2 class="tab-box-title">{{'library.tabs.measUnit' | translate}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchUnidades($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+       <a href="javascript:;" (click)="resetAddForm(newMuForm); addUnit.show()" class="btn default pull-right gold">
+        <i class="fa fa-plus"></i> {{'buttonGeneric.add' | translate}}</a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table class="table table-hover" id="unidades-table">
+      <thead>
+      <tr>
+        <th></th>
+        <th> {{'library.measUnit.tableHead.name' | translate}} <column-sorter (onSorterClicked)="sortColumn($event,'name')"></column-sorter></th>
+        <th> {{'library.measUnit.tableHead.shortN' | translate}}</th>
+        <th><!-- = --></th>
+        <th> {{'library.measUnit.tableHead.qty' | translate}}</th>
+        <th> {{'library.measUnit.tableHead.equal' | translate}}</th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let unit of units; let i = index;">
+
+      <tr>
+        <td><span *ngIf="unit.parentUnits.length > 0"><a href="javascript:;" *ngIf="unit.expanded" (click)="unit.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-</a>
+              <a href="javascript:;" *ngIf="!unit.expanded" (click)="unit.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+</a></span></td>
+        <td><div>{{unit.lang[0]?.name}}</div><span *ngIf="unit.base" class="label label-sm label-cd label-mini pull-right">  {{'library.measUnit.baseUnit' | translate}}</span>
+        </td>
+        <td>{{unit.lang[0]?.shortName}}</td>
+        <td></td>
+        <td>---</td>
+        <td>---</td>
+        <td>
+          <a href="javascript:;" (click)="selectMuToEdit(unit); editUnit.show()"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          <a href="javascript:;" *ngIf="!unit.base" (click)="deleteMu(unit._id)"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+          <a href="javascript:;" *ngIf="!unit.base"
+             (click)="selectMuToEdit(unit); getBaseUnits(unit); addConv.show()"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-plus"></i> {{'library.measUnit.tableActions.addConv' | translate}} </a>
+        </td>
+
+      </tr>
+      <tr [class.hidden]="!unit.expanded"  *ngFor="let pu of unit.parentUnits; let puIndex = index" >
+        <td></td>
+        <td></td>
+        <td></td>
+        <td><i class="fa fa-caret-right" aria-hidden="true"></i></td>
+        <td> {{pu.quantity}}</td>
+        <td *ngIf="pu.unit.lang" > {{pu.unit.lang[0]?.name}}</td>
+        <td>
+          <a href="javascript:;" (click)="selectConvToEdit(pu,i, puIndex); editConv.show()"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+            <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          <a href="javascript:;" (click)="deleteConversion(unit, pu)"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+            <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page> <span class="pagination-separator">|</span> <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet> 
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false"
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>
+
+
+<!--  MODALS  -->
+
+<!--  Add measuring unit  -->
+<div bsModal #addUnit="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="addUnit.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.measUnit.newMu' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+
+        <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="mu"
+                  [forceRefresh]="forceRefresh"> </lang-tab>
+
+        <form (ngSubmit)="createNewMu()" class="form-horizontal" #newMuForm="ngForm">
+          <div class="form-body">
+
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.referenceCode' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <select *ngIf="codeTypes"  id="type" class="form-control" [(ngModel)]="referenceCode" (change)="codeTypeSelected($event.target.value)" name="type" required [disabled]=viewMode>
+                        <option [disabled]="true" [value]="0" >{{ 'library.measUnit.tableHead.noCodeTypeSelected'  | translate}}</option>
+                        <option *ngFor="let code of codeTypes; let i=index" >{{code.code}}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="!name.valid && name.touched">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.name' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="mu.name" name="name" #name="ngModel"
+                       placeholder="{{'library.measUnit.tableHead.namePlaceholder' | translate}}" required
+                       autocomplete="off">
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="!shortName.valid && shortName.touched">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.shortN' | translate}} </label>
+              <div class="col-md-4">
+                <input type="text" class="form-control"
+                       placeholder="{{'library.measUnit.tableHead.shortNPlaceholder' | translate}}"
+                       [(ngModel)]="mu.shortName" name="shortName" #shortName="ngModel" maxlength="5" required autocomplete="off">
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="addUnit.hide()" class="btn green" [disabled]="!newMuForm.form.valid">
+                  {{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="addUnit.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--edit measuring unit -->
+<div bsModal #editUnit="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="editUnit.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.measUnit.editMu' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <lang-tab [fieldsObj]="mu" [builtFieldsObj]="editedMu" [forceRefresh]="forceRefreshForEdit"
+                   (langsObj)="langObjRefreshed($event)"></lang-tab>
+        <form (ngSubmit)="editMu()" class="form-horizontal" #editMuForm="ngForm">
+
+          <div class="form-body">
+
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.referenceCode' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <select *ngIf="codeTypes" id="type" class="form-control" [(ngModel)]="referenceCode" (change)="codeTypeSelected($event.target.value)" name="referenceCode" required [disabled]=viewMode>
+                        <option [disabled]="true" [value]="0">{{ 'library.measUnit.tableHead.noCodeTypeSelected'  | translate}}</option>
+                        <option *ngFor="let code of codeTypes; let i=index">{{code.code}}</option>
+                </select>
+      
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="!name.valid && name.touched">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.name' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="mu.name" name="name" #name="ngModel" required autocomplete="off">
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="!shortName.valid && shortName.touched">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.shortN' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="text" class="form-control" [(ngModel)]="mu.shortName" name="shortName" #shortName="ngModel"
+                       maxlength="5" required autocomplete="off">
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="editUnit.hide()" class="btn green" [disabled]="!editMuForm.form.valid">
+                  {{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="editUnit.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--add measuring unit conversion -->
+
+<div bsModal #addConv="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="addConv.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.measUnit.addConv' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="addConversion()" class="form-horizontal" #addConvForm="ngForm">
+
+          <div class="form-body">
+            <div class="form-group" [class.has-error]="">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.equal' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <select class="bs-select form-control" name="parent" id="" [(ngModel)]="conv.unit" required>
+                  <!-- <option value="" selected="selected"> --{{'library.measUnit.selectUnit' | translate}}--</option> -->
+                  <option *ngFor="let unidad of baseUnits" [value]="unidad._id">{{unidad.lang[0]?.name}}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group" [class.has-error]="">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.qty' | translate}} <span class="required"> * </span></label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" placeholder="" [(ngModel)]="conv.quantity" name="quantity" step="any" min="0" required>
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="addConv.hide()" class="btn green" [disabled]="!addConvForm.form.valid">
+                  {{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="addConv.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--edit measuring unit conversion -->
+
+<div bsModal #editConv="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myLargeModalLabel"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="editConv.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'library.measUnit.editConv' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="editConversion()" class="form-horizontal" #editConvForm="ngForm">
+
+          <div class="form-body">
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.equal' | translate}}</label>
+              <div class="col-md-4">
+                <select class="bs-select form-control" name="parent" [(ngModel)]="conv.unit" required>
+                  <option>{{conv.unit}}</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="col-md-3 control-label">{{'library.measUnit.tableHead.qty' | translate}}</label>
+              <div class="col-md-4">
+                <input type="number" class="form-control" placeholder="" [(ngModel)]="conv.quantity" name="quantity" step="any" min="0" required>
+              </div>
+            </div>
+
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="editConv.hide()" class="btn green" [disabled]="!editConvForm.form.valid">
+                  {{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="editConv.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

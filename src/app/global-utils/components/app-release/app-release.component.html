@@ -1,0 +1,65 @@
+<div class="releaseTag" (click)="viewLatestRelease(); appReleaseModal.show()">
+	{{ 'version' | translate }}: {{releaseName}}
+</div>
+
+
+<div bsModal #appReleaseModal="bs-modal" class="modal fade" tabindex="-1" style="z-index: 1050" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+ 			<div class="modal-header">
+				<button type="button" class="close" (click)="appReleaseModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4  *ngIf="mode == 'list'" class="modal-title">{{'versions' | translate}}</h4>
+				<h4  *ngIf="mode == 'detail'" class="modal-title">{{'version_details' | translate}}</h4>
+ 			</div>
+			<div class="modal-body">
+				<div *ngIf="mode == 'list' && appReleases.length" class="row">
+					<div class="col-xs-12">
+			      <div class="box">
+							<ul>
+								<li *ngFor="let appRelease of appReleases" (click)="selectToView(appRelease)" class="pointer">
+									{{'version' | translate }}: {{appRelease.name}} <br>
+									tag: {{appRelease.tag_name}} <br>	
+									{{'date' | translate}}: {{appRelease.published_at | date: 'medium'}} 							
+								</li>
+							</ul>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="mode == 'list' && !appReleases.length" class="row">
+					<div class="col-xs-12">
+						<div class="box">
+							{{'no_versions' | translate }}
+						</div>
+					</div>
+				</div>
+				<div *ngIf="mode == 'detail' && appReleases.length" class="row">
+					<div class="col-xs-12">
+						<div style="margin-bottom: 10px">
+							<a href="javascript:;" (click)="backToVersionList()"> < {{'back_to_version_history' | translate }}</a>
+						</div>
+					</div>
+					<div class="col-xs-12">
+			      <div class="box">
+								<h2>{{appRelease.name}}</h2>
+								<markdown>{{appRelease.body}}</markdown>
+						</div>
+					</div>
+				</div>
+				<div *ngIf="mode == 'detail' && !appReleases.length" class="row">
+					<div class="col-xs-12">
+						<div style="margin-bottom: 10px">
+							<a href="javascript:;" (click)="backToVersionList()"> < {{'back_to_version_history' | translate }}</a>
+						</div>
+					</div>					
+					<div class="col-xs-12">
+						<div class="box">
+							{{'no_data' | translate }}
+						</div>
+					</div>
+				</div>
+ 			</div>
+ 		</div>
+	</div>
+</div>

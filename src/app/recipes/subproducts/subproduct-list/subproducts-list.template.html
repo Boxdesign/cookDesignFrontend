@@ -1,0 +1,225 @@
+<loading-gif [loading]="loading" [updating]="updating"></loading-gif>
+
+<div *ngIf="!loading"  heading="Subproducts">
+
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'recipes.tabs.subproducts' | translate}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchSubproducts($event)" [label]="searchBoxLabel" [inputText]="filterText"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addSubproduct()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'recipes.subproduct.add' | translate}}</a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="subproducts-list" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th></th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.subproduct.tableHead.name'" [value]="'versions.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.subproduct.tableHead.batchWeight'" [value]="'versions.batchWeight'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.subproduct.tableHead.cost'" [value]="'versions.unitCost'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.subproduct.tableHead.family'" [value]="'family.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>{{'recipes.subproduct.tableHead.location' | translate}}&nbsp;<i (click)="filterLocationModal.show()" class="fa fa-filter" aria-hidden="true"></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span></th>
+        <th (click)="toggleActiveState()" class="pointer">
+        	<span *ngIf="!filterActive"> <i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.state' | translate}} </span>
+        	<span *ngIf="filterActive&&active"> <i class="fa fa-check" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.active' | translate}} </span>
+        	<span *ngIf="filterActive&&!active"> <i class="fa fa-times" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.inactive' | translate}} </span>
+        </th>        
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let subproduct of allSubproducts;let i=index ">
+        <tr [class.text-muted]="!subproduct.active" [class.active]="!subproduct.active">
+          <td (click)="viewSuproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              <img *ngIf="subproduct.versions.gallery" [src]="subproduct.versions.gallery.sizes[0].url" alt="">
+              <img *ngIf="!subproduct.versions.gallery" src="../../../assets/img/noImageCircle.png" alt="" >
+            </div>
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            {{subproduct.versions.lang.name}}
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <span *ngIf="subproduct.versions.batchWeight">{{subproduct.versions.batchWeight | number:'1.3-3'}}/{{subproduct.measurementUnit.lang[0]?.shortName}}</span>
+            <span *ngIf="!subproduct.versions.batchWeight">---</span>
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <span *ngIf="subproduct.versions.unitCost">{{subproduct.versions.unitCost | currency:'EUR':'symbol':'1.2-2'}}
+            /{{subproduct.measurementUnit.lang[0]?.shortName}}</span>
+            <span *ngIf="!subproduct.versions.unitCost">---</span>
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <span *ngIf="subproduct.family">
+                {{subproduct.family.lang[0]?.name}}
+            </span>
+            <span *ngIf="!subproduct.family">
+                ---
+            </span>
+          </td>
+          <td>
+            <a href="javascript:;" (click)="selectSubproductToEdit(subproduct); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{subproduct.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'recipes.subproduct.form.location' | translate}}</a>
+          </td>
+          <td (click)="viewSubproduct(subproduct._id, subproduct.versions._id)" class="pointer">
+            <span *ngIf="subproduct.active">
+              <i class="fa fa-check cd-gold" aria-hidden="true"></i>
+            </span>
+            <span *ngIf="!subproduct.active">
+              <i class="fa fa-times cd-gold" aria-hidden="true"></i>
+            </span>
+          </td>
+          <td>
+            <a href="javascript:;" (click)="editSubproduct(subproduct._id, subproduct.versions._id); selectSubproductToEdit(subproduct);" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a href="javascript:;" (click)="printSubproduct(subproduct)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-print"></i> {{'buttonGeneric.print' | translate}} </a>
+            <a href="javascript:;" (click)="selectedElementToEdit(subproduct); confirmDeleteModal.show();" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+            <a href="javascript:;" (click)="versionsSubproduct(subproduct._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-history" aria-hidden="true"></i> {{'buttonGeneric.versions' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="itemsPerPage" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination *ngIf="itemsPerPage && currentPage && totalItems" class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="notificationOptions"></simple-notifications>
+<subproduct-print [printEvent]="print" [hidden]="true"></subproduct-print>
+
+
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteSubproduct()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'recipes.subproduct.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'recipes.subproduct.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'recipes.subproduct.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'recipes.subproduct.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="subproduct">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'recipes.subproduct.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="subproduct.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+
+

@@ -1,0 +1,241 @@
+<div heading="Packaging">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.product.packaging.title' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="product" class="row">
+		<div class="col-md-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.packaging.netWeight' | translate}}:</label>
+										<div class="input-group">
+											<input id="netWeight" type="number" step="any" min="0" class="form-control" [(ngModel)]="product.netWeight" name="netWeight" [disabled]="mode=='view'">
+											<span *ngIf="product.measurementUnit" class="input-group-addon" id="addon1">{{product.measurementUnit.lang[0]?.shortName}}</span>
+											<span *ngIf="!product.measurementUnit" class="input-group-addon" id="addon2">-</span>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.product.packaging.packagingCost' | translate}}/{{product.measurementUnit.lang[0]?.shortName}}:</label> <br><span class="form-control disabled" *ngIf="product.netWeight && product.packagingCost"> {{product.packagingCost / product.netWeight | currency:'EUR':'symbol':'1.2-2'}}/{{product.measurementUnit.lang[0]?.shortName}}</span><span class="form-control disabled" *ngIf="!(product.netWeight&&product.packagingCost)">---</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<search-box (onSearchEntered)="searchProducts($event)" [label]="searchBoxLabel"></search-box>
+		</div>
+		<div class="col-md-6">
+			<a href="javascript:;" (click)="cleanAndResetFields(); addPackagingModal.show()" class="btn default pull-right gold" [class.hide-view-mode]="mode=='view'"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>
+		</div>
+	</div>
+	<div class="table-scrollable">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th> {{'recipes.product.packaging.tableHead.element' | translate}} </th>
+					<th> {{'recipes.product.packaging.tableHead.numItems' | translate}}</th>
+					<th> {{'recipes.product.packaging.tableHead.unitCost' | translate}} </th>
+					<th> {{'recipes.product.packaging.tableHead.totalCost' | translate}}</th>
+         			<th>{{'recipes.product.packaging.tableHead.costPercentage' |translate}}</th>
+					<th> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr *ngFor="let packaging of product.packaging; let i = index;">
+					<td (click)="selectProductPackagingToEdit(packaging, i); viewProductPackagingModal.show()" class="pointer">
+					{{packaging.name}}</td>
+					<td (click)="selectProductPackagingToEdit(packaging, i); viewProductPackagingModal.show()" class="pointer">
+					{{packaging.numItems | number:'1.2-2'}} </td>
+					<td (click)="selectProductPackagingToEdit(packaging, i); viewProductPackagingModal.show()" class="pointer">
+					{{packaging.unitCost | currency:'EUR':'symbol':'1.2-2'}}/{{packaging.measuringUnitShortName}}</td>
+					<td (click)="selectProductPackagingToEdit(packaging, i); viewProductPackagingModal.show()" class="pointer">
+					{{packaging.totalCost | currency:'EUR':'symbol':'1.2-2'}}</td>
+			    <td (click)="selectProductPackagingToEdit(packaging,i); viewProductPackagingModal.show()" class="pointer">
+			          <span *ngIf="product.packagingCost&&product.packagingCost!=0">{{packaging.totalCost/(product.packagingCost/100) | number:'1.2-2'}}%</span>
+			          <span *ngIf="!product.packagingCost || product.packagingCost==0">---</span>
+			    </td>
+					<td>
+		              <a href="javascript:;" (click)="selectProductPackagingToEdit(packaging, i); editPackagingModal.show()"
+		                 class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="mode=='view'">
+								  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+								  <a href="javascript:;" (click)="deletePackaging(i)"
+								  class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="mode=='view'">
+								  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+		              <a href="javascript:;" (click)="viewPackaging(packaging,i)"
+		                 class="btn gold btn-sm btn-outline table-row-button">
+		                 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+					</td>
+				</tr>
+				<tr *ngIf="totalPackagings>0" class="active sbold">
+					<td></td>
+					<td></td>
+					<td></td>
+					<td>{{product.packagingCost | currency:'EUR':'symbol':'1.2-2'}}</td>
+					<td>{{100 | number:'1.2-2'}}%</td>
+					<td></td>
+				</tr>
+	  		</tbody>
+		</table>
+	</div>
+</div>
+
+<!--MODALS-->
+
+<!--add -->
+<div bsModal #addPackagingModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="addPackagingModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{'recipes.product.packaging.new' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="addPackaging()" class="form-horizontal" #addPackagingForm="ngForm">
+					<div class="row">
+						<div class="col-md-7">
+							<div class="form-body">
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.element' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<select class="form-control" (change)="packagingSelected($event.target.value, true)" name="packaging" >
+											<option [selected]="i==0" *ngFor="let packaging of allPackagings; let i = index" [value]="i">{{packaging.lang.name | uppercase}} | <h6> {{packaging.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{packaging.measurementUnit.lang[0]?.shortName}}</h6></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.numItems' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<input type="number" class="form-control" [(ngModel)]="productPackaging.numItems" name="numItems" placeholder="" step="any" min="0" required>
+									</div>
+								</div>								
+							</div>
+							<div class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button type="submit" (click)="addPackagingModal.hide()" class="btn green"
+										[disabled]="!addPackagingForm.form.valid">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button type="button" (click)="cleanAndResetFields(); addPackagingModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+											translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+<!--edit -->
+<div bsModal #editPackagingModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="editPackagingModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{'recipes.product.packaging.edit' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="editPackaging()" class="form-horizontal" #editPackagingForm="ngForm" *ngIf="productPackagingOnEdit">
+					<div class="row">
+						<div class="col-md-7">
+							<div class="form-body">
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.element' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<select class="form-control" (change)="packagingSelected($event.target.value, false)" name="packaging" >
+											<option [selected]="productPackagingOnEdit.packaging == packaging._id" *ngFor="let packaging of allPackagings; let i = index" [value]="i">{{packaging.lang.name | uppercase}} | <h6> {{packaging.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{packaging.measurementUnit.lang[0]?.shortName}}</h6></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.numItems' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<input type="number" class="form-control" [(ngModel)]="productPackagingOnEdit.numItems" name="numItems" placeholder="" step="any" min="0" required>
+									</div>
+								</div>								
+							</div>
+							<div class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button type="submit" (click)="editPackagingModal.hide()" class="btn green"
+										[disabled]="!editPackagingForm.form.valid">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button type="button" (click)="cleanAndResetFields(); editPackagingModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<!--view -->
+<div bsModal #viewProductPackagingModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="viewProductPackagingModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{'recipes.product.packaging.view' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="editPackaging()" class="form-horizontal" #viewPackagingForm="ngForm" *ngIf="productPackagingOnEdit">
+					<div class="row">
+						<div class="col-md-7">
+							<div class="form-body">
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.element' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<select class="form-control" (change)="packagingSelected($event.target.value, true)" name="packaging" disabled="">
+											<option [selected]="productPackagingOnEdit.packaging == packaging._id" *ngFor="let packaging of allPackagings; let i = index" [value]="i">{{packaging.lang.name | uppercase}} | <h6> {{packaging.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{packaging.measurementUnit.lang[0]?.shortName}}</h6></option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'recipes.product.packaging.tableHead.numItems' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<input type="number" class="form-control" [(ngModel)]="productPackagingOnEdit.numItems" name="numItems" placeholder="" step="any" min="0" readonly="">
+									</div>
+								</div>								
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+
+
+
+
+
+

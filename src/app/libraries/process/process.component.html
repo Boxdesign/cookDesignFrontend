@@ -1,0 +1,122 @@
+<div heading="Processes">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'library.tabs.process' | translate}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchProcesses($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addClick(); processModal.show()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>      
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="processes-table" class="table table-hover">
+      <thead>
+        <tr>
+          <th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'library.process.tableHead.name'" [value]="'lang.name'" (onChange)="getProcess()" ></column-sorter></th>
+          <th> {{'library.process.tableHead.desc' | translate}} </th>
+          <th> {{'buttonGeneric.actions' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody *ngFor="let proc of processes">
+        <tr>
+          <td (click)="selectProcess(proc); viewClick(); processModal.show()" class="pointer"> {{proc.lang[0]?.name}}</td>
+          <td (click)="selectProcess(proc); viewClick(); processModal.show() " class="pointer"> {{proc.lang[0]?.description}}</td>
+          <td>
+          <!-- <a href="javascript:;" (click)="selectProcessToEdit(proc); viewProcessModal.show()"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+             <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+             <a href="javascript:;" (click)="editClick(); selectProcess(proc); processModal.show()"
+             class="btn gold btn-sm btn-outline table-row-button" >
+             <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+             <a href="javascript:;" (click)="deleteProcess(proc._id)"
+             class="btn gold btn-sm btn-outline table-row-button">
+             <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+           </td>
+         </tr>
+       </tbody>
+     </table>
+   </div>
+   <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"> </items-per-page><span class="pagination-separator">|</span> <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>
+
+<!-- MODAL-->
+
+<!--Modal New -->
+<div bsModal #processModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <!-- Model header -->
+      <div class="modal-header">
+        <button type="button" class="close" (click)="processModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 *ngIf="status=='new'" class="modal-title">{{'library.process.new' | translate}}</h4>
+        <h4 *ngIf="status=='edit'" class="modal-title">{{'library.process.edit' | translate}}</h4>
+        <h4 *ngIf="status=='view'" class="modal-title">{{'library.process.view' | translate}}</h4>
+      </div>
+      <!-- Modal body -->
+      <div class="modal-body">
+        <form (ngSubmit)="saveProcess()" class="form-horizontal" #processForm="ngForm" *ngIf="process">
+          <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="processLang" [forceRefresh]="forceLangRefresh"></lang-tab>
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="form-group" *ngIf="status=='edit' || status == 'view'">
+                  <label class="col-md-4 control-label">{{'library.process.tableHead.referenceNumber' | translate}}</label>
+                  <div class="col-md-7">
+                    <input type="number" class="form-control" [(ngModel)]="process.referenceNumber" name="referenceNumber" placeholder="" disabled>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-4 control-label">{{'library.process.tableHead.name' | translate}} <span class="required"> * </span></label>
+                  <div class="col-md-7">
+                    <input type="text" class="form-control" [(ngModel)]="processLang.name" name="name" placeholder="" required [disabled]="status=='view'">
+                  </div>
+                </div>          
+                <div class="form-group">
+                  <label class="col-md-4 control-label">{{'library.process.tableHead.desc' | translate}}</label>
+                  <div class="col-md-8">
+                    <textarea class="form-control" [(ngModel)]="processLang.description" name="description" cols="30" rows="10" [disabled]="status=='view'"></textarea>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">           
+                <div class="col-md-10">
+                  <media-files [(images)]="process.images" [(videos)]="process.videos"  [viewEdit]="status=='view'"></media-files>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Modal actions -->
+          <div *ngIf="status!='view'" class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-8 col-md-7">
+                <button *ngIf="status=='new'" type="submit" (click)="processModal.hide()" class="btn green" [disabled]="!processForm.form.valid">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button *ngIf="status=='edit'" type="submit" (click)="processModal.hide()" class="btn green" [disabled]="!processForm.form.valid">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="processModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

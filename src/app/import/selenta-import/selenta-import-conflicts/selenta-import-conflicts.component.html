@@ -1,0 +1,41 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportConflicts">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'selenta-import.conflicts' | translate}}</h2>
+    </div>
+  </div>
+	<div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="filterSelentaArticles($event)" [inputText]="selentaArticlesFilterText" [label]="searchBoxLabel"></search-box>
+      <div style="margin-bottom: 12px"></div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="box">
+      	<div *ngIf="articlesConflicts.length">
+	        <p *ngFor="let articlesConflict of articlesConflicts">
+	          <a href="javascript:;" (click)="goToArticle(articlesConflict)">{{ articlesConflict.article.MATNR }}</a> &nbsp;-&nbsp; 
+	          <b style="color:#555;"> {{ articlesConflict.article.MAKTX }} </b> &nbsp;-&nbsp; 
+	          <a href="javascript:;" (click)="navigateTo(articlesConflict.article.cookDesignId);">id: {{ articlesConflict.article.cookDesignId}} </a> &nbsp;-&nbsp; 
+	          <b style="color:#8B0000;">{{articlesConflict.issue.description}}</b>
+	        </p>
+	       </div>
+      	<div *ngIf="!articlesConflicts.length">
+      		{{'selenta-import.noResults' | translate}}
+      	</div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>        
+
+<simple-notifications [options]="options"></simple-notifications>

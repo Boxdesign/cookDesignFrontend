@@ -1,0 +1,432 @@
+<loading-gif [loading]="loading" [updating]="updating" [type]="'whereIs'"></loading-gif>
+<div *ngIf="!loading" heading="Ingredient articles">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'whereis.title' | translate}}</h3>
+		</div>
+	</div>
+	<div class="row" *ngIf="(allGastroOffers && (totalElements!=0)) || (allElements && (totalElements!=0))">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchVersions($event)" [label]="searchBoxLabel" [inputText]="filterText"></search-box>
+    </div>
+  </div>
+	<div *ngIf="allGastroOffers && (totalElements!=0)" class="table-scrollable">
+		<table id="whereis" class="table table-hover ingredient-location-cost">
+			<thead>
+				<tr>
+					<th></th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.name'" [value]="'versions.lang.name'" (onChange)="getGastroOffers()" ></column-sorter>
+					</th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.type'" [value]="'versions.type'" (onChange)="getGastroOffers()" ></column-sorter>
+					</th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.update'" [value]="'versions.updateAt'" (onChange)="getGastroOffers()" ></column-sorter>
+					</th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.active'" [value]="'versions.active'" (onChange)="getGastroOffers()" ></column-sorter>
+					</th>
+					<th> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let gastroOffer of allGastroOffers; let j=index; ">
+				<tr *ngIf="gastroOffer.activeVersion">
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active"> 
+	          <span *ngIf="gastroOffer.versions.length > 0">
+	            <a href="javascript:;" *ngIf="gastroOffer.expanded" (click)="gastroOffer.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-
+	            </a>      
+	            <a href="javascript:;" *ngIf="!gastroOffer.expanded" (click)="gastroOffer.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+
+	            </a> 
+	          </span>
+	        </td>
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active">
+					{{gastroOffer.activeVersion.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active">
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='carte'">{{'generic.carte' | translate | uppercase}}</span>
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='menu'">{{'generic.menu' | translate | uppercase}}</span>
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='dailyMenuCarte'">{{'generic.dailyMenuCarte' | translate | uppercase}}</span>
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='buffet'">{{'generic.buffet' | translate | uppercase}}</span>
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='fixedPriceCarte'">{{'generic.fixedPriceCarte' | translate | uppercase}}</span>
+						<span *ngIf="gastroOffer.activeVersion.type[0].category=='catalog'">{{'generic.catalog' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active">
+						{{gastroOffer.activeVersion.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active">
+						<span *ngIf="gastroOffer.activeVersion.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!gastroOffer.activeVersion.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!gastroOffer.activeVersion.active" [class.active]="gastroOffer.activeVersion.active">
+						<span>
+							<a href="javascript:;" (click)="viewGastroOffer(gastroOffer, gastroOffer.activeVersion._id)"
+							class="btn gold btn-sm btn-outline table-row-button">
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteGastroOffer(gastroOffer._id, gastroOffer.activeVersion._id,j,'gastroOffer')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+						<span *ngIf="gastroOffer.expanded">
+							<a href="javascript:;" (click)="deleteAllGastroOffers(gastroOffer,j, 'gastroOffer')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.deleteAll' | translate}}</a>
+						</span>
+					</td>
+				</tr>
+				<tr [class.hidden]="!gastroOffer.expanded" *ngFor="let version of gastroOffer.versions; let i = index; ">
+					<td [class.text-muted]="!version.active" [class.active]="version.active"></td>
+	        <td [class.text-muted]="!version.active" [class.active]="version.active">
+						{{version.lang.name | uppercase}}
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span *ngIf="version.type[0].category=='carte'">{{'generic.carte' | translate | uppercase}}</span>
+							<span *ngIf="version.type[0].category=='menu'">{{'generic.menu' | translate | uppercase}}</span>
+							<span *ngIf="version.type[0].category=='dailyMenuCarte'">{{'generic.dailyMenuCarte' | translate | uppercase}}</span>
+							<span *ngIf="version.type[0].category=='buffet'">{{'generic.buffet' | translate | uppercase}}<</span>
+							<span *ngIf="version.type[0].category=='fixedPriceCarte'">{{'generic.fixedPriceCarte' | translate | uppercase}}</span>
+							<span *ngIf="version.type[0].category=='catalog'">{{'generic.catalog' | translate | uppercase}}</span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							{{version.updatedAt | uppercase}}
+						</td>           
+						<td [class.text-muted]="version.active" [class.active]="version.active">
+							<span *ngIf="version.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+							<span *ngIf="!version.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>
+								<a href="javascript:;" (click)="viewGastroOffer(gastroOffer, version._id)"
+								class="btn gold btn-sm btn-outline table-row-button">
+								<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							</span>
+							<span>
+								<a href="javascript:;" (click)="deleteGastroOffer(gastroOffer._id, version._id,j,'gastroOffer')"
+								class="btn gold btn-sm btn-outline table-row-button" disabled>
+								<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+							</span>
+						</td>
+	      </tr>
+			</tbody>
+		</table>
+	</div>
+	<div *ngIf="(allElements && totalElements==0) || (allGastroOffers && totalElements==0)" style="margin-top: 10px; margin-bottom: 20px;">
+		<span> {{'generic.notUsed' | translate | uppercase}} </span>
+	</div>
+	<div *ngIf="allElements && (totalElements!=0)" class="table-scrollable">
+		<table id="whereis" class="table table-hover ingredient-location-cost">
+			<thead>
+				<tr>
+					<th></th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.ingredient'" [value]="'versions.lang.name'" (onChange)="getRecipes()" ></column-sorter>
+					</th>
+					<th> 
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.type'" [value]="'versions.type'" (onChange)="getRecipes()" ></column-sorter>
+					</th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.update'" [value]="'versions.updateAt'" (onChange)="getRecipes()" ></column-sorter>
+					</th>
+					<th>
+						<column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'whereis.tableHead.active'" [value]="'versions.active'" (onChange)="getRecipes()" ></column-sorter>
+					</th>
+					<th> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let subproduct of subproducts; let j=index; ">
+				<tr *ngIf="subproduct.activeVersion">
+					<td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+	          <span *ngIf="subproduct.versions.length > 0">
+	            <a href="javascript:;" *ngIf="subproduct.expanded" (click)="subproduct.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-
+	            </a>      
+	            <a href="javascript:;" *ngIf="!subproduct.expanded" (click)="subproduct.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+
+	            </a> 
+	          </span>
+	        </td>
+	        <td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+						{{subproduct.activeVersion.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+						<span>{{'generic.subproduct' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+						{{subproduct.activeVersion.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+						<span *ngIf="subproduct.activeVersion.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!subproduct.activeVersion.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!subproduct.activeVersion.active" [class.active]="subproduct.activeVersion.active">
+						<span>
+							<a href="javascript:;" (click)="viewElement(subproduct._id, 'subproduct', subproduct.activeVersion._id)"
+							class="btn gold btn-sm btn-outline table-row-button">
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteRecipe(subproduct._id,subproduct.activeVersion._id,'subproduct',j)"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+						<span *ngIf="subproduct.expanded">
+							<a href="javascript:;" (click)="deleteAllRecipes(subproduct,j, 'subproduct')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.deleteAll' | translate}}</a>
+						</span>
+					</td>
+				</tr>
+				<tr [class.hidden]="!subproduct.expanded" *ngFor="let version of subproduct.versions; let i = index">
+						<td [class.text-muted]="!version.active" [class.active]="version.active"></td>
+	        	<td [class.text-muted]="!version.active" [class.active]="version.active">
+							{{version.lang.name | uppercase}}
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>{{'generic.subproduct' | translate | uppercase}}</span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							{{version.updatedAt | uppercase}}
+						</td>           
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span *ngIf="version.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+							<span *ngIf="!version.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>
+								<a href="javascript:;" (click)="viewElement(subproduct._id, 'subproduct', version._id)"
+								class="btn gold btn-sm btn-outline table-row-button">
+								<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							</span>
+							<span>
+								<a href="javascript:;" (click)="deleteRecipe(subproduct._id,version._id,'subproduct',j,'subproduct')"
+								class="btn gold btn-sm btn-outline table-row-button" disabled>
+								<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+							</span>
+						</td>
+	      </tr>
+	    </tbody>
+	    <tbody *ngFor="let product of products; let j = index; ">
+				<tr *ngIf="product.activeVersion">
+					<td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+	          <span *ngIf="product.versions.length > 0">
+	            <a href="javascript:;" *ngIf="product.expanded" (click)="product.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-
+	            </a>      
+	            <a href="javascript:;" *ngIf="!product.expanded" (click)="product.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+
+	            </a> 
+	          </span>
+	        </td>
+	        <td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+						{{product.activeVersion.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+						<span>{{'generic.product' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+						{{product.activeVersion.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+						<span *ngIf="product.activeVersion.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!product.activeVersion.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!product.activeVersion.active" [class.active]="product.activeVersion.active">
+						<span>
+							<a href="javascript:;" (click)="viewElement(product._id, 'product', product.activeVersion._id)"
+							class="btn gold btn-sm btn-outline table-row-button">
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteRecipe(product._id,product.activeVersion._id,'product',j)"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+						<span *ngIf="product.expanded">
+							<a href="javascript:;" (click)="deleteAllRecipes(product,j, 'product')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.deleteAll' | translate}}</a>
+						</span>
+					</td>
+				</tr>
+				<tr [class.hidden]="!product.expanded" *ngFor="let version of product.versions; let i = index; ">
+					<td [class.text-muted]="!version.active" [class.active]="version.active"></td>
+	        <td [class.text-muted]="!version.active" [class.active]="version.active">
+						{{version.lang.name | uppercase}}
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>{{'generic.product' | translate | uppercase}}</span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							{{version.updatedAt | uppercase}}
+						</td>           
+						<td [class.text-muted]="version.active" [class.active]="version.active">
+							<span *ngIf="version.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+							<span *ngIf="!version.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>
+								<a href="javascript:;" (click)="viewElement(product._id, 'product', version._id)"
+								class="btn gold btn-sm btn-outline table-row-button">
+								<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							</span>
+							<span>
+								<a href="javascript:;" (click)="deleteRecipe(product._id,version._id,'product',j,'product')"
+								class="btn gold btn-sm btn-outline table-row-button" disabled>
+								<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+							</span>
+						</td>
+	      </tr>
+	    </tbody>
+	    <tbody *ngFor="let dish of dishes; let j= index; ">
+	      <tr *ngIf="dish.activeVersion">
+					<td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+	          <span *ngIf="dish.versions.length > 0">
+	            <a href="javascript:;" *ngIf="dish.expanded" (click)="dish.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-
+	            </a>      
+	            <a href="javascript:;" *ngIf="!dish.expanded" (click)="dish.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+
+	            </a> 
+	          </span>
+	        </td>
+	        <td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+						{{dish.activeVersion.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+						<span>{{'generic.dish' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+						{{dish.activeVersion.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+						<span *ngIf="dish.activeVersion.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!dish.activeVersion.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!dish.activeVersion.active" [class.active]="dish.activeVersion.active">
+						<span>
+							<a href="javascript:;" (click)="viewElement(dish._id, 'dish', dish.activeVersion._id)"
+							class="btn gold btn-sm btn-outline table-row-button">
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteRecipe(dish._id,dish.activeVersion._id,'dish',j)"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+						<span *ngIf="dish.expanded">
+							<a href="javascript:;" (click)="deleteAllRecipes(dish,j, 'dish')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.deleteAll' | translate}}</a>
+						</span>
+					</td>
+				</tr>
+				<tr [class.hidden]="!dish.expanded" *ngFor="let version of dish.versions">
+					<td [class.text-muted]="!version.active" [class.active]="version.active"></td>
+	        <td [class.text-muted]="!version.active" [class.active]="version.active">
+						{{version.lang.name | uppercase}}
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>{{'generic.dish' | translate | uppercase}}</span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							{{version.updatedAt | uppercase}}
+						</td>           
+						<td [class.text-muted]="version.active" [class.active]="version.active">
+							<span *ngIf="version.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+							<span *ngIf="!version.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+						</td>
+						<td [class.text-muted]="!version.active" [class.active]="version.active">
+							<span>
+								<a href="javascript:;" (click)="viewElement(dish._id, 'dish', version._id)"
+								class="btn gold btn-sm btn-outline table-row-button">
+								<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							</span>
+							<span>
+								<a href="javascript:;" (click)="deleteRecipe(dish._id,version._id,'dish',j,'dish')"
+								class="btn gold btn-sm btn-outline table-row-button" disabled>
+								<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+							</span>
+						</td>
+	      </tr>
+	     </tbody>
+	     <tbody *ngFor="let drink of drinks; let j = index; ">
+				<tr *ngIf="drink.activeVersion">
+					<td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+	          <span *ngIf="drink.versions.length > 0">
+	            <a href="javascript:;" *ngIf="drink.expanded" (click)="drink.expanded = false" class="btn btn-xs default" style="color: #a0a127;">-
+	            </a>      
+	            <a href="javascript:;" *ngIf="!drink.expanded" (click)="drink.expanded = true" class="btn btn-xs default" style="color: #a0a127;">+
+	            </a> 
+	          </span>
+	        </td>
+	        <td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+						{{drink.activeVersion.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+						<span>{{'generic.drink' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+						{{drink.activeVersion.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+						<span *ngIf="drink.activeVersion.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!drink.activeVersion.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!drink.activeVersion.active" [class.active]="drink.activeVersion.active">
+						<span>
+							<a href="javascript:;" (click)="viewElement(drink._id, 'drink', drink.activeVersion._id)"
+							class="btn gold btn-sm btn-outline table-row-button" >
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteRecipe(drink._id,drink.activeVersion._id,'drink',j)"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+						<span *ngIf="drink.expanded">
+							<a href="javascript:;" (click)="deleteAllRecipes(drink,j, 'drink')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.deleteAll' | translate}}</a>
+						</span>
+					</td>
+				</tr>
+				<tr [class.hidden]="!drink.expanded" *ngFor="let version of drink.versions; let i = index; ">
+					<td [class.text-muted]="!version.active" [class.active]="version.active"></td>
+	        <td [class.text-muted]="!version.active" [class.active]="version.active">
+						{{version.lang.name | uppercase}}
+					</td>
+					<td [class.text-muted]="!version.active" [class.active]="version.active">
+						<span>{{'generic.drink' | translate | uppercase}}</span>
+					</td>
+					<td [class.text-muted]="!version.active" [class.active]="version.active">
+						{{version.updatedAt | uppercase}}
+					</td>           
+					<td [class.text-muted]="version.active" [class.active]="version.active">
+						<span *ngIf="version.active"><i class="fa fa-check cd-gold" aria-hidden="true"></i></span>
+						<span *ngIf="!version.active"><i class="fa fa-times cd-gold" aria-hidden="true"></i></span>
+					</td>
+					<td [class.text-muted]="!version.active" [class.active]="version.active">
+						<span>
+							<a href="javascript:;" (click)="viewElement(drink._id, 'drink', version._id)"
+							class="btn gold btn-sm btn-outline table-row-button">
+							<i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+						</span>
+						<span>
+							<a href="javascript:;" (click)="deleteRecipe(drink._id,version._id,'drink',j,'drink')"
+							class="btn gold btn-sm btn-outline table-row-button" disabled>
+							<i class="fa fa-trash"></i>{{'buttonGeneric.delete' | translate}}</a>
+						</span>
+					</td>
+	      </tr>
+			</tbody>
+		</table>
+	</div>
+	<div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalElements"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination *ngIf="itemsPerPage && currentPage && totalElements" class="cd-pagination" [totalItems]="totalElements" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,68 @@
+<div class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
+  <app-header></app-header>
+  <div class="clearfix"></div>
+  <div class="page-container">
+    <menu style="padding:0px; margin: 0px" (showSideBarMenu)="showSideBarMenu($event)"></menu>
+    <div class="page-content-wrapper">
+      <!-- BEGIN CONTENT BODY -->
+      <div class="page-content marginTransition" [ngClass]="{'hideSideMenu': !showSideMenu}">
+        <!-- BEGIN PAGE HEADER-->
+        <h1 class="page-title"> {{'selenta-import.heading' | translate}} </h1>
+
+        <!-- END PAGE HEADER-->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="portlet box black">
+              <div class="portlet-body cd-portlet-body">
+                <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-pills cd-navs cd-nav-pills">
+
+                    <li [class.active]="(_router.url == '/import/selenta-import/selenta-import-providers')||(_router.url == '/import/selenta-import/selenta-import-new-providers')">
+                        <a href="javascript:;" routerLink="selenta-import-new-providers">{{'selenta-import.tabs.providers' | translate}}</a> 
+                    </li>
+                    <li [class.active]="_router.url == '/import/selenta-import/selenta-import-new-articles'"> 
+                        <a href="javascript:;" routerLink="selenta-import-new-articles">{{'selenta-import.tabs.newArticles' | translate}}</a> 
+                    </li> 
+                    <li [class.active]="regexp.test(_router.url)"> 
+                        <a href="javascript:;" routerLink="selenta-import-articles">{{'selenta-import.tabs.articles' | translate}}</a> 
+                    </li>
+                    <li [class.active]="(_router.url == '/import/selenta-import/selenta-import-families')||(_router.url == '/import/selenta-import/selenta-import-families')">
+                        <a href="javascript:;" routerLink="selenta-import-families">{{'selenta-import.tabs.families' | translate}}</a> 
+                    </li>
+                    <!-- <li routerLinkActive="active">
+                        <a href="javascript:;" routerLink="selenta-import-new-providers">{{'selenta-import.tabs.newProviders' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-new-articles">{{'selenta-import.tabs.newArticles' | translate}}</a> 
+                    </li> -->
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-deleted">{{'selenta-import.tabs.deleted' | translate}}</a> 
+                    </li>
+                  <!--   <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-providers">{{'selenta-import.tabs.providers' | translate}}</a> 
+                    </li> -->
+                    <!-- <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-articles">{{'selenta-import.tabs.articles' | translate}}</a> 
+                    </li> -->
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-activity-log">{{'selenta-import.tabs.activityLog' | translate}}</a> 
+                    </li>
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="selenta-import-conflicts">{{'selenta-import.tabs.conflicts' | translate}}</a> 
+                    </li>
+                  </ul>
+                  <div class="tab-content cd-tab-content">  
+                   <router-outlet></router-outlet>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END SAMPLE TABLE PORTLET-->
+      </div>
+      <!-- END CONTENT BODY -->
+    </div>
+  </div>
+  <footer></footer>
+</div>

@@ -1,0 +1,49 @@
+  <div *ngIf="userLocations" class="location-selector">
+  	<div style="font-size: 0.8em; font-style: italic; margin-bottom: 15px;">
+  		<span >{{ 'selected_locations' | translate:{value: selectedLocations.length} }}</span>
+  	</div>  	
+  	<ul style="list-style: none;">
+  		<li *ngFor="let organization of userLocations" class="li-selector">
+  			<span *ngIf="organization.companies.length > 0">
+  				<span *ngIf="organization.expanded" (click)="organization.expanded = false" class=""><i class="fa fa-minus" aria-hidden="true"></i></span>
+  				<span *ngIf="!organization.expanded" (click)="organization.expanded = true" class=""><i class="fa fa-plus" aria-hidden="true"></i></span>
+  			</span>
+        <label *ngIf="organization.active" class="mt-checkbox mt-checkbox-outline grey">
+         <input type="checkbox" [(ngModel)]="organization.checked" (click)="onClick($event, organization)" [disabled]="disabled">  
+          <span class="green-form"></span>
+        </label>
+        <label *ngIf="organization.active">{{organization.name}}</label><label *ngIf="!organization.active">---</label>
+  			<div *ngIf="organization.expanded">
+  				<ul style="list-style: none;">
+  					<li *ngFor="let company of organization.companies" class="li-selector">
+  					  <!-- Minus and plus signs -->
+  						<span *ngIf="company.activeBusinessUnits && company.businessUnits.length > 0">
+  							<span *ngIf="company.expanded" (click)="company.expanded = false" class=""><i  class="fa fa-minus" aria-hidden="true"></i></span>
+  							<span *ngIf="!company.expanded" (click)="company.expanded = true" class=""><i  class="fa fa-plus" aria-hidden="true"></i></span>
+  						</span>
+  					  <!-- Checkbox -->
+              <label *ngIf="company.active" class="mt-checkbox mt-checkbox-outline grey">
+                <input type="checkbox" [(ngModel)]="company.checked" (click)="onClick($event, organization, company)" [disabled]="disabled">  
+                <span class="green-form"></span>
+              </label>
+  						<label *ngIf="company.active">{{company.name}}</label>
+  						<label *ngIf="!company.active && company.activeBusinessUnits">---</label>
+              <!-- Name -->
+  						<div *ngIf="company.expanded">
+  							<ul style="list-style: none;">
+  								<li *ngFor="let businessUnit of company.businessUnits" class="li-selector">
+                    <label *ngIf="businessUnit.active" class="mt-checkbox mt-checkbox-outline grey">
+                      <input type="checkbox" [(ngModel)]="businessUnit.checked" (click)="onClick($event, organization, company, businessUnit)" [disabled]="disabled">  
+                      <span class="green-form"></span>
+                    </label>
+  									<span *ngIf="businessUnit.active"> {{businessUnit.name}}</span>
+  								</li>
+  							</ul>
+  						</div>
+  					</li>
+  				</ul>
+  			</div>
+  		</li>
+  	</ul>
+ </div>
+

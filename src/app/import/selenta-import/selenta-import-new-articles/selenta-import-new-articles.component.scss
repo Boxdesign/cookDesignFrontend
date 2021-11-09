@@ -1,0 +1,23 @@
+/*   .selector {
+    width: 100%;
+    border: 1px solid rgba(161, 162, 4, 0.31);
+    font-weight: 400;
+    font-family: "Lato" !important;
+    color: #606051;
+    background: rgba(255, 255, 255, 0.64);
+    padding: 30px;
+    font-size: 14px;
+  }
+  .selector {
+    max-height: 440px;
+    overflow-y: auto;
+  } */
+
+  .selected {
+    background-color: #a0a127;
+    color: #fff;
+  }
+  .selected:hover {
+    background-color: #a0a127;
+    color: #fff;
+  }

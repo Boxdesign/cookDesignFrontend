@@ -1,0 +1,326 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportNewProviders">
+  <div class="row">
+    <div class="col-md-6">
+
+    <!-- SELENTA NEW PROVIDERS -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.newSapProviders' | translate}}</h2>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="filterSelentaProviders($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <div class="col-md-6">
+          <a href="javascript:;" routerLink="../selenta-import-providers" class="btn default pull-right gold">{{'selenta-import.tabs.providers' | translate}}</a>
+        </div>
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="selentaProvidersSortField" [(sortOrder)]="selentaProvidersSortOrder" [label]="'provider.provider.tableHead.name'" [value]="'provider.NAME1'" (onChange)="getSelentaSapNewProviders()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaProvidersSortField" [(sortOrder)]="selentaProvidersSortOrder" [label]="'provider.provider.tableHead.taxId'" [value]="'provider.STCD1'" (onChange)="getSelentaSapNewProviders()" ></column-sorter>
+            </th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let selentaProvider of selentaNewProviders; let in=index" >
+            <tr [class.selected]="(selentaProvider?._id === selentaProviderSelected?._id)">
+              <td height="70" width="10%" (click)="selectSelentaProvider(selentaProvider)" class="pointer">
+                <div style="display: block; text-align:center;">
+                  {{(selentaProvidersCurrentPage-1)*selentaProvidersPerPage + in + 1}}
+                </div>
+              </td>
+              <td height="70" width="60%" (click)="selectSelentaProvider(selentaProvider)" class="pointer">
+                {{selentaProvider.provider.NAME1}}
+              </td>
+              <td height="70" (click)="selectSelentaProvider(selentaProvider)" class="pointer">
+                {{selentaProvider.provider.STCD1}}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateSelentaProvidersPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="selentaProvidersPerPage" [currentPage]="selentaProvidersCurrentPage" [totalItems]="selentaTotalProviders"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="selentaProvidersPerPage && selentaProvidersCurrentPage && selentaTotalProviders" class="cd-pagination" [totalItems]="selentaTotalProviders" [(ngModel)]="selentaProvidersCurrentPage" [itemsPerPage]="selentaProvidersPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="selentaPageHasChanged($event)" (numPages)="selentaProvidersNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-6">
+
+      <!-- PROVIDERS TABLE -->
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="tab-box-title">{{'selenta-import.unlinkedProviders' | translate}}</h2>
+       </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <search-box (onSearchEntered)="searchProviders($event)" [label]="searchBoxLabel"></search-box>
+        </div>
+        <div class="col-md-6">
+          <a href="javascript:;" (click)="addProvider()" class="btn default pull-right gold"> <i class="fa fa-plus"></i> {{'provider.provider.addProvider' | translate}}
+          </a>
+        </div>
+      </div>
+      <div class="table-scrollable">
+        <table class="table table-hover">
+          <thead>
+          <tr>
+            <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="providersSortField" [(sortOrder)]="providersSortOrder" [label]="'provider.provider.tableHead.name'" [value]="'commercialName'" (onChange)="getProviders()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="providersSortField" [(sortOrder)]="providersSortOrder" [label]="'provider.provider.tableHead.taxId'" [value]="'taxId'" (onChange)="getProviders()" ></column-sorter>
+            </th>
+            <th>
+              <i (click)="filterLocationModal.show()" style="cursor: pointer;font-style: normal;">{{'provider.provider.tableHead.location' | translate}}&nbsp;<i class="fa fa-filter" aria-hidden="true"></i></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+            </th>
+            <th> {{'buttonGeneric.actions' | translate}}</th>
+          </tr>
+          </thead>
+          <tbody *ngFor="let provider of providers;let i=index">
+            <tr [class.text-muted]="!provider.active" [class.active]="!provider.active">
+              <td height="70" width="5%" (click)="viewProvider(provider._id)" class="pointer">
+                <div style="display: block; text-align:center;">
+                  {{(providersCurrentPage-1)*providersPerPage + i + 1}}
+                </div>
+              </td>
+              <td height="70" (click)="viewProvider(provider._id)" class="pointer">
+                {{provider.commercialName}}
+              </td>
+              <td height="70" width="10%" (click)="viewProvider(provider._id)" class="pointer">
+                {{provider.taxId}}
+              </td>
+              <td width="10%">
+                <a href="javascript:;" (click)="selectProviderToEdit(provider); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{provider.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'provider.provider.form.location' | translate}}</a>
+              </td>
+              <td height="70" width="280">
+                <a href="javascript:;" (click)="editProvider(provider._id)" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+                <a href="javascript:;" (click)="selectProviderToEdit(provider); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+                <a href="javascript:;" (click) ="providerSelected=provider; linkProviderModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+                  <i class="fa fa-trash"></i> {{'selenta-import.link' | translate}} </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <div class="col-md-5">
+          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+          <span class="pagination-separator">|</span>
+          <pagination-snippet [itemsPerPage]="providersPerPage" [currentPage]="providersCurrentPage" [totalItems]="totalProviders"></pagination-snippet>
+        </div>
+        <div class="col-md-7">
+          <div class="pull-right">
+            <pagination *ngIf="providersPerPage && providersCurrentPage && totalProviders" class="cd-pagination" [totalItems]="totalProviders" [(ngModel)]="providersCurrentPage" [itemsPerPage]="providersPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="providersNumPages = $event"></pagination>
+          </div>
+        </div>
+      </div>
+
+
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../../../import" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'provider.provider.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.provider.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="provider">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="provider.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;"></div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!--confirm delete MODAL -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.provider.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteProvider()" class="form-horizontal" #deleteProviderForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <p>{{'provider.provider.form.confirmDeleteQuestion' | translate}}</p>
+                  <br>
+                  <p>{{ provider?.commercialName}}</p>
+                  <br>
+                  <p>{{ provider?.taxId}}</p>
+                  <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--LINK provider MODAL -->
+<div bsModal #linkProviderModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" style="width: 800px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="linkProviderModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'selenta-import.linkProviders' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="linkProviders()" class="form-horizontal" #linkProviderForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                <b *ngIf="selentaProviderSelected">{{'selenta-import.linkProvidersMessage' | translate}}</b>
+                <b *ngIf="!selentaProviderSelected" style="color: red;">{{ 'selenta-import.linkProvidersError' | translate }}</b>
+
+                <div class="row" *ngIf="selentaProviderSelected">
+                  <div class="col-md-6">
+                    <h4 class="tab-box-title">{{'selenta-import.newSapProvider' | translate}}</h4>
+                    <div class="col-md-3" style="padding: 0px; color: #666;">
+                      {{'selenta-import.provider' | translate}}:<br>
+                      {{'selenta-import.STCD1' | translate}}:<br>
+                    </div>
+                    <div class="col-md-9" style="padding: 0px;"> 
+                      {{ selentaProviderSelected?.provider.NAME1 }}<br>
+                      {{ selentaroviderSelected?.provider.STCD1 }}<br>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <h4 class="tab-box-title">{{'selenta-import.unlinkedProvider' | translate}}</h4>
+                    <div class="col-md-3" style="padding: 0px; color: #666;">
+                      {{'selenta-import.provider' | translate}}:<br>
+                      {{'selenta-import.STCD1' | translate}}:<br>
+                    </div>
+                    <div class="col-md-9" style="padding: 0px;"> 
+                      {{ providerSelected?.commercialName}}<br>
+                      {{ providerSelected?.taxId}}<br>
+                    </div>
+                  </div>
+                </div>
+                <br>
+                <br>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-7 col-md-5">
+                    <button type="submit" (click)="linkProviderModal.hide();" class="btn green" [disabled]="!selentaProviderSelected">{{'selenta-import.link' | translate}}
+                    </button>
+                    <button type="button" (click)="linkProviderModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

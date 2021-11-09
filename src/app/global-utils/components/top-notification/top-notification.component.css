@@ -1,0 +1,43 @@
+.top-notification {
+  width: 100%;
+  border-style: solid;
+  border-color: #3a3a3a;
+  border-width: 2px;
+}
+.notification-success {
+  background-color: #a0a127;
+  padding-top: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 2%;
+  color: white;
+}
+
+.notification-success a{
+  color: white;
+}
+.notification-error {
+  background-color: #ba0b1f;
+  padding-top: 0.5%;
+  padding-bottom: 0.5%;
+  padding-left: 2%;
+  color: white;
+}
+.notification-error a{
+  color: white;
+}
+
+.notification-summary {
+  font-weight: bold;
+  font-style: normal;
+}
+.notification-detail {
+  font-style: normal;
+}
+.top-notification-border {
+  border-top: none !important;
+}
+.msg-delete {
+  float: right;
+  padding-right: 2%;
+  cursor: pointer;
+}

@@ -1,0 +1,9 @@
+<div *ngIf="loading" class="loadingGifBox" [ngClass]="{'loadingGifBoxComposition': (loading && (type == 'composition' || type == 'whereIs'))}">
+  <img src="../../../../assets/img/staticLoading.png" alt="loading!" class="loadingGif loadingGifMotion" />
+</div>
+<div *ngIf="type!='whereIs'" class="updatingGifHided" [ngClass]="{'showUpdatingGif': (updating && !loading)}" >
+  <img src="../../../../assets/img/staticLoading.png" alt="loading!" class="loadingGif loadingGifMotion" />
+</div>
+<div *ngIf="type=='whereIs'" class="updatingGifHidedWhereIs" [ngClass]="{'showUpdatingGif': (updating && !loading)}" >
+  <img src="../../../../assets/img/staticLoading.png" alt="loading!" class="loadingGif loadingGifMotion" />
+</div>

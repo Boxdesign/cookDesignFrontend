@@ -1,0 +1,188 @@
+<div heading="Exports">
+  <div class="row">
+		<div class="col-md-4">
+			<h2 class="tab-box-title">{{'export.filters' | translate}}</h2>
+			<div class="selector">
+				<div class="form-group">
+	          <label for="searchText" class="control-label">{{'export.searchText' | translate}} </label>
+	          <input for="searchText" class="form-control"  [(ngModel)]="filterText" name="filterText" [disabled]="qty=='some'">
+	      </div>
+	      <div class="form-group">			
+		      <label for="location" class="control-label">{{'export.location' | translate}}</label>
+					<location-filter (onLocationChecked)="updateFilterLocations($event)" [disabled]="qty=='some' || firstSelectorType == 'article'"></location-filter>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-5">
+			<h2 class="tab-box-title">{{'export.selectData' | translate}}</h2>
+			<div class="selector">
+				<form class="form-horizontal">
+					<div class="form-body">
+						<div class="form-group">
+							<label for="type" class="control-label">{{'export.type' | translate}} </label>
+							<select id="type" class="form-control" name="type" required (change)="firstSelected($event.target.value)" [disabled]="false">
+								<option [selected]="true" value="gastroOffer">{{'export.gastroOffers' | translate | uppercase}}</option>
+								<option [selected]="false" value="recipe">{{'export.recipes' | translate | uppercase}}</option>
+								<option [selected]="false" value="article">{{'export.articles' | translate | uppercase}}</option>
+							</select>
+						</div>
+						<div class="form-group" *ngIf="firstSelectorType == 'gastroOffer'" >
+							<label for="gastroOfferType" class="control-label">{{'export.gastroOfferType' | translate}} </label>
+							<select id="gastroOfferType" class="form-control" name="gastroOfferType" required (change)="gastroOfferTypeSelected($event.target.value)" [disabled]="false">
+								<option [selected]="true" value="all">{{'export.all' | translate | uppercase}}</option>
+								<option [selected]="false" value="menu">{{'export.simpleMenu' | translate | uppercase}}</option>
+								<option [selected]="false" value="dailyMenuCarte">{{'export.dailyMenuCarte' | translate | uppercase}}</option>
+								<option [selected]="false" value="buffet">{{'export.buffet' | translate | uppercase}}</option>
+								<option [selected]="false" value="carte">{{'export.carte' | translate | uppercase}}</option>
+								<option [selected]="false" value="fixedPriceCarte">{{'export.fixedPriceCarte' | translate | uppercase}}</option>
+								<option [selected]="false" value="catalog">{{'export.catalog' | translate | uppercase}}</option>
+							</select>
+						</div>
+
+						<div class="form-group" *ngIf="firstSelectorType == 'recipe'" >
+							<label for="recipesType" class="control-label">{{'export.recipesType' | translate}} </label> 
+							<select id="recipesType" class="form-control" name="recipesType" required (change)="recipesTypeSelected($event.target.value)" [disabled]="false">
+								<option [selected]="true" value="subproduct">{{'export.subproducts' | translate | uppercase}}</option>
+								<option [selected]="false" value="product">{{'export.products' | translate | uppercase}}</option>
+								<option [selected]="false" value="dish">{{'export.dishes' | translate | uppercase}}</option>
+								<option [selected]="false" value="drink">{{'export.drinks' | translate | uppercase}}</option>
+							</select>
+						</div>
+
+						<div class="form-group" *ngIf="firstSelectorType == 'article'" >
+							<label for="articlesType" class="control-label">{{'export.articlesType' | translate}} </label>
+							<select id="articlesType" class="form-control" name="articlesType" required (change)="articlesTypeSelected($event.target.value)" [disabled]="false">
+								<option [selected]="false" value="ingredient">{{'export.ingredients' | translate | uppercase}}</option>
+								<option [selected]="false" value="packaging">{{'export.packagings' | translate | uppercase}}</option>
+							</select>
+						</div>
+
+						<div class="form-group" *ngIf="(gastroOfferType && gastroOfferType!='all') || (recipeType && recipeType!='all') || (articleType && articleType!='all')">
+							<label for="qty" class="control-label">{{'export.group' | translate}}</label> 
+					        <br/>
+					        <p-selectButton [options]="quantityOptions" [(ngModel)]="qty" name="qty" (onChange)="resetList()"></p-selectButton>
+					    </div>
+<!-- gastroOffer -->
+						<div class="form-group" *ngIf="firstSelectorType == 'gastroOffer' && gastroOfferType && gastroOfferType!='all' && qty=='some'">
+								<label for="gastroOffer" class="control-label">{{'export.gastroOffer' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="gastroOfferSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="gastroOfferSearchChanged($event)"
+									(removed)="gastroOfferRemoved($event)" #gastroOfferSelectElement>
+							</ng-select>
+						</div>
+
+<!-- subproduct -->
+						<div class="form-group" *ngIf="firstSelectorType == 'recipe' && recipeType && recipeType=='subproduct' && qty=='some'">
+								<label for="subproduct" class="control-label">{{'export.recipe' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="recipeSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="recipeSearchChanged($event)"
+									(removed)="recipeRemoved($event)" #subproductSelectElement>
+							</ng-select>
+						</div>
+
+<!-- product -->
+						<div class="form-group" *ngIf="firstSelectorType == 'recipe' && recipeType && recipeType=='product' && qty=='some'">
+								<label for="product" class="control-label">{{'export.recipe' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="recipeSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="recipeSearchChanged($event)"
+									(removed)="recipeRemoved($event)" #productSelectElement>
+							</ng-select>
+						</div>
+
+<!-- dishes -->
+						<div class="form-group" *ngIf="firstSelectorType == 'recipe' && recipeType && recipeType=='dish' && qty=='some'">
+								<label for="dish" class="control-label">{{'export.recipe' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="recipeSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="recipeSearchChanged($event)"
+									(removed)="recipeRemoved($event)" #dishSelectElement>
+							</ng-select>
+						</div>
+
+<!-- drinks -->
+						<div class="form-group" *ngIf="firstSelectorType == 'recipe' && recipeType && recipeType=='drink' && qty=='some'">
+								<label for="drink" class="control-label">{{'export.recipe' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="recipeSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="recipeSearchChanged($event)"
+									(removed)="recipeRemoved($event)" #drinkSelectElement>
+							</ng-select>
+						</div>
+
+<!-- ingredients -->
+						<div class="form-group" *ngIf="firstSelectorType == 'article' && articleType && articleType=='ingredient' && qty=='some'">
+								<label for="ingredient" class="control-label">{{'export.article' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="articleSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="articleSearchChanged($event)"
+									(removed)="articleRemoved($event)" #ingredientSelectElement>
+							</ng-select>
+						</div>
+
+<!-- packagings -->
+						<div class="form-group" *ngIf="firstSelectorType == 'article' && articleType && articleType=='packaging' && qty=='some'">
+								<label for="packaging" class="control-label">{{'export.article' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="true"
+									[allowClear]="true"
+									[active] = "activeElement"
+									(selected)="articleSelected($event)" 
+									[disabled]="status=='view'"
+									(typed)="articleSearchChanged($event)"
+									(removed)="articleRemoved($event)" #packagingSelectElement>
+							</ng-select>
+						</div>						
+					</div>
+					<div class="form-actions">
+						<div class="row">
+							<div class="pull-right">
+								<img *ngIf="loadingData" src="../assets/img/preloader.gif"/>
+								<button *ngIf="firstSelectorType == 'gastroOffer'" [disabled]="qty=='some' && gastroOffer.length==0" type="submit" (click)="downloadGastroData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>
+								<button *ngIf="firstSelectorType == 'recipe' && recipeType == 'subproduct'" [disabled]="qty=='some' && subproduct.length==0" type="submit" (click)="downloadRecipeData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>	
+								<button *ngIf="firstSelectorType == 'recipe'  && recipeType == 'product' " [disabled]="qty=='some' && product.length==0" type="submit" (click)="downloadRecipeData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>	
+								<button *ngIf="firstSelectorType == 'recipe'  && recipeType == 'dish'" [disabled]="qty=='some' && dish.length==0" type="submit" (click)="downloadRecipeData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>	
+								<button *ngIf="firstSelectorType == 'recipe'  && recipeType == 'drink' " [disabled]="qty=='some' && drink.length==0" type="submit" (click)="downloadRecipeData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>									
+		            <button *ngIf="firstSelectorType == 'article' && articleType == 'ingredient' " [disabled]="qty=='some' && ingredient.length==0" type="submit" (click)="downloadArticleData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>
+ 								<button *ngIf="firstSelectorType == 'article' && articleType == 'packaging' " [disabled]="qty=='some' && packaging.length==0" type="submit" (click)="downloadArticleData()" class="btn green right">{{'buttonGeneric.export' | translate }}
+		            </button>		            
+	            </div>
+	          </div>
+					</div>
+				</form>
+		</div>
+	</div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>

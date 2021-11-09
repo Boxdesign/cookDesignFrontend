@@ -1,0 +1,6 @@
+<div (click)="sortColumn(value)" class="pointer">
+  <i *ngIf="sortField != value" class="fa fa-sort" aria-hidden="true"></i>
+  <i *ngIf="(sortField == value)&&(sortOrder == 1)" class="fa fa-sort-desc" aria-hidden="true"></i>
+  <i *ngIf="(sortField == value)&&(sortOrder == -1)" class="fa fa-sort-asc" aria-hidden="true"></i>
+  {{ label | translate }}
+</div>

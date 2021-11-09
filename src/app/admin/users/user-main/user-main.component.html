@@ -1,0 +1,132 @@
+<div heading="User">
+	<h3 *ngIf="mode=='edit'" class="tab-box-title">{{'admin.user.form.editUser' | translate}}</h3>
+	<h3 *ngIf="mode=='view'" class="tab-box-title">{{'admin.user.form.viewUser' | translate}}</h3>
+	<h6 *ngIf="account&&user&&mode!='new'">{{'admin.user.form.latestUpdate' | translate}}&nbsp;{{user.updatedAt | date: 'medium'}}&nbsp;{{'admin.user.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+	<button *ngIf="mode=='view'" type="button" (click)="editUser()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="portlet-body form">
+				<form (ngSubmit)="uploadImage()" class="horizontal-form cd-form"  #userMainForm="ngForm" *ngIf="user">
+					<div class="form-body">
+							<div class="row">
+								<div class="col-md-12">
+									<h2 *ngIf="mode=='new'" class="tab-box-title" style="margin-bottom: 20px;">{{'admin.user.form.new' | translate}}</h2>
+								</div>
+								<div class="col-md-6">
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="firstName" class="control-label">{{'admin.user.form.firstName' | translate}} <span class="required"> * </span></label>
+												<input for="firstName" class="form-control"  [(ngModel)]="user.firstName" name="firstName" [disabled]="mode=='view'" pInputText required="">
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="lastName" class="control-label">{{'admin.user.form.lastName' | translate}} <span class="required"> * </span></label>
+												<input for="lastName" class="form-control"  [(ngModel)]="user.lastName" name="lastName" [disabled]="mode=='view'" pInputText required="">
+											</div>
+										</div>
+									</div> 
+									<div class="row">
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="active" class="control-label">{{'admin.user.form.active' | translate}}</label>
+												<select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required [disabled]="mode=='view'">
+													<option [selected]="user.active" value="yes">{{'buttonGeneric.yes' | translate}}</option>
+													<option [selected]="!user.active" value="no">{{'buttonGeneric.no' | translate}}</option>
+												</select>
+											</div>
+										</div>
+										<div class="col-md-6">
+											<div class="form-group">
+												<label for="language" class="control-label cd-control-label">{{'admin.user.form.language' | translate}}</label>
+												<select *ngIf="languages" id="languages" class="form-control" (change)="languageSelected($event.target.value)" name="languages" required [disabled]="mode=='view'">
+													<option *ngFor="let language of languages;let i = index" [value]="i" [selected]="language.langCode==user.language">{{'admin.user.' + language.langCode | translate}}</option>
+												</select>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<div class="form-group">
+												<label for="email" class="control-label">{{'admin.user.form.email' | translate}} <span class="required"> * </span></label>
+												<input for="email" class="form-control"  [(ngModel)]="user.email" name="email" [disabled]="mode=='view'" pInputText required="">
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12">
+											<hr style="boder: none;">
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12" *ngIf="mode=='new'">
+											<div class="form-group">
+												<label for="password" class="control-label">{{'admin.user.form.password' | translate}} <span class="required"> * </span></label>
+												<input for="password" class="form-control"  [(ngModel)]="user.password" name="password" type="password" pInputText>
+											</div>
+										</div>
+									</div>
+									<div class="row">
+										<div class="col-md-12" *ngIf="mode=='new'">
+											<div class="form-group">
+												<label for="repeatpassword" class="control-label">{{'admin.user.form.repeatpassword' | translate}} <span class="required"> * </span>
+												</label>
+												<input for="repeatpassword" class="form-control"  [(ngModel)]="repeat_password" name="repeatpassword" type="password" pInputText>
+											</div>
+										</div>
+									</div>
+								</div>
+									<div class="col-md-6">
+										<div class="row">
+											<div class="col-md-12">
+                    		<crop-and-upload [(gallery)]="user.gallery" [folderPath]="'imgs/users/'" [upload]="upload" (uploadFinished)="imageUploadFinished()" [mode]="mode" ></crop-and-upload>											
+											</div>
+										</div>
+									</div>								
+								</div>
+							</div>
+							<div class="form-actions right">
+									<button *ngIf="mode!='view'" type="submit" [disabled]="!user.firstName" class="btn green">{{'buttonGeneric.save' | translate}}
+									</button>
+									<button type="button" routerLink="/admin/user" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

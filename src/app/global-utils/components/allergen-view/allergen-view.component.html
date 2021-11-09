@@ -1,0 +1,20 @@
+<div *ngIf="allergens.length>0">
+  <div class="col-md-4 col-xs-4" *ngFor="let allergen of allergens">
+    <div *ngIf="allergen.level!=0">
+      <img *ngIf="!allergen.gallery" src="../../../assets/img/noImageCircle.png" alt="" >
+      <img *ngIf="allergen.gallery "[src]="allergen.gallery.sizes[0].url" alt="">
+      <div class="mt-card-content allergen-card-content">
+        <span [ngSwitch]="allergen.level">
+          <span style="color:grey; font-size: 10px;" *ngSwitchDefault>{{'library.allergen.null' | translate}}</span>
+          <span style="color:grey; font-size: 10px;" *ngSwitchCase="0">{{'library.allergen.null' | translate}}</span>
+          <span style="color:orange; font-size: 10px;" *ngSwitchCase="1">{{'library.allergen.traces' | translate}}</span>
+          <span style="color:red; font-size: 10px;" *ngSwitchCase="2">{{'library.allergen.full' | translate}}</span>
+        </span>
+        <p style="font-size: 12px;" class="mt-card-desc font-grey-mint">{{allergen.lang[0]?.name}}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div *ngIf="allergens.length==0">
+  <p>{{'library.allergen.void' | translate}}</p>
+</div>

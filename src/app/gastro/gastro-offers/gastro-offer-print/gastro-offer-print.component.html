@@ -1,0 +1,145 @@
+		<h4 *ngIf="!hidden" class="tab-box-title" style="margin-bottom: 20px;">
+			{{'recipes.subproduct.printTitle' | translate}}&nbsp; 
+			<div (click)="cleanAndResetFields(); print.show()" style="display: inline-block;" class="pointer">
+				<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+			</div>
+		</h4>
+		<!-- <h4 class="tab-box-title" style="margin-bottom: 20px;">
+		{{'recipes.subproduct.printTitleBook' | translate}}&nbsp; 
+		<div (click)="cleanAndResetFieldsBook(); print.show()" style="display: inline-block;" class="pointer">
+			<i class="fa fa-file-pdf-o" aria-hidden="true"></i>
+		</div>
+	</h4> -->
+	<simple-notifications [options]="options"></simple-notifications>
+
+	<!--MODALS-->
+
+	<!--add -->
+	<div bsModal #print="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+		<div class="modal-dialog modal-lg">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" (click)="print.hide()" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 *ngIf="active==false" style="display: inline;" class="modal-title">{{'recipes.subproduct.downloadFile' | translate}}:</h4>
+					<h4 *ngIf="active==true" style="display: inline;" class="modal-title">{{'recipes.subproduct.downloadBook' | translate}}:</h4>
+					<h4 *ngIf="hidden==false" style="display: inline;">{{menuOnEdit.lang[0]?.name}}</h4>
+					<h4 *ngIf="hidden==true" style="display: inline;">{{menuName}}</h4>
+				</div>
+				<div class="modal-body">
+					<form (ngSubmit)="downloadFile()" class="form-horizontal" #printForm="ngForm">
+						<div class="row">
+							<div class="col-md-7 col-md-offset-1">
+								<div class="form-body">
+
+									<div class="form-group">
+
+										<div class="col-md-12">
+
+											<label class="col-md-5 control-label">{{'recipes.subproduct.template' | translate}}<span class="required"> * </span></label>
+											
+											<div class="col-md-7">
+												<select *ngIf="active==false" class="form-control" (change)="templateSelected($event.target.value)" name="gastroType" required="">
+													<option *ngFor="let template of templateList; let i=index;" [value]="i">{{ template.lang[0]?.name | uppercase}} </option>
+												</select> 
+												<select *ngIf="active==true" class="form-control" (change)="templateSelected($event.target.value)" name="gastroType" required="">
+													<option *ngFor="let template of templateList; let i=index;" [value]="i">{{ template.lang[0]?.name | uppercase}} </option>
+												</select>
+											</div>
+
+										</div>
+										
+									</div>
+
+									<div class="form-group" style="margin-top: 30px; margin-left: 20px !important;" *ngIf="descriptiveSelected || menuType=='menu' || menuType == 'buffet'">
+
+										<label class="control-label">{{'gastro.menu.form.options'  | translate}}</label><br>
+										
+										<div class="options">
+											
+											<div class="row">
+
+												<div class="col-md-4 pull-left" *ngIf="descriptiveSelected">
+
+													<div class="col-md-10 pull-left">
+														<label class="control-label">{{ 'gastro.menu.form.price'	| translate}}</label>
+													</div>
+
+													<div class="col-md-8 pointer pull-left ">
+														<label class="control-label" style="color: #a0a127;">{{ 'showPrice'	| translate}}</label>&nbsp;
+														<div class="pull-right">
+	 										        <label class="mt-radio control-label mt-radio-outline grey">
+				                        <input type="radio" name="priceOption" value="yes" checked="true" (click)="printOptions('yes')"> 
+				                        <span class="green-form"></span>
+				                      </label>															
+														</div>														
+													</div>													
+
+
+													<div class="col-md-8 pointer pull-left">
+
+														<label class="control-label" style="color: #a0a127 ;">{{ 'noShowPrice'	| translate}}</label>&nbsp;
+														<div class="pull-right"> 
+															<label class="mt-radio control-label mt-radio-outline grey">
+				                        <input type="radio" name="priceOption" value="no" (click)="printOptions('no')"> 
+				                        <span class="green-form"></span>
+				                      </label>
+														</div>
+													</div>
+												</div>
+											<div class="col-md-6 pull-left" *ngIf="menuType=='menu' || menuType=='buffet'">
+												<div class="col-md-10 pull-left">
+													<label class="control-label">{{ 'gastro.menu.composition.print'	| translate}}</label>
+												</div>
+												<div class="col-md-8 pointer pull-left" *ngIf="menuType=='menu' || menuType=='buffet'">
+													<label class="control-label" style="color: #a0a127 ;">{{ 'gastro.menu.composition.dish'	| translate}}</label>&nbsp;
+													<div class="pull-right"> 
+														<label class="mt-radio control-label mt-radio-outline grey">
+			                        <input type="radio" name="printOption" value="dish" (click)="filterGastroOfferBy('dish')"> 
+			                        <span class="green-form"></span>
+			                      </label>
+													</div>													
+												</div>
+												<div class="col-md-8 pointer pull-left" *ngIf="menuType=='menu' || menuType=='buffet'">
+													<label class="control-label" style="color: #a0a127 ;">{{ 'gastro.menu.composition.drink'	| translate}}</label>&nbsp;
+													<div class="pull-right"> 
+														<label class="mt-radio control-label mt-radio-outline grey">
+			                        <input type="radio" name="printOption" value="drink" (click)="filterGastroOfferBy('drink')"> 
+			                        <span class="green-form"></span>
+			                      </label>
+													</div>													
+												</div>
+												<div class="col-md-8 pointer pull-left" *ngIf="menuType=='menu' || menuType=='buffet'">
+													<label class="control-label" style="color: #a0a127 ;">{{ 'gastro.menu.composition.both'	| translate}}</label>&nbsp;
+													<div class="pull-right"> 
+														<label class="mt-radio control-label mt-radio-outline grey">
+			                        <input type="radio" name="printOption" value="both" checked="true" (click)="filterGastroOfferBy('both')"> 
+			                        <span class="green-form"></span>
+			                      </label>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+									</div>
+								</div>
+								<div class="form-actions" style="margin-top: 10px !important;">
+									<div class="row">
+										<div class="col-md-offset-10 col-md-12">
+											<button type="submit" (click)="print.hide()" class="btn green"
+											[disabled]="!printForm.form.valid || this.templateId==null || (showPrice!=true && showPrice!=false)">{{'buttonGeneric.download' | translate}}
+										</button>
+										<button type="button" (click)="print.hide();" class="btn default">{{'buttonGeneric.cancel' |
+											translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

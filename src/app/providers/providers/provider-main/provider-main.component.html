@@ -1,0 +1,178 @@
+
+<div heading="Provider" class="main">
+  <div class="ui-g">
+      <div class="ui-g-12 ui-g-nopad">
+          <h3 class="tab-box-title">{{'provider.provider.form.main' | translate}}</h3>
+          <h6 *ngIf="account&&provider&&mode!='new'">{{'provider.provider.form.latestUpdate' | translate}}&nbsp;{{provider.updatedAt | date: 'medium'}}&nbsp;{{'provider.provider.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+      </div>
+  </div>
+  <div class="ui-g">
+    <div class="ui-g-12 ui-md-12 ui-lg-9 ui-g-nopad">     	 	
+      <div class="form" *ngIf="provider">     		
+          <div class="form-body">
+			      <div class="ui-g">
+			    		<div class="ui-g-12 ui-g-nopad">
+			    			<h2 *ngIf="mode=='new'" class="tab-box-title" style="margin-bottom: 20px;">{{'provider.provider.form.new' | translate}}</h2>
+			    		</div>
+            </div>
+            <div class="ui-g">
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.commercialName' | translate}} <span class="required"> * </span></label>
+                    <input for="name" class="form-control"  [(ngModel)]="provider.commercialName" name="name" [disabled]="mode=='view'" pInputText required="">
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="active" class="control-label">{{'provider.provider.form.active' | translate}}</label>
+                    <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required [disabled]="mode=='view'">
+                      <option [selected]="provider.active" value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                      <option [selected]="!provider.active" value="no">{{'buttonGeneric.no' | translate}}</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="active" class="control-label">{{'provider.provider.form.telephones' | translate}}</label>
+                    <editable-listbox [options]="provider.telephone" [disabled]="mode == 'view'"></editable-listbox>
+                  </div>
+                </div>
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.legalName' | translate}}</label>
+                    <input for="name" class="form-control"  [(ngModel)]="provider.legalName" name="name" [disabled]="mode=='view'" pInputText>
+                  </div>
+                </div>
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.url' | translate}}</label>
+                    <input for="name" class="form-control"  [(ngModel)]="provider.url" name="url" [disabled]="mode=='view'" pInputText>
+                  </div>
+                </div>
+                <div class="ui-g-5 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.externalReference' | translate}}</label>
+                    <input for="name" class="form-control"  [(ngModel)]="provider.externalReference" name="externalReference" [disabled]="mode=='view'" pInputText>
+                  </div>
+                </div>
+                <div class="ui-g-5 ui-g-nopad pull-right">
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.taxId' | translate}}</label>
+                    <input for="name" class="form-control"  [(ngModel)]="provider.taxId" name="taxId" [disabled]="mode=='view'" pInputText>
+                  </div>
+                </div>
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                <div class="form-group">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-selector [source]="'provider'" *ngIf="userLocations&&(mode!='view')" [locations]="userLocations" [savedLocations]="provider.location" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="mode=='edit' || mode=='new'"></location-selector>
+                  <location-view *ngIf="userLocations&&(mode=='view')" [savedLocations]="provider.location"></location-view>
+               	</div> 
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                  <div class="form-group ui-g-6">
+                    <label for="name" class="control-label">{{'provider.provider.form.provider' | translate}}</label>
+                    <br/>
+                    <p-toggleButton [(ngModel)]="provider.provider" name="provider" onLabel="{{'provider.provider.form.provider' | translate}}" offLabel="No" onIcon="fa-check-square" offIcon="fa-square" [style]="{'width':'130px'}" [disabled]="mode=='view'"></p-toggleButton>
+                  </div>
+                  <div class="form-group ui-g-6">
+                    <label for="name" class="control-label">{{'provider.provider.form.creditor' | translate}}</label>
+                    <br/>
+                    <p-toggleButton [(ngModel)]="provider.creditor" name="creditor" onLabel="{{'provider.provider.form.creditor' | translate}}" offLabel="No" onIcon="fa-check-square" offIcon="fa-square" [style]="{'width':'130px'}" [disabled]="mode=='view'"></p-toggleButton>
+                  </div>
+              </div>
+            </div>
+            <div class="ui-g">
+              <div class="ui-g-12">
+              <label for="name" class="control-label">{{ 'provider.provider.form.address' | translate }}</label>
+              <div class="ui-g-12 ui-md-12 ui-lg-12 panel panel-default">
+                    <div class="ui-g-12 ui-md-7 ui-lg-8">
+                        <label for="name" class="control-label">{{'provider.provider.form.street' | translate}}</label>
+                        <input class="form-control" pInputText [(ngModel)]="provider.address[0].street" [disabled]="mode == 'view'" name="street"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-5 ui-lg-4">
+                        <label for="name" class="control-label">{{'provider.provider.form.postalCode' | translate}}</label>
+                        <input class="form-control" pInputText [(ngModel)]="provider.address[0].postalCode" mask="99999" [disabled]="mode == 'view'" name="postalCode" />
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                        <label for="name" class="control-label">{{'provider.provider.form.city' | translate}}</label>
+                        <input class="form-control" pInputText [(ngModel)]="provider.address[0].city" [disabled]="mode == 'view'" name="city"/>
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                        <label for="name" class="control-label">{{'provider.provider.form.state' | translate}}</label>
+                        <input class="form-control" pInputText [(ngModel)]="provider.address[0].state" [disabled]="mode == 'view'" name="state" />
+                    </div>
+                    <div class="ui-g-12 ui-md-4 ui-lg-4">
+                        <label for="name" class="control-label">{{'provider.provider.form.country' | translate}}</label>
+                        <input class="form-control" pInputText [(ngModel)]="provider.address[0].country" [disabled]="mode == 'view'" name="country" />
+                    </div>
+              </div>
+            </div>
+            <div class="ui-g">
+              <div class="ui-g-12">
+            <label for="name" class="control-label">{{ 'provider.provider.form.contacts' | translate }}</label>
+              <div class="ui-g-12 panel panel-default">
+                <div class="ui-g-11">
+                  <contact-datatable [value]="provider.contact" [disabled]="mode== 'view'"></contact-datatable>
+                </div>
+              </div> 
+            </div>               
+            </div>
+          </div>
+          </div>
+          <div class="form-actions right">
+            <div class="ui-g">
+              <div class="ui-g-12">
+                <button type="submit" [disabled]="!provider.commercialName || provider.location.length == 0" class="btn green" (click)="saveProvider()">{{'buttonGeneric.save' | translate}}
+                </button> {{selectedLocations}}
+                <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+ <p-confirmDialog *ngIf="mode=='new'" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" [closable]="false" width="425"></p-confirmDialog>
+
+<div bsModal #confirmDeleteLocationsModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteLocationsModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">Se han eliminado localizaciones</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="saveProvider()" class="form-horizontal" #deleteArticleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <span>Se ha eliminado la localización del proveedor y de todos sus articulos</span>
+                  <li *ngFor="let deletedLocation of deletedLocations" class="li-selector">
+                    <span>  {{deletedLocation.name}}</span>
+                  </li>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteLocationsModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteLocationsModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

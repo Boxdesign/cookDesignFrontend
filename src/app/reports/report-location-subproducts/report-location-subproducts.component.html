@@ -1,0 +1,74 @@
+<div heading="Exports">
+  <div class="row">
+		<div class="col-md-4">
+			<h2 class="tab-box-title">{{'printBooks.filters' | translate}}</h2>
+			<div class="selector" style="min-height: 350px;">
+
+				<!-- <div class="form-group">
+					<label for="gastroOfferType" class="control-label">{{'printBooks.gastroOfferType' | translate}} </label>
+					<select id="gastroOfferType" class="form-control" name="gastroOfferType" required (change)="gastroOfferTypeSelected($event.target.value)" [disabled]="false">
+						<option [selected]="false" value="menu">{{'printBooks.simpleMenu' | translate | uppercase}}</option>
+						<option [selected]="false" value="dailyMenuCarte">{{'printBooks.dailyMenuCarte' | translate | uppercase}}</option>
+						<option [selected]="false" value="buffet">{{'printBooks.buffet' | translate | uppercase}}</option>
+						<option [selected]="false" value="carte">{{'printBooks.carte' | translate | uppercase}}</option>
+						<option [selected]="false" value="fixedPriceCarte">{{'printBooks.fixedPriceCarte' | translate | uppercase}}</option>
+						<option [selected]="false" value="catalog">{{'printBooks.catalog' | translate | uppercase}}</option>
+					</select>
+				</div> -->
+
+	      <div class="form-group">			
+		      <label for="location" class="control-label">{{'printBooks.location' | translate}}</label>
+					<location-filter (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+				</div>
+				
+			</div>
+
+		</div>
+
+		<div class="col-md-5">
+			<h2 class="tab-box-title">{{'printBooks.selectData' | translate}}</h2>
+			<div class="selector" style="min-height: 350px;">
+				<form class="form-horizontal">
+					<div class="form-body">
+
+						<!-- <div class="form-group">
+								<label for="gastroOffer" class="control-label">{{'printBooks.gastroOffer' | translate | uppercase}} </label>
+								<ng-select class="cd-select" 
+									[multiple]="false"
+									[allowClear]="true"
+									(selected)="gastroOfferSelected($event)" 
+									(typed)="gastroOfferSearchChanged($event)"
+									(removed)="gastroOfferRemoved($event)" #gastroOfferSelectElement>
+							</ng-select>
+						</div> -->
+
+						<div class="form-group">
+							<label for="bookType" class="control-label">{{'recipes.subproduct.template' | translate}}</label>
+							<select id="bookType" class="form-control" [(ngModel)]="template" (change)="templateSelected($event.target.value)" name="template" required="">
+								<option *ngFor="let template of templateList; let i=index;" [ngValue]="template">{{ template.lang[0]?.name | uppercase}} </option>
+							</select>
+						</div>
+
+						<div class="form-group" *ngIf="showSubproductsCheck">
+							<label class="mt-checkbox control-label mt-checkbox-outline grey">
+			          <input type="checkbox" [(ngModel)]="showSubproducts" name="showSubproducts">  
+			          <span class="green-form"></span>{{ 'printBooks.showSubproducts' | translate }}
+			        </label>
+						</div>
+
+					</div>
+					<div class="form-actions">
+						<div class="row">
+							<div class="pull-right">
+								<img *ngIf="loadingData" src="../assets/img/preloader.gif"/>
+								<button type="submit" (click)="downloadFile();" class="btn green right" [disabled]="!template || !searchFilterLocations.length">{{'buttonGeneric.printBooks' | translate }}
+		            </button>    
+	            </div>
+	          </div>
+					</div>
+					
+				</form>
+		</div>
+	</div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>

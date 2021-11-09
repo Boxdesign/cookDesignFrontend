@@ -1,0 +1,208 @@
+<simple-notifications [options]="options"></simple-notifications>
+<div heading="Quartering">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="tab-box-title">{{'articles.ingredients.quartering.title' | translate}}</h3>
+   </div>
+  </div>
+  <div *ngIf="ingredientOnEdit" class="row">
+    <div class="col-md-3">
+      <div class="panel panel-default">
+        <div class="panel-body">
+          <label class="control-label">{{'articles.ingredients.quartering.ingredientName' | translate}}:</label>
+          {{ingredientOnEdit.lang[0]?.name}}<br>
+          <label class="control-label">{{'articles.ingredients.quartering.ingredientCost' | translate}}:</label> {{ingredientOnEdit.referencePrice | currency:'EUR':'symbol':'1.2-2'}}/{{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}<br>
+          <span *ngIf="totalItems>0 && waste!=100"><label class="control-label">{{'articles.ingredients.quartering.netCostWithoutWaste' | translate}}: </label> {{netCostWithoutWaste | currency:'EUR':'symbol':'1.2-2'}}/{{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}</span>
+          <span *ngIf="totalItems==0||waste==100"><label class="control-label">{{'articles.ingredients.quartering.netCostWithoutWaste' | translate}}:</label> {{'articles.ingredients.quartering.notAvailable' | translate}}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchQuarterings($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a *ngIf="mode!='view'" href="javascript:;" (click)="addClick(); cleanFields(); openModal(quarteringModal);" class="btn default pull-right gold"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>
+    </div>
+  </div>
+	<div *ngIf="ingredientOnEdit" class="table-scrollable">
+    <table id="quartering-table" class="table table-hover">
+      <thead>
+        <tr>
+          <th> {{'articles.ingredients.quartering.tableHead.image' | translate}}</th>
+          <th>
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.quartering.tableHead.name'" [value]="'lang.name'" (onChange)="getQuarterings()" ></column-sorter>
+          </th>
+          <th>
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.quartering.tableHead.ingredientPercentage'" [value]="'ingredientPercentage'" (onChange)="getQuarterings()" ></column-sorter>
+          </th>
+          <th>
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.quartering.tableHead.netPercentage'" [value]="'netPercentage'" (onChange)="getQuarterings()" ></column-sorter>
+          </th>
+          <th>
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.quartering.tableHead.netPercentageCost'" [value]="'referencePrice'" (onChange)="getQuarterings()" ></column-sorter>
+          </th>
+          <th> {{'articles.ingredients.quartering.tableHead.cost' | translate:{ measUnit: ingredientOnEdit.measurementUnit?.lang[0]?.shortName} }}
+            <!-- <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.quartering.tableHead.costPerKg'" [value]="'costPerKg'" (onChange)="getQuarterings()" ></column-sorter> -->
+          </th>
+          <th> {{'buttonGeneric.actions' | translate}}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let quartering of quarterings;let i = index;">
+          <td (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">
+            <div style="display: block; text-align:center;">
+             <img *ngIf="quartering.gallery" [src]="quartering.gallery.sizes[0].url" alt="">
+             <img *ngIf="!quartering.gallery" src="../../../assets/img/noImageCircle.png" alt="">
+           </div>
+          </td>
+          <td (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">{{quartering.lang[0]?.name}}</td>
+          <td (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">{{quartering.ingredientPercentage}}</td>
+          <td (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">{{quartering.netPercentage}}</td>     
+          <td (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">{{quartering.netPercentageCost | currency:'EUR':'symbol':'1.2-2'}} / {{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}</td>
+         	<td style="background-color: #f2f2f2" (click)="viewClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)" class="pointer">{{quartering.referencePrice | currency:'EUR':'symbol':'1.2-2'}} / {{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}</td>
+          <td>
+            <!-- <a href="javascript:;" (click)="selectQuarteringToEdit(quartering); openModal(quarteringModal)"
+               class="btn gold btn-sm btn-outline sbold table-row-button">
+              <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+            <a *ngIf="mode!='view'" href="javascript:;" (click)="editClick(); selectQuarteringToEdit(quartering); openModal(quarteringModal)"
+               class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a *ngIf="mode!='view'" href="javascript:;" (click)="selectQuarteringToEdit(quartering); confirmDeleteModal.show();"
+               class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+						<a href="javascript:;" (click)="viewQuartering(quartering)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-eye"></i> {{'buttonGeneric.view' | translate}} </a>              
+          </td>
+        </tr>
+        <tr *ngIf="totalItems>0" class="active sbold">
+          <td></td>
+          <td><div style="display:block; text-align:right;">{{'articles.ingredients.quartering.waste' | translate}}:</div></td>
+          <td><span *ngIf="waste">{{waste | number:'1.2-2'}}</span></td>
+          <td>{{totalNetPercentage | number:'1.2-2'}}</td>
+          <td>{{totalNetPercentageCost | currency:'EUR':'symbol':'1.2-2'}} / {{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}</td>
+          <td [ngClass]="{'warning': totalCost < netCostWithoutWaste}">{{totalCost | currency:'EUR':'symbol':'1.2-2'}} / {{ingredientOnEdit.measurementUnit?.lang[0]?.shortName}}</td>
+          <td *ngIf="mode!='view'"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10"
+                      (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage"
+                          [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false"
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODALS-->
+
+
+<ng-template #quarteringModal>
+  <div class="modal-header">
+    <button type="button" class="close" (click)="modalRef.hide()" aria-label="Close">
+      <span aria-hidden="true">&times;</span>
+    </button>
+    <h4 *ngIf="this.status=='new'" class="modal-title">{{'articles.ingredients.quartering.new' | translate}}</h4>
+    <h4 *ngIf="this.status=='edit'" class="modal-title">{{'articles.ingredients.quartering.edit' | translate}}</h4>
+    <h4 *ngIf="this.status=='add'" class="modal-title">{{'articles.ingredients.quartering.view' | translate}}</h4>
+  </div>
+  <div class="modal-body">
+    <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="quarteringLang"
+              [forceRefresh]="forceRefresh"></lang-tab>
+    <form (ngSubmit)="uploadImage()" class="form-horizontal" #editQuarteringForm="ngForm">
+      <div class="row">
+        <div class="col-md-7">
+          <div class="form-body">
+            <div class="form-group">
+              <label class="col-md-5 control-label">{{'articles.ingredients.quartering.tableHead.name' | translate}}<span class="required"> * </span></label>
+              <div class="col-md-7">
+                <input type="text" class="form-control" [(ngModel)]="quarteringLang.name" name="name" placeholder="" required 
+                [disabled]="status=='view'">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-5 control-label">{{'articles.ingredients.quartering.tableHead.ingredientPercentage' | translate}}<span class="required"> * </span></label>
+              <div class="col-md-7">
+                <input type="number" class="form-control" *ngIf="quartering" [(ngModel)]="quartering.ingredientPercentage" name="ingredientpercentage" placeholder="" step="any" min="0" required
+                [disabled]="status=='view'">
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="col-md-5 control-label">{{'articles.ingredients.quartering.tableHead.netPercentage' | translate}}<span class="required"> * </span></label>
+              <div class="col-md-7">
+                <input type="number" class="form-control" *ngIf="quartering" [(ngModel)]="quartering.netPercentage" name="netpercentage" placeholder="" step="any" min="0" required
+                [disabled]="status=='view'">
+              </div>
+            </div>                
+          </div>
+        </div>
+        <div class="col-md-5">
+          <crop-and-upload [(gallery)]="imageObject" [folderPath]="'imgs/quartering/'" [upload]="upload" (uploadFinished)="saveQuartering()" [mode]="status" ></crop-and-upload>              
+        </div>
+      </div>
+      <div class="form-actions">
+        <div class="row">
+          <div class="col-md-offset-3 col-md-9">
+            <button type="submit" (click)="modalRef.hide()" class="btn green"
+                    [disabled]="!editQuarteringForm.form.valid || quartering.ingredientPercentage == 0 || quartering.netPercentage == 0">{{'buttonGeneric.save' | translate}}
+            </button>
+            <button type="button" (click)="modalRef.hide()" class="btn default">{{'buttonGeneric.cancel'
+              |
+              translate}}
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteQuartering()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+

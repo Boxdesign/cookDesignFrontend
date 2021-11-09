@@ -1,0 +1,224 @@
+<div heading="Accounts">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="tab-box-title">{{'admin.user.account.accounts' | translate}}</h3>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchAccounts($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addClick(); accountModal.show()" class="btn default pull-right gold"> <i class="fa fa-plus"></i> {{'admin.user.account.addAccount' | translate}}
+      </a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="account-list" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'admin.user.account.tableHead.name'" [value]="'name'" (onChange)="getUserAccounts()" ></column-sorter>
+        </th>
+        <th>{{'admin.user.account.tableHead.role' | translate}}</th>
+        <th>{{'admin.user.account.tableHead.location' | translate}}&nbsp;<i (click)="filterLocationModal.show()" class="fa fa-filter" aria-hidden="true"></i><span *ngIf="filterLocations.length>0" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span></th>
+        <th>{{'admin.user.account.tableHead.active' | translate}} </th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let account of allAccounts;let i=index">
+        <tr [class.text-muted]="!account.active" [class.active]="!account.active">
+          <td (click)="viewClick(); selectAccount(account); accountModal.show()" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>
+          <td (click)="viewClick(); selectAccount(account); accountModal.show()" class="pointer">
+            {{account.name}}
+          </td>
+          <td (click)="viewClick(); selectAccount(account); accountModal.show()" class="pointer">
+            {{account.role.name}}
+          </td>
+          <td>
+            <a href="javascript:;" (click)="selectAccount(account); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'admin.user.account.location' | translate}}</a>
+          </td>
+          <td (click)="viewClick(); selectAccount(account); accountModal.show()" class="pointer">
+            <span *ngIf="account.active">
+              <i class="fa fa-check cd-gold" aria-hidden="true"></i>
+            </span>
+            <span *ngIf="!account.active">
+              <i class="fa fa-times cd-gold" aria-hidden="true"></i>
+            </span>
+          </td>
+          <td>
+            <a href="javascript:;" (click)="editClick(); selectAccount(account); accountModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a href="javascript:;" (click)="selectAccount(account); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="itemsPerPage" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>
+
+<!-- MODALS -->
+
+<div bsModal #accountModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="accountModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 *ngIf="status=='new'" class="modal-title">{{'admin.user.account.new' | translate}}</h4>
+        <h4 *ngIf="status=='edit'" class="modal-title">{{'admin.user.account.edit' | translate}}</h4>
+        <h4 *ngIf="status=='view'" class="modal-title">{{'admin.user.account.view' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="saveAccount()" class="form-horizontal" #accountForm="ngForm" *ngIf="account">
+					<div class="row">
+						<div class="col-md-9">
+							<div class="form-body">
+								<div class="form-group">									
+									<label class="col-md-5 control-label">{{'admin.user.account.tableHead.name' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+									   <input type="name" class="form-control" [(ngModel)]="account.name" name="name" placeholder="" step="any" min="0" [disabled]="status=='view'" required>		
+									</div>							
+								</div>
+								<div class="form-group">
+									<label for="active" class="col-md-5 control-label">{{'admin.user.account.tableHead.active' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+  									<select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required [disabled]="status=='view'" required>
+  										<option [selected]="account.active" value="yes">{{'buttonGeneric.yes' | translate | uppercase}}</option>
+  										<option [selected]="!account.active" value="no">{{'buttonGeneric.no' | translate | uppercase}}</option>
+  									</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-5 control-label">{{'admin.user.account.tableHead.role' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+									<select class="form-control" (change)="roleSelected($event.target.value, true)" name="role" [disabled]="status=='view'">
+										<option [selected]="role._id == account.role._id" *ngFor="let role of roles; let i = index" [value]="i">{{role.name | uppercase}} </option>
+									</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label for="location" class="col-md-5 control-label">{{'admin.user.account.location' | translate}} <span class="required"> * </span></label>
+									<div *ngIf="status=='edit' || status=='new'" class="col-md-7">
+									   <all-location-selector (onLocationChecked)="updateSelectedLocations($event)" [savedLocations]="account.location" [editMode]="true"></all-location-selector>
+									</div>
+                  <div *ngIf="status=='view'" class="col-md-7">
+                     <all-location-view [savedLocations]="account.location"></all-location-view>
+                  </div>
+								</div>
+								<div class="form-group">
+		            	<label class="col-md-5 control-label">{{'admin.user.account.checkLocOnLogin' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-5">
+										<div class="mt-checkbox-inline">
+											<label class="mt-checkbox mt-checkbox-outline">
+	                        <input type="checkbox" [(ngModel)]="account.checkLocOnLogin" name="checkLocOnLogin" placeholder="" [disabled]="status=='view'">
+	                        <span class="green-form"></span>
+	                    </label>
+	                  </div>	              		
+		              </div>
+		            </div>
+							</div>
+							<div *ngIf="status!='view'" class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button *ngIf="status=='new'" type="submit" (click)="accountModal.hide()" class="btn green" [disabled]="!accountForm.form.valid || account.location.length == 0">{{'buttonGeneric.save' | translate}}
+									</button>
+                  <button *ngIf="status=='edit'" type="submit" (click)="accountModal.hide()" class="btn green" [disabled]="!accountForm.form.valid || selectedLocations.length == 0">{{'buttonGeneric.save' | translate}}
+                  </button>
+									<button type="button" (click)="accountModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+										translate}}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'recipes.subproduct.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="account">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'recipes.subproduct.form.location' | translate}} <span class="required"> * </span></label>
+                  <all-location-view [savedLocations]="account.location"></all-location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'messageGeneric.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteAccount()" class="form-horizontal" #deleteUserForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'messageGeneric.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+

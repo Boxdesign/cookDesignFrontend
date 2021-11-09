@@ -1,0 +1,143 @@
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'admin.tabs.location' | translate}}</h2>      
+      <h6 *ngIf="account&&user&&mode!='new'">{{'admin.location.latestUpdate' | translate}}&nbsp;{{user.updatedAt | date: 'medium'}}&nbsp;{{'admin.user.form.by' | translate}}&nbsp;{{account.name}} </h6>
+      <div *ngIf="userLocations" class="row location-selector" style="margin-top: 20px;">
+        <div class="col-md-6" style="padding-left: 45px;">
+          <h2 class="tab-box-title">{{'admin.location.locationTree' | translate}}</h2>
+          <ul style="list-style: none;">
+            <li *ngFor="let organization of userLocations" class="li-selector">
+              <span *ngIf="organization.companies.length > 0">
+                <span *ngIf="organization.expanded" (click)="organization.expanded = false" class=""><i class="fa fa-minus" aria-hidden="true"></i></span>
+                <span *ngIf="!organization.expanded" (click)="organization.expanded = true" class=""><i class="fa fa-plus" aria-hidden="true"></i></span>
+              </span>
+              <span (mouseenter)="organization.mouseover = true" (mouseleave)="organization.mouseover = false" class="pointer">
+                <span (click)="viewClick(); selectLocation(organization)">{{organization.name}}</span>
+                
+                <span *ngIf="organization.mouseover">
+                  <i (click)="editClick(); selectLocation(organization);" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;
+                  <i *ngIf="organization.companies.length==0"  (click)="selectLocation(organization); confirmDeleteModal.show();" class="fa fa-trash" aria-hidden="true"></i>
+                </span>
+              </span>
+
+              <div *ngIf="organization.expanded">
+                <ul style="list-style: none;">
+                  <li *ngFor="let company of organization.companies" class="li-selector">
+                    <span *ngIf="company.businessUnits.length > 0">
+                      <span *ngIf="company.expanded" (click)="company.expanded = false" class=""><i  class="fa fa-minus" aria-hidden="true"></i></span>
+                      <span *ngIf="!company.expanded" (click)="company.expanded = true" class=""><i  class="fa fa-plus" aria-hidden="true"></i></span>
+                    </span>
+                    <span (mouseenter)="company.mouseover = true" (mouseleave)="company.mouseover = false" class="pointer">
+                      <span (click)="viewClick(); selectLocation(company)">{{company.name}}</span>
+                      
+                      <span *ngIf="company.mouseover">
+                        <i (click)="editClick(); selectLocation(company);" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;
+                        <i *ngIf="company.businessUnits.length==0" (click)="selectLocation(company); confirmDeleteModal.show();" class="fa fa-trash" aria-hidden="true"></i>
+                      </span>
+                    </span>
+                    <div *ngIf="company.expanded">
+                      <ul style="list-style: none;">
+                        <li *ngFor="let businessUnit of company.businessUnits" class="li-selector">
+                          <span (mouseenter)="businessUnit.mouseover = true" (mouseleave)="businessUnit.mouseover = false" class="pointer">
+                            <span (click)="viewClick(); selectLocation(businessUnit)">{{businessUnit.name}}</span>
+                            <span *ngIf="businessUnit.mouseover">
+                              <i (click)="editClick(); selectLocation(businessUnit);" class="fa fa-pencil" aria-hidden="true"></i>&nbsp;
+                              <i (click)="selectLocation(businessUnit); confirmDeleteModal.show();" class="fa fa-trash" aria-hidden="true"></i>
+                            </span>
+                          </span>
+                        </li>
+                        <li *ngIf="company.addBusinessUnit">
+                          <input [(ngModel)]="name" name="name" type="text"/>
+                          <i (click)="addLocation('businessUnit', organization, company); company.addBusinessUnit = false" class="fa fa-check" aria-hidden="true"></i>&nbsp;
+                          <i (click)="company.addBusinessUnit = false" class="fa fa-times" aria-hidden="true"></i>
+                        </li>
+                        <li *ngIf="!company.addBusinessUnit" class="li-selector pointer" (click)="name=''; company.addBusinessUnit = true; "><span><i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;<em>{{'admin.location.addBusinessUnit' | translate}}</em></span></li>
+                      </ul>
+                    </div>
+                  </li>
+                  <li *ngIf="organization.addCompany"><input [(ngModel)]="name" name="name" type="text"/><i (click)="addLocation('company', organization); organization.addCompany = false" class="fa fa-check" aria-hidden="true"></i>&nbsp;<i (click)="organization.addCompany = false" class="fa fa-times" aria-hidden="true"></i></li>
+                  <li *ngIf="!organization.addCompany" class="li-selector pointer" (click)="name=''; organization.addCompany = true"><span><i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;<em>{{'admin.location.addCompany' | translate}}</em></span></li>
+                </ul>
+              </div>
+            </li>
+            <li *ngIf="canAddOrganization&&addOrganization"><input [(ngModel)]="name" name="name" type="text"/><i (click)="addLocation('organization'); addOrganization = false" class="fa fa-check" aria-hidden="true"></i>&nbsp;<i (click)="addOrganization = false" class="fa fa-times" aria-hidden="true"></i></li>
+            <li *ngIf="canAddOrganization&&!addOrganization" class="li-selector pointer" (click)="name=''; addOrganization = true"><span><i class="fa fa-plus-square-o" aria-hidden="true"></i>&nbsp;<em>{{'admin.location.addCompany' | translate}}</em></span></li>
+          </ul>
+        </div>
+
+
+        <div *ngIf="location" class="col-md-5">
+         <h2 *ngIf="this.status=='view'" class="tab-box-title">{{'admin.location.viewLocation' | translate}}</h2>
+         <h2 *ngIf="this.status=='edit'" class="tab-box-title">{{'admin.location.editLocation' | translate}}</h2>
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-group">
+                <label for="name" class="control-label">{{'articles.ingredients.form.name' | translate}} <span
+                  class="required"> * </span></label>
+                <input for="name" class="form-control" [(ngModel)]="location.name" name="name" [disabled]="status == 'view'">
+              </div>
+            </div>
+          </div>
+          <div class="row">
+            <div class="col-md-12">
+              <crop-and-upload [(gallery)]="imageObject" [cropperOptions]="cropperOptions" [folderPath]="'imgs/location-tree/'" [upload]="upload" (uploadFinished)="saveLocation()" [mode]="status" ></crop-and-upload>              
+            </div>
+          </div>
+          <div>
+            <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="lang" [forceRefresh]="forceRefresh"></lang-tab>
+            <div class="row">
+              <div class="col-md-12">
+                <div class="form-group">
+                  <label for="description" class="control-label">{{'gastro.menu.form.desc' | translate}}</label>
+                  <textarea id="description" class="form-control" [(ngModel)]="lang.description" name="description" rows="10" [disabled]="status=='view'"></textarea>
+                </div>
+              </div>
+            </div>
+            <form *ngIf="this.status=='edit'" class="horizontal-form cd-form" >
+              <div class="form-actions right">
+                <button type="submit" (click)="uploadImage()" class="btn green" [class.hide-view-mode]="viewMode">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+              </div>
+            </form>   
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <simple-notifications [options]="options"></simple-notifications>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'messageGeneric.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteLocation()" class="form-horizontal" #deleteUserForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'messageGeneric.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

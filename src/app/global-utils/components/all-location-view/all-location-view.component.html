@@ -1,0 +1,40 @@
+  <div *ngIf="allLocations" class="location-selector">
+  	<ul style="list-style: none;">
+  		<li *ngFor="let organization of allLocations" class="li-selector">
+  			<span *ngIf="organization.companies.length > 0">
+  				<span *ngIf="organization.expanded" (click)="organization.expanded = false" class=""><i class="fa fa-minus" aria-hidden="true"></i></span>
+  				<span *ngIf="!organization.expanded" (click)="organization.expanded = true" class=""><i class="fa fa-plus" aria-hidden="true"></i></span>
+  			</span>
+        <label class="mt-checkbox mt-checkbox-outline grey">
+          <input type="checkbox" [checked]="organization.checked" disabled>  
+          <span class="green-form"></span>{{organization.name}}
+        </label>
+  			<div *ngIf="organization.expanded">
+  				<ul style="list-style: none;">
+  					<li *ngFor="let company of organization.companies" class="li-selector">
+  						<span *ngIf="company.businessUnits.length > 0">
+  							<span *ngIf="company.expanded" (click)="company.expanded = false" class=""><i  class="fa fa-minus" aria-hidden="true"></i></span>
+  							<span *ngIf="!company.expanded" (click)="company.expanded = true" class=""><i  class="fa fa-plus" aria-hidden="true"></i></span>
+  						</span>
+              <label class="mt-checkbox mt-checkbox-outline grey">
+                <input type="checkbox" [(ngModel)]="company.checked" disabled>  
+                <span class="green-form"></span>{{company.name}}
+              </label>
+  						<div *ngIf="company.expanded">
+  							<ul style="list-style: none;">
+  								<li *ngFor="let businessUnit of company.businessUnits" class="li-selector">
+                    <label class="mt-checkbox mt-checkbox-outline grey">
+                      <input type="checkbox" [checked]="businessUnit.checked" disabled>  
+                      <span class="green-form"></span>{{businessUnit.name}}
+                    </label>
+                  </li>
+  							</ul>
+  						</div>
+  					</li>
+  				</ul>
+  			</div>
+  		</li>
+  	</ul>
+ </div>
+<!--  <simple-notifications [options]="notificationOptions"></simple-notifications>
+ -->

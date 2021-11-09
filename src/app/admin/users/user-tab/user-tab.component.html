@@ -1,0 +1,21 @@
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-body">
+				<h2 *ngIf="mode=='new'" class="tab-box-title">{{'admin.user.addUser'}}</h2>
+<!-- 				<h2 *ngIf="mode=='edit'&& user" class="tab-box-title">{{'admin.user.editUser' | translate:{value: user.firstName} }}</h2>				
+ -->				<tabset class="tabbable-line">
+					<tab heading="{{'admin.user.tabs.main' | translate}}">
+						<user-main></user-main>
+					</tab>
+					<tab *ngIf="mode!='new'" heading="{{'admin.user.tabs.account' | translate}}" [active]="tab == 'account'">
+						<user-account></user-account>
+					</tab>
+					<tab *ngIf="mode=='edit'" heading="{{'admin.user.tabs.password' | translate}}" [active]="tab == 'password'">
+						<user-password></user-password>
+					</tab>				
+				</tabset>
+			</div>
+		</div>
+	</div>
+</div>

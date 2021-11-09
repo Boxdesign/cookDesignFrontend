@@ -1,0 +1,409 @@
+<loading-gif [loading]="loading" [type]="'composition'"></loading-gif>
+<div *ngIf="!loading" heading="Drink Composition">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.drink.composition.title' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="drink" class="row">
+		<div class="col-md-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.numServings' | translate}}:</label>
+										<div class="input-group">
+											<input id="numServings" type="number" step="any" min="0" class="form-control" [(ngModel)]="drink.numServings" name="numServings" [disabled]="mode=='view'">
+											<span class="input-group-addon" id="addon1">{{'recipes.drink.composition.numServingsAbbrev' | translate}}</span>
+										</div>
+									</div>
+								</div>
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.weightPerServing' | translate}}:</label>
+										<div class="input-group">
+											<input id="weightPerServing" type="number" step="any" min="0" class="form-control" [(ngModel)]="drink.weightPerServing" name="weightPerServing" [disabled]="mode=='view'">
+											<span *ngIf="drink.measurementUnit" class="input-group-addon" id="addon1">{{drink.measurementUnit.lang[0]?.shortName}}</span>
+											<span *ngIf="!drink.measurementUnit" class="input-group-addon" id="addon2">-</span>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-8">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.salesPrice' | translate}}: </label><br>
+										<span class="form-control disabled" *ngIf="drink.refPricePerServing&&salesTax"> {{drink.refPricePerServing*(1+salesTax/100) | currency:'EUR':'symbol':'1.2-2'}} / {{'recipes.drink.composition.numServingsAbbrev' | translate}}</span><span class="form-control disabled" *ngIf="!drink.refPricePerServing || !salesTax">---</span>
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.basePrice' | translate}}:</label><br>
+										<span class="form-control disabled" *ngIf="drink.refPricePerServing"> {{ drink.refPricePerServing | currency:'EUR':'symbol':'1.2-2'}} / {{'recipes.drink.composition.numServingsAbbrev' | translate}}</span><span class="form-control disabled" *ngIf="!drink.refPricePerServing">---</span>
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.costPerServing' | translate}}</label><br>
+										<span class="form-control disabled" *ngIf="drink.numServings&&drink.totalCost"> {{drink.totalCost / drink.numServings | currency:'EUR':'symbol':'1.2-2'}} / {{'recipes.drink.composition.numServingsAbbrev' | translate}}</span><span class="form-control disabled" *ngIf="!drink.numServings || !drink.totalCost">---</span>
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'recipes.drink.composition.costOverPricePercentage' | translate}}</label> <br>
+										<span *ngIf="drink.maxCostOverPricePercentage&&drink.refPricePerServing&&drink.numServings&&drink.totalCost" class="form-control disabled" [class.text-danger]="(((drink.totalCost / drink.numServings) / drink.refPricePerServing)*100) > drink.maxCostOverPricePercentage" [class.text-success]="(((drink.totalCost / drink.numServings) / drink.refPricePerServing)*100) < drink.maxCostOverPricePercentage"> {{((drink.totalCost / drink.numServings) / drink.refPricePerServing)*100 | number:'1.2-2'}} %</span>
+										<span *ngIf="(!drink.maxCostOverPricePercentage)&&drink.refPricePerServing&&drink.numServings&&drink.totalCost" class="form-control disabled"> {{((drink.totalCost / drink.numServings) / drink.refPricePerServing)*100 | number:'1.2-2'}} %</span>
+										<span *ngIf="!(drink.refPricePerServing&&drink.numServings&&drink.totalCost)" class="form-control disabled" >---</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-3">
+			<search-box (onSearchEntered)="searchDrinks($event)" [label]="searchBoxLabel"></search-box>
+		</div>
+		<div class="col-md-7">
+			<div *ngFor="let option of categoryOptions" style="display: inline-block;padding: 6px 20px;" class="pointer">
+				<label for="{{option.name}}" class="mt-checkbox control-label mt-checkbox-outline grey">
+          <input type="checkbox" id="{{option.name}}" [(ngModel)]="option.active" (change)="onCategorySelectChange()">  
+          <span class="green-form"></span>{{ option.name | translate }}
+        </label>
+			</div>
+		</div>
+		<div class="col-md-2">
+			<a *ngIf="mode!='view'" href="javascript:;" (click)=" addClick(); cleanAndResetFields(); compositionModal.show()" class="btn default pull-right gold" [class.hide-view-mode]="viewMode"> <i class="fa fa-plus" ></i>  {{'buttonGeneric.add' | translate}}</a>
+		</div>
+	</div>
+	<div class="table-scrollable">
+		<table id="dish-composition" class="table table-hover">
+			<thead>
+				<tr>
+					<th><div (click)="sortColumn()" class="pointer"><i *ngIf="sortOrder" class="fa fa-sort" aria-hidden="true"></i>{{'recipes.drink.composition.tableHead.category' | translate}}</div></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.element'" [value]="'name'"></column-sorter></th>
+
+					<th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.subproduct.composition.tableHead.kind'" [value]="'element.kind'"></column-sorter></th>
+
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.grossWeight'" [value]="'grossWeight'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.grossWeigthPercentage'" [value]="'grossWeightPercent'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.wastePercentage'" [value]="'wastePercentage'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.netWeight'" [value]="'netWeight'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.netWeightPercentage'" [value]="'netWeight.'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.elementUnitCost'" [value]="'unitCost'"></column-sorter></th>
+
+					<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.elementTotalCost'" [value]="'calculatedCost'"></column-sorter></th>
+
+		         	<th> <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'recipes.drink.composition.tableHead.costPercentage'" [value]="'costPercent'"></column-sorter></th>
+
+					<!-- <th> {{'recipes.drink.composition.tableHead.oneGrossValue' | translate}}</th>
+					<th> {{'recipes.drink.composition.tableHead.oneNetValue' | translate}}</th> -->
+					<th style="text-align: center;"> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let composition of drink.composition | recipeCompositionFilter:selectedCategoryOptions  | compositionFilterText:filterText | orderByCategory:activeOrderBy  |  compositionSort:sortField:sortOrder; let i = index;">
+					<!-- MAIN PRODUCT ELEMENTS -->
+				<tr *ngIf="composition.init">
+					<td (click)="selectElementToEdit(composition, i); compositionModal.show()" class="pointer" [ngSwitch]="composition.category">
+						<div *ngSwitchCase = "'mainProduct'" > {{ 'recipes.drink.composition.categories.mainProduct' | translate}} </div>
+						<div *ngSwitchCase = "'dressing'" > {{ 'recipes.drink.composition.categories.dressing' | translate}} </div>
+						<div *ngSwitchCase = "'addition'" > {{ 'recipes.drink.composition.categories.addition' | translate}} </div>
+					</td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td (click)="viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+						{{composition.name}}
+						<span *ngIf="!composition.active" class="label label-sm label-cd label-mini pull-right"> {{'recipes.drink.nonActive' | translate }}</span>
+					  <span *ngIf="composition.locationWarning" class="label label-sm label-cd label-mini pull-right"> {{'messageGeneric.locationWarning' | translate }} </span>
+					  <span *ngIf="composition.itemNull" class="label label-sm label-cd label-mini pull-right"> {{'messageGeneric.itemNull' | translate }} </span>					  
+					</td>
+					<td (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{'recipes.subproduct.composition.' + composition.element.kind | translate}}</td>
+					<td (click)="viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{composition.grossWeight | number:'1.3-3'}} {{composition.measuringUnitShortName}} </td>
+					<td (click)="viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{(composition.grossWeight / totalGrossWeight)*100 | number:'1.2-2'}}%
+					</td>
+					<td (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{composition.wastePercentage | number:'1.2-2'}}</td>
+					<td  (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{composition.netWeight | number:'1.3-3'}} {{composition.baseUnitShortName}}
+					</td>
+					<td (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{((composition.netWeight) / totalNetWeight)*100 | number:'1.2-2'}}%</td>
+					<td (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{composition.unitCost | currency:'EUR':'symbol':'1.2-2'}}/{{composition.baseUnitShortName}}</td>
+					<td (click)=" viewClick(); selectElementToEdit(composition, i); compositionModal.show()" class="pointer">
+					{{composition.calculatedCost | currency:'EUR':'symbol':'1.2-2'}}</td>
+			        <td (click)=" viewClick(); selectElementToEdit(composition,i); compositionModal.show()" class="pointer">
+			          {{composition.calculatedCost/(drink.totalCost/100) | number:'1.2-2'}}%</td>
+					<!-- <td (click)="selectElementToEdit(composition, i); viewDishElementModal.show()" class="pointer"><span *ngIf="dishOnEdit.netWeight">{{composition.grossWeight/dishOnEdit.netWeight | number:'1.2-2'}}</span><span *ngIf="!dishOnEdit.netWeight">---</span></td>
+					<td (click)="selectElementToEdit(composition, i); viewDishElementModal.show()" class="pointer"><span *ngIf="dishOnEdit.netWeight">{{(composition.netWeight)/dishOnEdit.netWeight | number:'1.2-2'}}</span><span *ngIf="!dishOnEdit.netWeight">---</span></td> -->
+					<td>
+						<span *ngIf="composition.location_unavailable" class="label label-sm label-cd label-mini pull-right">{{'recipes.drink.composition.tableHead.outOfLocation' | translate}}</span>
+            <a *ngIf="!composition.location_unavailable && mode!='view'" href="javascript:;" (click)=" editClick(); selectElementToEdit(composition, i); compositionModal.show()"
+               class="btn gold btn-sm btn-outline table-row-button">
+					  <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+					  <a *ngIf="mode!='view'" href="javascript:;" (click)="selectElementToDelete(composition, i); deleteDrinkElement()"
+						 class="btn gold btn-sm btn-outline table-row-button" [class.hide-view-mode]="viewMode">
+								  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+						<span *ngIf="!composition.location_unavailable">
+              <a href="javascript:;" *ngIf="composition.element.kind =='ingredient'" (click)="viewIngredient(composition,i)"
+                 class="btn gold btn-sm btn-outline table-row-button">
+                 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+              <a href="javascript:;" *ngIf="composition.element.kind =='subproduct'" (click)="viewSubproductVersion(composition,i)"
+                 class="btn gold btn-sm btn-outline table-row-button">
+                 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+		        </span>
+				  </td>
+				</tr>
+				</tbody>				
+				<tr *ngIf="totalElements>0" class="active sbold">
+					<td></td>
+					<td></td>
+					<td>{{totalGrossWeight | number:'1.2-2'}}</td>
+					<td>{{100 | number:'1.2-2'}}%</td>
+					<td></td>
+					<td></td>
+					<td>{{totalNetWeight | number:'1.2-2'}}</td>
+					<td>{{100 | number:'1.2-2'}}%</td>
+					<td></td>
+					<td>{{drink.totalCost | currency:'EUR':'symbol':'1.2-2'}}</td>
+					<td>{{ 100 | number: '1.2-2'}}%</td>
+<!-- 					<td></td>
+          			<td></td> -->
+					<td></td>
+				</tr>  
+</table>
+</div>
+  <!-- <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10"
+                      (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage"
+                          [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false"
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+</div> -->
+</div>
+
+<!--MODALS-->
+
+<div bsModal #compositionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="compositionModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 *ngIf="status=='new'" class="modal-title">{{'recipes.drink.composition.new' | translate}}</h4>
+        <h4 *ngIf="status=='edit'" class="modal-title">{{'recipes.drink.composition.edit' | translate}}</h4>
+        <h4 *ngIf="status=='view'" class="modal-title">{{'recipes.drink.composition.view' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="saveDrinkElement()" class="form-horizontal" #compositionForm="ngForm">
+					<div class="row">
+						<div class="col-md-8">
+							<div class="col-md-12">							
+								<div class="form-body">
+									<div class="form-group">
+										<label for="category" class="col-md-4 control-label">{{'provider.article.form.category' | translate}} <span class="required"> * </span></label>
+										 <p-selectButton [options]="drinkCategories" class="col-md-8" [(ngModel)]="drinkElement.element.kind" name="kind" [disabled]="mode=='view' || status =='view'" (onChange)="onChangeCategory($event)"></p-selectButton> 
+									</div>
+									<div class="form-group">
+										 <label *ngIf="drinkElement.element.kind=='ingredient'" for="category" class="col-md-4 control-label">{{'recipes.subproduct.form.ingredient' | translate}} <span class="required"> * </span></label>
+										 
+										 <label *ngIf="drinkElement.element.kind=='subproduct'" for="category" class="col-md-4 control-label">{{'recipes.subproduct.form.subproduct' | translate}} <span class="required"> * </span></label>
+										 			            
+										 <ng-select class="cd-select col-md-8 " [allowClear]="true"                    
+												 (selected)="drinkElementSelected($event)" 
+												 (typed)="elementSearchChanged($event)"
+												 [active]="activeElement"
+												 [disabled]="mode =='view' || status =='view'" 
+												 (removed)="drinkElementRemoved($event)" #selectElement>
+										 </ng-select>
+									</div>
+									<div class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.category' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<select class="form-control" (change)="categorySelected($event.target.value, true)" name="category" [disabled]="status=='view'">
+												<option [selected]="drinkElement.category=='mainProduct'" value="0">{{'recipes.drink.composition.categories.mainProduct' | translate | uppercase}} </option>
+												<option [selected]="drinkElement.category=='dressing'" value="1">{{'recipes.drink.composition.categories.dressing' | translate | uppercase}} </option>
+												<option [selected]="drinkElement.category=='addition'" value="2">{{'recipes.drink.composition.categories.addition' | translate | uppercase}} </option>
+											</select>
+										</div>
+									</div>
+									<div *ngIf="!equivalenceUnitSelected" class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.grossWeightArticle' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<input type="number" class="form-control" [(ngModel)]="drinkElement.grossWeight" name="grossWeight" placeholder="" step="any" min="0" required [disabled]="status=='view'">
+										</div>
+									</div>
+									<div *ngIf="equivalenceUnitSelected" class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.grossWeightArticle' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<input *ngIf="drinkElement.quantity" type="number" class="form-control" value="{{drinkElement.quantity*drinkElement.equivalenceUnit.quantity}}" name="grossWeightEq" placeholder="" step="any" min="0" readonly [disabled]="status=='view'">
+											<input *ngIf="!drinkElement.quantity" type="number" class="form-control" value="" name="grossWeightEq" placeholder="" step="any" min="0" readonly [disabled]="status=='view'">
+										</div>
+									</div>
+									<div *ngIf="equivalenceUnitSelected" class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.quantity' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<input type="number" class="form-control" [(ngModel)]="drinkElement.quantity" name="quantity" placeholder="" step="any" min="0" required [disabled]="status=='view'">
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.measuringUnit' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<select *ngIf="elementMeasUnits" class="form-control" (change)="drinkMeasUnitSelected($event.target.value, true)" name="element" [disabled]="status=='view'">
+												<option *ngFor="let measUnit of elementMeasUnits; let i = index" [value]="i" [selected]="measUnit._id == drinkElement.measuringUnit">{{measUnit.name | uppercase}} </option>
+											</select>
+											<select *ngIf="!elementMeasUnits" class="form-control" name="element" >
+												<option></option>
+											</select>
+										</div>
+									</div>
+									<div class="form-group">
+										<label class="col-md-4 control-label">{{'recipes.drink.composition.tableHead.wastePercentage' | translate}}<span class="required"> * </span></label>
+										<div class="col-md-8">
+											<input type="number" class="form-control" [(ngModel)]="drinkElement.wastePercentage" name="wastePercentage" placeholder="" step="any" required [disabled]="status=='view'">
+										</div>
+									</div>
+								</div>
+								<div class="form-actions">
+									<div class="row">
+										<div class="col-md-offset-5 col-md-8">
+											<button *ngIf="status=='new'" type="submit" (click)="compositionModal.hide()" class="btn green"
+											[disabled]="!compositionForm.form.valid || !drinkElement.element.item || (!drinkElement.measuringUnit&& !equivalenceUnitSelected)">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button *ngIf="status=='edit'" type="submit" (click)="compositionModal.hide()" class="btn green"
+											[disabled]="!compositionForm.form.valid || !drinkElement.element.item || (!drinkElement.measuringUnit&& !equivalenceUnitSelected)">{{'buttonGeneric.save' | translate}}
+										</button>									
+										<button type="button" (click)="cleanAndResetFields(); compositionModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+											translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="col-md-4">
+						<div class="form-group" style="margin-top: 15px;">
+							<div class="col-md-12" *ngIf="(drinkElement.element.kind == 'ingredient') && (articleProviders && articleProviders.length)">			
+							  <label class="control-label">{{'recipes.composition.articleProviders' | translate}}</label>
+						    <div class="selector grey-backround viewProviders" >
+							     <div *ngFor="let articleProvider of articleProviders" style="margin: 5px; padding-left: 5px">
+						  		 <span *ngIf="articleProvider.description.length > 0">
+						  		 		<span *ngIf="articleProvider.expanded" (click)="articleProvider.expanded = false" class="">
+						  		 			<i class="fa fa-minus" aria-hidden="true">  </i>
+						  		 		</span>
+						  				<span *ngIf="!articleProvider.expanded" (click)="articleProvider.expanded = true" class="">
+						  					<i class="fa fa-plus" aria-hidden="true">  </i>	
+						  				</span>
+						  			</span>
+						        <span> 
+						        	{{articleProvider.comercialName}}
+						        </span>
+						  			<div *ngIf="articleProvider.expanded">
+					  					<li *ngFor="let description of articleProvider.description" style="margin-left: 10px; ">
+					  						<span *ngIf= " description=='' " style="font-style: italic;"> Sin descripción</span>			  						
+					  						<span *ngIf= " description!='' "> {{description}}</span>			  						
+					  					</li>
+						  			</div>
+						  		</div>												
+								</div>
+							</div>
+							<div class="col-md-12" *ngIf="(drinkElement.element.kind == 'ingredient') && (!articleProviders || articleProviders.length == 0)">			
+							  <label class="control-label">{{'recipes.composition.articleProviders' | translate}}</label>
+						    <div class="selector grey-backround viewProviders" >
+							     <div style="margin: 5px; padding-left: 5px; text-align: center;">
+						  		 		<i style="font-style: italic;" aria-hidden="true"> {{'recipes.composition.noProvider' | translate}}. </i>					  			
+						  		</div>												
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>
+
+
+<!--confirm delete -->
+<!-- <div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.provider.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteDrinkElement()" class="form-horizontal" #deleteDrinkForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'recipes.provider.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-8">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div> -->

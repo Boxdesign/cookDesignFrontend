@@ -1,0 +1,120 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div class="row" *ngIf="!loading">
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-body">  
+				<h2 *ngIf="userLang && mode!='view'" class="tab-box-title">{{'recipes.subproduct.edit' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && mode=='view'" class="tab-box-title">{{'recipes.subproduct.view' | translate:{value: userLang.name} }}</h2>
+        <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+  			<button *ngIf="mode=='view'" type="button" (click)="navigateEditSubproduct()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+        <button style="margin-left: 10px" *ngIf="mode!='new'" type="button" (click)="clickDuplicate(); duplicateModal.show()" class="btn green pointer">{{'buttonGeneric.duplicate' | translate}}</button>
+				<tabset class="tabbable-line">
+					<tab heading="{{'recipes.subproduct.tabs.subproduct' | translate}}">
+						<subproduct-main-edit *ngIf="subproduct" [(subproduct)]="subproduct" [forceRefresh]="forceRefresh" [savingSubproduct]="savingSubproduct" (savingSubproductFinished)="saveSubproduct()"></subproduct-main-edit>
+					</tab>
+					<tab *ngIf="mode!='new'" heading="{{'recipes.subproduct.tabs.composition' | translate}}">
+						<subproduct-composition-edit *ngIf="subproduct" [(subproduct)]="subproduct" (passRedirectOn)="redirectOn=$event" ></subproduct-composition-edit>
+					</tab>
+					<tab *ngIf="mode!='new'" heading="{{'recipes.subproduct.tabs.cookingSteps' | translate}}">
+						<subproduct-steps-edit *ngIf="subproduct" [(subproduct)]="subproduct"></subproduct-steps-edit> 
+					</tab>
+					<tab *ngIf="mode!='new'" heading="{{'recipes.subproduct.tabs.production' | translate}}">
+						<subproduct-production-edit *ngIf="subproduct" [(subproduct)]="subproduct" [netWeight]="subproduct.netWeight"></subproduct-production-edit>
+					</tab>
+      		<tab *ngIf="mode=='view'" heading="{{'articles.ingredients.tabs.locationCost' | translate}}"> 
+      			<location-cost-table [costs]="locationCost"></location-cost-table>
+      		</tab>	
+      		<tab *ngIf="mode=='view'" heading="{{'articles.ingredients.tabs.locationAllergens' | translate}}"> 
+      			<location-allergen-table [subproductId]="id" [versionId]="versionId"></location-allergen-table>
+      		</tab>
+      		<tab *ngIf="mode=='view'" heading="{{'recipes.product.tabs.includedIn' | translate}}"> 
+      			<where-is-included [id]="id" [versionId]="versionId"  [type]="'subproduct'" (redirectOn)="setRedirectOn($event)"></where-is-included>
+      		</tab>			      			
+					<tab *ngIf="mode!='new'">
+						<ng-template tabHeading>
+							<i class="fa fa-print fa-lg" aria-hidden="true"></i>
+				    </ng-template>
+						<subproduct-print *ngIf="subproduct" [(subproduct)]="subproduct"></subproduct-print>
+					</tab>
+				</tabset>
+				<form class="horizontal-form cd-form" >
+					<div class="form-actions right">
+						<button type="submit" (click)="preSaveSubproduct()" class="btn green" [class.hide-view-mode]="mode=='view'" [disabled]=" subproduct?.location.length==0">{{'buttonGeneric.save' | translate}}
+						</button>
+						<button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<simple-notifications [options]="notificationOptions"></simple-notifications>
+<p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" [closable]="false" width="425"></p-confirmDialog>
+
+<!--DUPLICATE MODAL-->
+<div bsModal #duplicateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="duplicateModal.hide()" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 >{{'recipes.subproduct.duplicate' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="duplicateSubproduct()" class="form-horizontal" #duplicateForm="ngForm" *ngIf="userLang">
+          <div class="row">
+            <div class="col-md-9">
+              <div class="form-body">
+                <div class="form-group">
+                    <label class="col-md-5 control-label" id="duplicateName" >{{'messageGeneric.duplicateName' | translate}} </label>
+                    <div class="col-md-7">
+                      <input for="duplicateName" placeholder="{{'COPY OF ' + userLang.name | uppercase}}" class="form-control"  [(ngModel)]="duplicateName" name="duplicateName">
+                    </div>
+                </div> 
+								<div class="form-group">
+		            	<label class="col-md-5 control-label">{{'recipes.subproduct.updateSubproductsLocation' | translate}}</label>
+									<div class="col-md-7">
+										<div class="mt-checkbox-inline">
+											<label class="mt-checkbox mt-checkbox-outline">
+	                        <input type="checkbox" [(ngModel)]="updateSubproductsLocation" name="updateSubproductsLocation" placeholder="" [disabled]="status=='view'">
+	                        <span class="green-form"></span>
+	                    </label>
+	                  </div>	              		
+		              </div>
+		            </div>
+								<div class="form-group">
+		            	<label class="col-md-5 control-label">{{'recipes.subproduct.duplicateIntoDish' | translate}}</label>
+									<div class="col-md-7">
+										<div class="mt-checkbox-inline">
+											<label class="mt-checkbox mt-checkbox-outline">
+	                        <input type="checkbox" [(ngModel)]="duplicateIntoDish" name="duplicateIntoDish" placeholder="" [disabled]="status=='view'">
+	                        <span class="green-form"></span>
+	                    </label>
+	                  </div>	              		
+		              </div>
+		            </div>
+                <div class="form-group">
+                  <label class="col-md-5 control-label" id="location">{{'export.location' | translate}}</label>
+                  <location-filter class="col-md-7" (onLocationChecked)="updateFilterLocations($event)" [savedLocations]="duplicateLocation"></location-filter>
+                </div>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="duplicateModal.hide()" class="btn green"
+                      [disabled]="!duplicateForm.form.valid || duplicateLocation.length == 0">{{'buttonGeneric.duplicate' | translate}}
+                    </button>                 
+                    <button type="button" (click)="duplicateModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                      translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

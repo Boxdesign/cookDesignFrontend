@@ -1,0 +1,98 @@
+<div class="page-sidebar-wrapper">
+  <!-- END SIDEBAR -->
+  <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+  <!-- DOC: Change data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+  <div class="page-sidebar marginTransition" [ngClass]="{'hideSideBar': !showSideBar}">
+    <!-- BEGIN SIDEBAR MENU -->
+    <!-- DOC: Apply "page-sidebar-menu-light" class right after "page-sidebar-menu" to enable light sidebar menu style(without borders) -->
+    <!-- DOC: Apply "page-sidebar-menu-hover-submenu" class right after "page-sidebar-menu" to enable hoverable(hover vs accordion) sub menu mode -->
+    <!-- DOC: Apply "page-sidebar-menu-closed" class right after "page-sidebar-menu" to collapse("page-sidebar-closed" class must be applied to the body element) the sidebar sub menu mode -->
+    <!-- DOC: Set data-auto-scroll="false" to disable the sidebar from auto scrolling/focusing -->
+    <!-- DOC: Set data-keep-expand="true" to keep the submenues expanded -->
+    <!-- DOC: Set data-auto-speed="200" to adjust the sub menu slide up/down speed -->
+
+    <div style="width: 100%; height: 30px;">
+      <button type="button" class="custom-btn btn-blue pull-right" (click)="showHideSideBarMenu()" style="padding: 2px 12px; margin: 0px;">
+        <i *ngIf="showSideBar" class="fa fa-chevron-left" aria-hidden="true"></i>
+        <i *ngIf="!showSideBar" class="fa fa-bars" aria-hidden="true"></i>
+      </button>
+    </div>
+
+    <ul class="page-sidebar-menu  page-header-fixed page-sidebar-menu-hover-submenu " data-keep-expanded="false"
+        data-auto-scroll="true" data-slide-speed="200">
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/articles" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-shopping-basket"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.articles' |translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/providers" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-user"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.suppliers' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>      
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/recipes" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-file-text-o"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.recipes' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/gastro-offering" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-spoon"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.gastroOffers' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/reports" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-pie-chart" aria-hidden="true"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.reports' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>   
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/print-books" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-print" aria-hidden="true"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.books' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/libraries" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-book"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.library' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/export" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-file-code-o" aria-hidden="true"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.export' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li *ngIf="isSelentaModule" routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/import" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-download" aria-hidden="true"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.import' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+      <li *ngIf="isAdmin" routerLinkActive="active" class="nav-item">
+        <a href="javascript:;" routerLink="/admin" class="nav-link nav-toggle paddingTransition" [ngClass]="{'logoMenuHide': !showSideBar}">
+          <i class="fa fa-cog" aria-hidden="true"></i>
+          <span class="title" [ngClass]="{'opacityNone': !showSideBar}">{{'menu.admin' | translate}}</span>
+          <span class="arrow" *ngIf="showSideBar"></span>
+        </a>
+      </li>
+
+    </ul>
+    <!-- END SIDEBAR MENU -->
+  </div>
+  <!-- END SIDEBAR -->
+</div>

@@ -1,0 +1,18 @@
+<div *ngIf="msgs">
+  <div *ngFor= "let msg of msgs; let i = index " class="top-notification" > 
+		<div *ngIf="msg.severity==='success'" class="notification-success">
+    	<i class="notification-summary" *ngIf="msg.summary">{{msg.summary}}</i>
+    	<i class="notification-detail" *ngIf="msg.detail">{{msg.detail}}</i>
+    	<a *ngIf="msg.url&&!msg.sameTab" href="{{msg.url}}" target="_blank">{{msg.clickUrl}}</a>
+    	<a *ngIf="msg.url&&msg.sameTab" href="{{msg.url}}">{{msg.clickUrl}}</a>
+	    <i class="msg-delete fa fa-times" (click)= " deleteMsg(i)"></i>
+    </div>
+    <div *ngIf="msg.severity==='error'" class="notification-error">
+	   	<i class="notification-summary" *ngIf="msg.summary">{{msg.summary}}</i>
+    	<i class="notification-detail" *ngIf="msg.detail">{{msg.detail}}</i>
+    	<a *ngIf="msg.url&&!msg.sameTab" href="{{msg.url}}" target="_blank">{{msg.clickUrl}}</a>
+    	<a *ngIf="msg.url&&msg.sameTab" href="{{msg.url}}">{{msg.clickUrl}}</a>
+    	<i class="msg-delete fa fa-times" (click)= " deleteMsg(i)"></i>
+    </div>
+  </div>
+</div>

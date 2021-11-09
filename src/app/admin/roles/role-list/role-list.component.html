@@ -1,0 +1,95 @@
+<div heading="Roles">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'admin.tabs.role' | translate}}</h2>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchRoles($event)" [label]="searchBoxLabel" [inputText]="filterText"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addRole()" class="btn default pull-right gold"> <i class="fa fa-plus"></i> {{'admin.role.addRole' | translate}}
+      </a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="role-list" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'admin.role.tableHead.name'" [value]="'name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let role of roles;let i=index">
+        <tr>
+          <td (click)="viewRole(role._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>
+          <td (click)="viewRole(role._id)" class="pointer">
+          	{{role.name}}
+          </td>
+          <td>
+            <a href="javascript:;" (click)="editRole(role._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a href="javascript:;" (click)="selectRoleToEdit(role); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="itemsPerPage" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'admin.role.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteRole()" class="form-horizontal" #deleteRoleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'admin.role.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

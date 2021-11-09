@@ -1,0 +1,36 @@
+<div class="row">
+  	<div class="col-md-12">
+	    <div class="portlet light">
+	      	<div class="portlet-body">
+					<h2 *ngIf="name && mode=='edit'" class="tab-box-title">{{'articles.packagings.form.edit' | translate:{value: this.name} }}</h2>
+					<h2 *ngIf="name && mode=='view'" class="tab-box-title">{{'articles.packagings.form.view' | translate:{value: this.name} }}</h2>
+	        <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+				  <button *ngIf="mode=='view'" type="button" (click)="editPackaging()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>		      	
+	      		<tabset class="tabbable-line">
+		      		<tab heading="{{'articles.packagings.tabs.packaging' | translate}}"> 
+		      			<packaging-main [id]="id" (passRedirectOn)="redirectOn=$event"></packaging-main>
+		      		</tab>
+		      		<tab heading="{{'articles.packagings.tabs.providers' | translate}}"> 
+		      			<packaging-provider (passRedirectOn)="redirectOn=$event"></packaging-provider>
+		      		</tab>
+		      		<tab *ngIf="mode=='view'" heading="{{'articles.packagings.tabs.locationCost' | translate}}"> 
+		      			<location-cost-table [costs]="locPrices"></location-cost-table>
+		      		</tab>
+		      		<tab *ngIf="mode=='view'" heading="{{'recipes.product.tabs.includedIn' | translate}}"> 
+      					<where-is-included [id]="id" [type]="'packaging'" (redirectOn)="setRedirectOn($event)"></where-is-included>
+      				</tab>
+      				<!-- <tab *ngIf="mode == 'edit' && isAdmin" heading="{{'articles.ingredients.tabs.refreshLocationCost' | translate}}">
+      					<location-cost-refresh [model]="'packaging'" [id]="id"></location-cost-refresh>
+      				</tab>  -->     				
+      				<tab *ngIf="mode=='view' || mode=='edit'">
+								<ng-template tabHeading>
+									<i class="fa fa-print fa-lg" aria-hidden="true"></i>
+						    </ng-template>
+								<packaging-print *ngIf="packagingOnEdit" [(packagingOnEdit)]="packagingOnEdit"></packaging-print>
+							</tab>		      		
+		      	</tabset>	
+    		</div>
+  		</div>
+	</div>
+</div>
+<p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" [closable]="false" width="425"></p-confirmDialog>

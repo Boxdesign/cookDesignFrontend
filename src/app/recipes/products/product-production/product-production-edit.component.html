@@ -1,0 +1,59 @@
+<div heading="Production">
+	<div class="row">
+		<div class="col-md-12">
+			<h3 class="tab-box-title">{{'recipes.product.production.title' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="product" class="row">
+		<div class="col-md-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">										
+										<label for="netWeight" class="control-label">{{'recipes.product.production.netWeight' | translate}}:</label>
+										<div class="input-group">
+											<input id="netWeight" type="number" step="0.001" min="0" class="form-control" [(ngModel)]="product.simulationNetWeight" name="simulationNetWeight" [disabled]="mode=='view'">
+											<span class="input-group-addon" id="addon1">{{product.measurementUnit.lang[0]?.shortName}}</span>
+										</div>	
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="table-scrollable">
+		<table class="table table-hover">
+			<thead>
+				<tr>
+					<th> {{'recipes.product.composition.tableHead.element' | translate}} </th>
+					<th> {{'recipes.product.composition.tableHead.grossWeight' | translate}}</th>
+					<th> {{'recipes.product.composition.tableHead.wastePercentage' | translate}}</th>
+					<th> {{'recipes.product.composition.tableHead.netWeight' | translate}}</th>
+					<th> {{'recipes.product.composition.tableHead.oneGrossValue' | translate}}</th>
+					<th> {{'recipes.product.composition.tableHead.oneNetValue' | translate}}</th>
+					<th> {{'recipes.product.production.simulationValue' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let composition of product.composition; let i = index;">
+				<tr>
+					<td> {{composition.name}}</td>
+					<td> {{composition.grossWeight | number:'1.3-3'}} {{composition.measuringUnitShortName}} </td>
+					<td> {{composition.wastePercentage | number:'1.2-2'}}</td>
+					<td> {{composition.netWeight | number:'1.3-3'}} {{composition.measuringUnitShortName}} </td>
+					<td><span *ngIf="product.netWeight">{{composition.grossWeight/product.netWeight | number:'1.3-3'}}</span><span *ngIf="!product.netWeight">---</span></td>
+					<td><span *ngIf="product.netWeight">{{(composition.grossWeight*(1-(composition.wastePercentage/100)))/product.netWeight | number:'1.3-3'}}</span><span *ngIf="!product.netWeight">---</span></td>
+					<td>
+						<span *ngIf="product.simulationNetWeight"> {{(composition.grossWeight/product.netWeight) * product.simulationNetWeight | number:'1.3-3'}} {{composition.measuringUnitShortName}}</span>
+						<span *ngIf="!product.simulationNetWeight">---</span>
+					</td>
+				</tr>
+	  		</tbody>
+		</table>
+	</div>
+</div>

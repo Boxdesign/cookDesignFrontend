@@ -1,0 +1,187 @@
+<div heading="Packaging articles">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="tab-box-title">{{'articles.packagings.tabs.providers' | translate}}</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchArticles($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table class="table table-hover ingredient-articles-list">
+      <thead>
+	      <tr>
+        	<th><div style="display: block; text-align:center;">#</div></th>
+        	<th> 
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.packagings.tableHead.provider'" [value]="'provider.commercialName'" (onChange)="getArticles()" ></column-sorter>
+          </th>
+          <th>
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.packagings.tableHead.reference'" [value]="'reference'" (onChange)="getArticles()" ></column-sorter>
+          </th>
+          <th> 
+            <!-- <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.ingredients.tableHead.format'" [value]="'packFormat.lang.name'" (onChange)="getArticles()" ></column-sorter> -->
+            {{'articles.packagings.tableHead.format' | translate}}
+          </th>
+          <th> 
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.packagings.tableHead.netPrice'" [value]="'netPrice'" (onChange)="getArticles()" ></column-sorter>
+          </th>
+          <th> 
+            <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'articles.packagings.tableHead.description'" [value]="'lang.description'" (onChange)="getArticles()" ></column-sorter>
+          </th>
+          <th>
+            {{'articles.packagings.tableHead.location' | translate}}&nbsp;<i (click)="filterLocationModal.show()" class="fa fa-filter" aria-hidden="true"></i><span *ngIf="filterLocations.length>0" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+          </th>
+	      </tr>
+      </thead>
+      <tbody *ngFor="let article of articles; let i=index">
+	      <tr>
+          <td (click)="viewArticle(article._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>	        
+          <td (click)="viewProvider(article)" class="pointer">
+            {{ article.provider.commercialName }}
+          </td>
+          <td (click)="viewArticle(article._id)" class="pointer">
+            {{ article.reference}}
+          </td>
+          <td *ngIf="article.packFormat" (click)="viewArticle(article._id)" class="pointer">
+            {{ article.packFormat.lang[0]?.name}}
+          </td>
+          <td (click)="viewArticle(article._id)" class="pointer">
+            {{ article.netPrice | currency:'EUR':'symbol':'1.2-2'}}
+          </td>
+          <td (click)="viewArticle(article._id)" class="pointer">
+            {{article.lang[0]?.description}}
+          </td>
+          <td>
+            <a href="javascript:;" (click)="selectArticleToEdit(article); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'articles.packagings.form.location' | translate}}</a>
+          </td>
+	      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10"
+                      (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage"
+                          [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false"
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.article.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'provider.article.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="article">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'provider.article.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="article.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteArticle()" class="form-horizontal" #deleteArticleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'provider.article.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,44 @@
+<!-- Add modal -->
+<p-dialog header="{{ 'buttonGeneric.add' | translate }}" [(visible)]="dialog_add_show" modal="modal" (onAfterShow)="setFocus('add')">
+  <h4>{{ 'contactDatatable.name' | translate }}</h4>
+  <input #nameElement [(ngModel)]="contact.name"/>
+  <h4>{{ 'contactDatatable.job' | translate }}</h4>
+  <input [(ngModel)]="contact.job"/>
+  <h4>{{ 'contactDatatable.email' | translate }}</h4>
+  <input [(ngModel)]="contact.email"/>
+  <h4>{{ 'contactDatatable.phone' | translate }}</h4>
+  <input [(ngModel)]="contact.phone"/>
+  <footer>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+      <button type="button" pButton icon="fa-close" (click)="dialog_add_show=false" label="{{ 'buttonGeneric.cancel' | translate }}"></button>
+      <button type="button" pButton icon="fa-check" (click)="addValue()" label="{{ 'buttonGeneric.add' | translate }}"></button>
+    </div>
+  </footer>
+</p-dialog>
+
+<!-- Edit modal -->
+<p-dialog header="{{ 'buttonGeneric.edit' | translate }}" [(visible)]="dialog_edit_show" modal="modal" (onAfterShow)="setFocus('edit')">
+  <input #editInputElement [(ngModel)]="dialog_edit_value"/>
+  <footer>
+    <div class="ui-dialog-buttonpane ui-widget-content ui-helper-clearfix">
+      <button type="button" pButton icon="fa-close" (click)="dialog_edit_show=false" label="{{ 'buttonGeneric.cancel' | translate }}"></button>
+      <button type="button" pButton icon="fa-check" (click)="editValue()" label="{{ 'buttonGeneric.edit' | translate }}"></button>
+    </div>
+  </footer>
+</p-dialog>
+
+<!-- Confirm modal -->
+<p-confirmDialog header="{{ 'messageGeneric.confirmDelete' | translate }}" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" width="425"></p-confirmDialog>
+
+<!-- Contact table -->
+<p-dataTable [value]="value" selectionMode="single" [(selection)]="selected" [responsive]="true" resizableColumns="true">
+  <p-column field="name" header="{{ 'contactDatatable.name' | translate | uppercase}}" [editable]="true"></p-column>
+  <p-column field="job" header="{{ 'contactDatatable.job' | translate | uppercase }}" [editable]="true"></p-column>
+  <p-column field="email" header="{{ 'contactDatatable.email' | translate | uppercase}}" [editable]="true"></p-column>
+  <p-column field="phone" header="{{ 'contactDatatable.phone' | translate | uppercase}}" [editable]="true"></p-column>
+</p-dataTable>
+<div class="ui-g-12" style="text-align: right">
+  <button pButton icon="fa-plus" (click)="addClick()" [disabled]="disabled"></button>
+  <button pButton icon="fa-pencil" (click)="editClick()" [disabled]="disabled || selected==null || value.length == 0"></button>
+  <button pButton icon="fa-trash" (click)="confirm()" [disabled]="disabled || selected==null || value.length == 0"></button>
+</div>

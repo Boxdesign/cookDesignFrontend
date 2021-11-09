@@ -1,0 +1,274 @@
+<div heading="Article">
+  <div class="ui-g">
+    <div class="ui-g-12 ui-g-nopad">
+      <h3 *ngIf="mode!='new'" class="tab-box-title">{{'provider.article.form.main' | translate}}</h3>
+      <h6 *ngIf="account&&article&&mode!='new'">{{'provider.article.form.latestUpdate' | translate}}&nbsp;{{article.updatedAt | date: 'medium'}}&nbsp;{{'provider.article.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+    </div>
+    <div class="ui-g-12 ui-g-nopad">
+      <h2 *ngIf="mode=='new'" class="tab-box-title" style="margin-bottom: 20px;">{{'provider.article.form.new' | translate}}</h2>
+    </div>
+  </div>
+  <div class="ui-g">
+    <div class="ui-g-12 ui-md-12 ui-lg-9 ui-g-nopad">         
+      <div class="form" *ngIf="article">        
+        <div class="form-body">
+          <lang-tab (langsObj)="langObjRefreshed($event)" 
+                    [fieldsObj]="articleLang"
+                    [forceRefresh]="forceRefresh"></lang-tab>
+          <div class="ui-g">
+            <div class="ui-g-12 ui-md-12 ui-lg-6">  
+              <div class="ui-g-12 ui-g-nopad">
+                <div class="form-group" style="padding-bottom: 8px;">
+                  <label for="category" class="control-label">{{'provider.article.form.category' | translate}} <span class="required"> * </span></label><br> 
+                  <p-selectButton (click)="selectButton()" [options]="articleCategories" [(ngModel)]="article.category.kind" [disabled]="mode !='new'"></p-selectButton>
+                </div>
+              </div>
+              <div *ngIf="article.category.kind=='ingredient'" class="ui-g-12 ui-g-nopad">
+                <div class="form-group">
+                  <label for="category" class="control-label">{{'provider.article.form.ingredient' | translate}} <span class="required"> * </span></label><br>
+                  <ng-select class="cd-select" [allowClear]="true"
+                    (selected)="ingredientSelected($event)" 
+                    (typed)="ingredientSearchChanged($event)"
+                    [active]="activeIngredient"
+                    [disabled]="mode =='view'" 
+                    (removed)="ingredientRemoved($event)"
+                    #selectIngredient>
+                  </ng-select>
+                </div>
+              </div>
+              <div *ngIf="article.category.kind=='packaging'" class="ui-g-12 ui-g-nopad">
+                <div class="form-group">
+                  <label for="category" class="control-label">{{'provider.article.form.packaging' | translate}} <span class="required"> * </span></label><br>
+                  <ng-select class="cd-select" [allowClear]="true"
+                    (selected)="packagingSelected($event)" 
+                    (typed)="packagingSearchChanged($event)"
+                      [active]="activePackaging"
+                      [disabled]="mode =='view'" #selectPackaging>
+                      (removed)="packagingRemoved($event)"
+                    </ng-select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <div class="form-group">
+                    <label for="desc" class="control-label">{{'provider.article.form.description' | translate}}</label> 
+                    <input id="desc" class="form-control" [(ngModel)]="articleLang.description" name="desc" [disabled]="mode =='view'"/>
+                  </div>
+                  <label for="name" class="control-label">{{'provider.article.form.provider' | translate}} <span class="required"> * </span></label>
+                  <ng-select class="cd-select" [allowClear]="true"
+                      [items]="providersSelector"
+                      (selected)="providerSelected($event)"
+                      (typed)="providerSearchChanged($event)"
+                      [active]="activeProvider"
+                      [disabled]="mode =='view' || mode =='edit'" 
+                      (removed)="providerRemoved($event)"                        
+                      #selectProvider>
+                  </ng-select>  
+                </div>
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">  
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="ref" class="control-label">{{'provider.article.form.reference' | translate}}</label>
+                    <input id="ref" class="form-control" [(ngModel)]="article.reference" name="reference" [disabled]="mode =='view'"/>
+                  </div>
+                </div> 
+                <div>
+                  <div class="ui-g-12 ui-g-nopad">
+                    <div class="form-group">
+                      <label for="ref" class="control-label">{{'provider.article.form.externalReference' | translate}}</label>
+                      <input id="ref" class="form-control" [(ngModel)]="article.externalReference" name="externalReference" [disabled]="mode =='view'"/>
+                    </div>
+                  </div>
+                </div> 
+                <div class="form-group">
+                  <div class="form-group">
+                    <label for="desc" class="control-label">{{'provider.article.form.grossPrice' | translate}}</label> 
+                    <div (click)="grossPrice.show()" style="display: inline-block; padding-left: 5px;" class="img-buttons" > 
+                      <i *ngIf="mode!='view'" class="fa fa-calculator" aria-hidden="true"></i> 
+                      <i *ngIf="mode=='view'" class="fa fa-eye" aria-hidden="true"></i> 
+                    </div>
+                    <div class="input-group">
+                      <span *ngIf="article.packPrice && article.packUnits && article.grossWeightPerUnit" class="form-control disabled">{{article.packPrice / (article.packUnits * article.grossWeightPerUnit) | number:'1.2-2' }}</span>
+                      <span *ngIf="(!article.packPrice || !article.packUnits || !article.grossWeightPerUnit) && !article.grossPrice" class="form-control disabled">---</span>
+                      <span *ngIf="(!article.packPrice || !article.packUnits || !article.grossWeightPerUnit) && article.grossPrice" class="form-control disabled">{{article.grossPrice | number:'1.2-2' }}</span>                        
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">€ / {{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div>                   
+                </div>              
+                <div class="ui-g-12 ui-g-nopad">
+                  <div class="form-group">
+                    <label for="ref" class="control-label">{{'provider.article.form.netPrice' | translate}}</label>
+                    <div (click)="netPrice.show()" style="display: inline-block; padding-left: 5px;" class="img-buttons" > 
+                      <i *ngIf="mode!='view'" class="fa fa-calculator" aria-hidden="true"></i> 
+                      <i *ngIf="mode=='view'" class="fa fa-eye" aria-hidden="true"></i>                       
+                    </div>
+                    <div class="input-group">
+                      <span *ngIf="article.packPrice && article.packUnits && article.grossWeightPerUnit&&article.grossWeightPerUnit && article.netWeightPerUnit" class="form-control disabled">{{((article.packPrice / (article.packUnits * article.grossWeightPerUnit)) / (article.netWeightPerUnit / article.grossWeightPerUnit)) | number:'1.2-2' }}</span>
+                      <span *ngIf="(!article.packPrice || !article.packUnits || !article.grossWeightPerUnit || !article.grossWeightPerUnit || !article.netWeightPerUnit) && !article.netPrice" class="form-control disabled">---</span>
+                      <span *ngIf="(!article.packPrice || !article.packUnits || !article.grossWeightPerUnit || !article.grossWeightPerUnit || !article.netWeightPerUnit) && article.netPrice" class="form-control disabled">{{article.netPrice | number:'1.2-2' }}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">€ / {{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div>
+                </div>                  
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                <div *ngIf=" article.category.kind =='ingredient' && article.category.item ">
+                  <allergen-edit [(article)]="article" [mode]="mode" ></allergen-edit>
+                </div>
+              </div>
+              <div class="ui-g-12 ui-md-12 ui-lg-6">
+                <div class="form-group">
+                  <label for="location" class="control-label">{{'provider.provider.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-provider *ngIf="mode!='view' && article && article.provider" [article]="article" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="true"></location-provider>
+                  <location-provider *ngIf="mode=='view' && article" [article]="article" [editMode]="false"></location-provider>
+                </div> 
+              </div>
+            </div>
+          </div>
+          <div class="form-actions right">
+            <div class="ui-g">
+              <div class="ui-g-12">
+                <button *ngIf="mode !='view'" type="submit" [disabled]="!article.provider || !article.category.item || !article.location.length" class="btn green" (click)="saveArticle()">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+              </div>
+            </div>
+          </div>          
+        </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #grossPrice="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="grossPrice.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.grossPriceCalc' | translate}}</h4>
+      </div>
+      <div class="modal-body" style="padding: 5px 35px 15px;">
+        <form (ngSubmit)="updateGrossPrice()" class="form-horizontal" #deleteRoleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12"  *ngIf="article&&priceCalc">              
+              <div class="form-body">                   
+                <div class="ui-g-12 ui-xl-12 ui-lg-12">
+                  <div class="form-group">
+                    <label for="initFormat" class="control-label">{{'provider.article.form.packFormat' | translate}}</label>
+                    <ng-select class="cd-select" [allowClear]="true"
+                      (selected)="packFormatSelected($event)" 
+                      (typed)="packFormatSearchChanged($event)"
+                      [active]="activePackFormat"
+                      [disabled]="mode =='view'" #selectPackFormat>
+                    </ng-select>
+                  </div>
+                  <div class="form-group">
+                    <label for="packPrice" class="control-label">{{'provider.article.form.packPrice' | translate}}</label>
+                    <div class="input-group">
+                      <input type="number" min="0" step="any" id="packPrice" class="form-control" [(ngModel)]="priceCalc.packPrice" name="packPrice" [disabled]="mode =='view'"/>
+                      <span class="input-group-addon" id="addon1">€</span>
+                    </div>
+                  </div>        
+                  <div class="form-group">
+                    <label for="packUnits" class="control-label">{{'provider.article.form.packUnits' | translate}}</label>
+                    <div class="input-group">
+                      <input type="number" min="0" step="any" id="packUnits" class="form-control" [(ngModel)]="priceCalc.packUnits" name="reference" [disabled]="mode =='view'"/>
+                      <span class="input-group-addon" id="addon1">{{'generic.units' | translate}}</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="grossWeightPerUnit" class="control-label">{{'provider.article.form.grossWeightPerUnit' | translate}}</label>
+                    <div class="input-group">
+                      <input type="number" min="0" step="any" id="grossWeightPerUnit" class="form-control" [(ngModel)]="priceCalc.grossWeightPerUnit" name="grossWeightPerUnit" [disabled]="mode =='view'"/>
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">{{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div> 
+                  <div class="form-group">
+                    <label for="desc" class="control-label">{{'provider.article.form.grossPrice' | translate}}</label>                
+                    <div class="input-group">
+                      <span *ngIf="priceCalc.packPrice && priceCalc.packUnits && priceCalc.grossWeightPerUnit" class="form-control disabled">{{priceCalc.packPrice / (priceCalc.packUnits * priceCalc.grossWeightPerUnit) | number:'1.2-2' }}</span>
+                      <span *ngIf="(!priceCalc.packPrice || !priceCalc.packUnits || !priceCalc.grossWeightPerUnit) && !priceCalc.grossPrice" class="form-control disabled">---</span>
+                      <span *ngIf="(!priceCalc.packPrice || !priceCalc.packUnits || !priceCalc.grossWeightPerUnit) && priceCalc.grossPrice" class="form-control disabled">{{priceCalc.grossPrice | number:'1.2-2' }}</span>                        
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">€ / {{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div> 
+                </div>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-7 col-md-6">
+                    <button type="submit" (click)="grossPrice.hide()" *ngIf="mode!='view'" class="btn green">{{'buttonGeneric.accept' | translate}}
+                    </button> 
+                    <button type="button"(click)="grossPrice.hide()" class="btn default">{{'buttonGeneric.close' | translate}}
+                    </button>                
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div bsModal #netPrice="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="netPrice.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'provider.article.form.netPriceCalc' | translate}}</h4>
+      </div>
+      <div class="modal-body" style="padding: 5px 35px 15px;">
+        <form (ngSubmit)="updateNetPrice()" class="form-horizontal" #deleteRoleForm="ngForm">
+          <div class="row">
+            <div class="col-md-12"  *ngIf="article&&priceCalc">              
+              <div class="form-body">                   
+                <div class="ui-g-12 ui-xl-12 ui-lg-12">
+                  <div class="form-group">
+                    <label for="netWeightPerUnit" class="control-label">{{'provider.article.form.netWeightPerUnit' | translate}}</label>
+                    <div class="input-group">
+                      <input type="number" min="0" step="any" id="netWeightPerUnit" class="form-control" [(ngModel)]="priceCalc.netWeightPerUnit" name="netWeightPerUnit" [disabled]="mode =='view'"/>
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">{{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div>
+                  <div class="form-group">
+                    <label for="netPrice" class="control-label">{{'provider.article.form.netPrice' | translate}}</label>
+                    <div class="input-group">
+                      <span *ngIf="priceCalc.packPrice && priceCalc.packUnits && priceCalc.grossWeightPerUnit&&priceCalc.grossWeightPerUnit && priceCalc.netWeightPerUnit" class="form-control disabled">{{((priceCalc.packPrice / (priceCalc.packUnits * priceCalc.grossWeightPerUnit)) / (priceCalc.netWeightPerUnit / priceCalc.grossWeightPerUnit)) | number:'1.2-2' }}</span>
+                      <span *ngIf="(!priceCalc.packPrice || !priceCalc.packUnits || !priceCalc.grossWeightPerUnit || !priceCalc.grossWeightPerUnit || !priceCalc.netWeightPerUnit) && !priceCalc.netPrice" class="form-control disabled">---</span>
+                      <span *ngIf="(!priceCalc.packPrice || !priceCalc.packUnits || !priceCalc.grossWeightPerUnit || !priceCalc.grossWeightPerUnit || !priceCalc.netWeightPerUnit) && priceCalc.netPrice" class="form-control disabled">{{priceCalc.netPrice  | number:'1.2-2' }}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && measUnitPopulated) || ((mode == 'new') && article.category.item)" class="input-group-addon" id="addon1">€ / {{article.category.item?.measurementUnit.lang[0]?.shortName}}</span>
+                      <span *ngIf="((mode=='edit' || mode=='view') && !measUnitPopulated) || ((mode == 'new') && !article.category.item)" class="input-group-addon" id="addon2">---</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-7 col-md-6">
+                    <button type="submit" (click)="netPrice.hide()" class="btn green" *ngIf="mode!='view'">{{'buttonGeneric.accept' | translate}}
+                    </button>  
+                    <button type="button" (click)="netPrice.hide()" class="btn default">{{'buttonGeneric.close' | translate}}
+                    </button>                  
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>
+ <p-confirmDialog *ngIf="mode=='new'" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" [closable]="false" width="425"></p-confirmDialog>

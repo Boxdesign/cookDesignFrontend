@@ -1,0 +1,80 @@
+<div class="login">
+    <!-- <div class="fullscreen-bg hidden-xs hidden-sm">
+	  <video id="fullscreen-bg-video" autoplay="autoplay" width="100%" height="auto" loop="loop">
+	     <source src="../assets/img/Carles_Tejedor_oilmotion.mp4" type="video/mp4">
+	  </video>
+	</div> -->
+    <div style="position: absolute; z-index: 100; top:100px; right:40px;">
+        <img src="" style="height:200px;">
+    </div>
+    <div class="fullscreen-bg" style="background-color: #070707; opacity: 0.7 !important;  text-align: right;">
+        <img id="fullscreen-bg-img" src="" alt="" style="height: 100%; float: right;" />
+    </div>
+    <div class="col-xs-12" style="background-color: #FFFFFF;">
+        <a href="index.html">
+
+            <img src="../assets/img/logo.svg" alt="cookdesign-logo" style="height:30px;margin-top:26px; margin-left:12px; margin-bottom: 14px;" />
+        </a>
+    </div>
+    <div *ngIf="!loginFormState">
+        <div class="col-xs-12 col-sm-10 col-md-8 col-lg-5">
+            <div id="login-box-container">
+                <div id="login_copis">
+                    <h1>{{'login.headline' | translate}} </h1>
+                    <h2>{{'login.subtitle' | translate}} </h2>
+                    <div (click)="toggleLogin()" id="landing_but">{{'login.start' | translate}}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div *ngIf="loginFormState">
+        <div class="col-xs-12">
+            <!-- BEGIN LOGIN -->
+            <div id="cd-login" class="content">
+                <!-- BEGIN LOGIN FORM -->
+                <form class="login-form">
+                    <h3 class="form-title">{{'login.start' | translate}}</h3>
+                    <div class="alert alert-danger display-hide">
+                        <button class="close" data-close="alert"></button>
+                        <span> {{'login.enter_uid_pwd' | translate}} </span>
+                    </div>
+                    <div class="form-group">
+                        <!--ie8, ie9 does not support html5 placeholder, so we just show field title for that-->
+                        <label class="control-label visible-ie8 visible-ie9">{{'login.username' | translate}}</label>
+                        <input (keydown.enter)="loginPassword.focus()" #loginMail [(ngModel)]="email" class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="{{'login.username' | translate}}" name="username" />
+                    </div>
+                    <div class="form-group">
+                        <label class="control-label visible-ie8 visible-ie9">{{'login.password' | translate}}</label>
+                        <input (keydown.enter)="login();" (keyup.enter)="accountsSelector.focus();" #loginPassword [(ngModel)]="password" class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="{{'login.password' | translate}}"
+                            name="password" />
+                        <div *ngIf="loginError" class="alert alert-danger">
+                            <strong>{{'loginError' | translate}}</strong>
+                        </div>
+                    </div>
+                    <div [ngClass]="{ 'displayElement': accountsReady, 'hideElement': !accountsReady }" class="form-group">
+                        <label class="control-label visible-ie8 visible-ie9">{{'login.account' | translate}}</label>
+                        <select id="accounts" #accountsSelector class="form-control" (change)="accountSelected($event.target.value)" (keydown.enter)="setAccount()" name="account" required>
+		          <option *ngFor="let account of accounts;let i = index" [value]="i">
+		            {{account.name}}
+		          </option>
+		        </select>
+                    </div>
+                    <div class="form-actions">
+                        <button *ngIf="!accountsReady" type="submit" class="btn green uppercase" (click)="login()">{{'login.login' | translate}}</button>
+                        <button *ngIf="accountsReady" type="submit" class="btn green uppercase" (click)="setAccount()">{{'login.selectAccount' | translate}}</button>
+                        <label class="rememberme check mt-checkbox mt-checkbox-outline">
+		          <input type="checkbox" name="remember" value="1"/>{{'login.remember' | translate}}
+		          <span></span>
+		        </label>
+                    </div>
+                    <div class="create-account">
+                        <p>
+                            <a href="javascript:;" id="register-btn">{{'login.forgot_password' | translate}}</a>
+                        </p>
+                    </div>
+                </form>
+                <!-- END LOGIN FORM -->
+            </div>
+        </div>
+    </div>
+</div>

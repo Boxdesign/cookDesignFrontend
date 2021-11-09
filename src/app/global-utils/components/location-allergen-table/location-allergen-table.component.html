@@ -1,0 +1,61 @@
+<div heading="Ingredient articles">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="tab-box-title">{{'articles.ingredients.tabs.locationAllergens' | translate}}</h3>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="allergen-table" class="table table-hover ingredient-location-cost">
+      <thead>
+        <tr>
+          <th>
+            <div style="display: block; text-align:center;">#</div>
+          </th>
+          <th>
+            {{'articles.ingredients.tableHead.location' | translate}}
+          </th>
+          <th>
+            {{'library.allergen.full' | translate}}
+          </th>
+          <th>
+            {{'library.allergen.traces' | translate}}
+            <!-- {{'articles.ingredients.tableHead.allergens' | translate}} -->
+          </th>
+        </tr>
+      </thead>
+      <tbody id="allergen-table" *ngFor="let locAllergen of locAllergens; let i=index ">
+        <tr>
+          <td>
+            <div style="display: block; text-align:center;">
+              {{i+1}} </div>
+          </td>
+          <td>
+            {{locAllergen.location.name | uppercase}}
+          </td>
+          <td>
+            <div *ngFor="let allergen of locAllergen.allergens" style="display: inline-block; ">
+              <div *ngIf="allergen.level&&allergen.level=='2'" class="card" style="width: 10rem; background-color: transparent !important">
+                <img *ngIf="allergen.allergen.gallery" style="width: 2rem;" class="card-img-top" alt="Card image cap" [src]="allergen.allergen.gallery.sizes[0].url">
+                <img *ngIf="!allergen.allergen.gallery" style="width: 2rem;" class="card-img-top" alt="Card image cap" src="../../../assets/img/noImageCircle.png">
+                <div class="card-body">
+                  <p class="card-text">{{allergen.allergen.lang[0]?.name}}</p>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td>
+            <div *ngFor="let allergen of locAllergen.allergens" style="display: inline-block; ">
+              <div *ngIf="allergen.level&&allergen.level=='1'" class="card" style="width: 10rem; background-color: transparent !important">
+                <img *ngIf="allergen.allergen.gallery" style="width: 2rem;" class="card-img-top" alt="Card image cap" [src]="allergen.allergen.gallery.sizes[0].url">
+                <img *ngIf="!allergen.allergen.gallery" style="width: 2rem;" class="card-img-top" alt="Card image cap" src="../../../assets/img/noImageCircle.png">
+                <div class="card-body">
+                  <p class="card-text">{{allergen.allergen.lang[0]?.name}}</p>
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

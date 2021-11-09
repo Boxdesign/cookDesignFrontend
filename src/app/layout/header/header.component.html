@@ -1,0 +1,164 @@
+
+<!-- BEGIN HEADER -->
+<div class="page-header navbar navbar-fixed-top">
+	<!-- BEGIN HEADER INNER -->
+	<div class="page-header-inner ">
+		<!-- BEGIN LOGO -->
+			<div class="page-logo">
+				<a href="index.html">
+					<img src="../assets/img/logo.svg" alt="cookdesign-logo" style="height:30px;margin-top:26px; margin-left:27px;"/>
+				</a>
+				<!-- <div class="menu-toggler sidebar-toggler"> -->
+					<!-- DOC: Remove the above "hide" to enable the sidebar toggler button on header -->
+					<!-- </div> -->
+			</div>
+			<!-- END LOGO -->
+			<!-- BEGIN RESPONSIVE MENU TOGGLER -->
+			<a href="javascript:;" class="menu-toggler responsive-toggler" data-toggle="collapse"
+			data-target=".navbar-collapse"> </a>
+			<!-- END RESPONSIVE MENU TOGGLER -->
+			<!-- BEGIN PAGE TOP -->
+			<div class="page-top">
+				<!-- BEGIN HEADER SEARCH BOX -->
+				<!-- DOC: Apply "search-form-expanded" right after the "search-form" class to have half expanded search box -->
+				<!-- <form class="search-form search-form-expanded" action="page_general_search_3.html" method="GET">
+					<div class="input-group">
+						<input type="text" class="form-control" placeholder="Buscar..." name="query">
+						<span class="input-group-btn">
+							<a href="javascript:;" class="btn submit">
+								<i class="fa fa-search"></i>
+							</a>
+						</span>
+					</div>
+				</form> -->
+				<app-release [refresh]="refreshAppRelease" ></app-release>
+  			<!-- END HEADER SEARCH BOX -->
+				<!-- BEGIN TOP NAVIGATION MENU -->
+				<div class="top-menu">
+					<ul class="nav navbar-nav pull-right">
+						<!-- BEGIN USER LOGIN DROPDOWN -->
+						<!-- DOC: Apply "dropdown-dark" class after below "dropdown-extended" to change the dropdown styte -->
+          <!-- <li class="dropdown dropdown-user">
+            <span dropdown>
+              <span dropdownToggle> <i class="fa fa-angle-down"></i></span>
+              <ul dropdownMenu class="dropdown-menu-right" aria-labelledby="simple-dropdown">
+                <li>
+                  <a (click)="logout()">
+                    <i class="fa fa-sign-out" aria-hidden="true"></i> {{'login.logout' | translate}} </a>
+                </li>
+              </ul>
+            </span>
+          </li> -->
+          <li class="dropdown dropdown-user">
+          	<a href="javascript:;" class="dropdown-toggle" (click)="costFilterModal.show()">
+          		<i class="fa fa-filter" aria-hidden="true"></i> 
+          		<span class="username username-hide-on-mobile"> {{'header.locationCosts' | translate}} </span>
+          		<!-- <span class="badge badge-default"> Localizaciones </span> -->
+          	</a>
+          </li>    
+          <li *ngIf="costFilterSet" class="dropdown dropdown-user">
+          	<a href="javascript:;" class="dropdown-toggle" (click)="resetCostFilter()">
+          		<i class="fa fa-times" aria-hidden="true"></i>
+          	</a>
+          </li>          
+          <li class="dropdown dropdown-user">
+          	<a href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+          	data-close-others="true">
+          	<img *ngIf="userImage" alt="" class="img-circle" src="{{userImage}}"/>
+          	<img *ngIf="!userImage" alt="" class="img-circle" src="../../../assets/img/avatar.png" />
+          	<span class="username username-hide-on-mobile"> {{firstName}} </span>
+          </a>              
+            <!-- <ul dropdownMenu class="dropdown-menu dropdown-menu-default">
+               <li>
+                <a href="page_user_profile_1.html">
+                  <i class="icon-user"></i> My Profile </a>
+              </li>
+              <li>
+                <a href="app_calendar.html">
+                  <i class="icon-calendar"></i> My Calendar </a>
+              </li>
+              <li>
+                <a href="app_inbox.html">
+                  <i class="icon-envelope-open"></i> My Inbox
+                  <span class="badge badge-danger"> 3 </span>
+                </a>
+              </li>
+              <li>
+                <a href="app_todo_2.html">
+                  <i class="icon-rocket"></i> My Tasks
+                  <span class="badge badge-success"> 7 </span>
+                </a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a href="page_user_lock_1.html">
+                  <i class="icon-lock"></i> Lock Screen </a>
+              </li>
+              <li>
+                <a (click)="logout()">
+                  <i class="fa fa-sign-out" aria-hidden="true"></i> {{'login.logout' | translate}} </a>
+              </li>
+            </ul> -->
+          </li>
+          <li dropdown class="dropdown dropdown-user">
+          	<a (click)="logout()" href="javascript:;" class="dropdown-toggle" data-toggle="dropdown" data-hover="dropdown"
+          	data-close-others="true">
+          	<i class="fa fa-sign-out" aria-hidden="true"></i>
+          </a>
+        </li>
+        <!-- END USER LOGIN DROPDOWN -->
+      </ul>
+    </div>
+    <!-- END TOP NAVIGATION MENU -->
+  </div>
+  <div>
+  	
+  </div>
+  <!-- END PAGE TOP -->
+</div>
+<!-- END HEADER INNER -->
+</div>
+<!-- END HEADER -->
+
+
+<!--location filter -->
+<div bsModal #costFilterModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="cancelSelection(); costFilterModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{'header.setLocationFilter' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="filterCostsByLocation()" class="form-horizontal" #costFilterForm="ngForm">
+					<div class="row">
+						<div class="col-md-12">
+							<div class="form-body">
+								<label for="location" class="control-label">{{'header.location' | translate}} <span class="required"> * </span></label>
+								<location-selector [editMode]="true" [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refreshLocation" (onLocationChecked)="updateFilterLocations($event)"></location-selector>
+							</div>
+							<div class="form-actions" style="margin-top:20px;">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button type="submit" (click)="costFilterModal.hide()" class="btn green"
+										[disabled]="!costFilterForm.form.valid">{{'header.saveLocationFilter' | translate}}
+									</button>
+									<button type="button" (click)="cancelSelection(); costFilterModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+										translate}}
+									</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>
+
+<div style="color:yellow; margin-top: 70px;">
+	<top-notification [(msgs)]="msgs">  </top-notification>
+</div>

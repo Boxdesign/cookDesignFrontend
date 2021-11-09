@@ -1,0 +1,20 @@
+<div>
+	<div *ngIf="criticalCheckpoint" tooltip="{{criticalCheckpoint.lang[0]?.name}}">
+		<div class="circle-box">
+			<div class="criticalCheckpoint circle-content" *ngIf="criticalCheckpoint.type=='critical'" >
+				<div class="circle-content-div" >
+					<span>PCQ </span>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div *ngIf="gastroCheckpoint" tooltip="{{gastroCheckpoint.lang[0]?.name}}">
+		<div class="circle-box">
+			<div class="gastroCheckpoint circle-content" *ngIf="gastroCheckpoint.type=='gastronomic'" >
+				<div class="circle-content-div" >
+					<span>PCG</span>	
+				</div>	
+			</div>
+		</div>
+	</div>
+</div>

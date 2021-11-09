@@ -1,0 +1,139 @@
+<div class="row">
+	
+	<div class="col-md-10" >
+		<h2 class="tab-box-title">{{'reports.heading' | translate}}</h2>
+
+		<form #export="ngForm" class="ui form" style="margin-left: -15px; margin-top: 15px;">
+
+			<div class="col-xs-12 col-md-1 pull-left">
+
+				<span class="pull-left" *ngIf="stepLocations == false" style="color: grey">{{ 'reports.gastroIngredients.step' | translate | uppercase }} {{ (page + 1 ) }} <!-- {{ 'reports.gastroIngredients.of'	| translate | uppercase }} : --></span>
+
+				<span class="pull-left" *ngIf="stepLocations == true" style="color: grey">{{ 'reports.gastroIngredients.step' | translate | uppercase }} {{ (page + 1 ) }}<!--  {{ 'reports.gastroIngredients.ofLocs'	| translate | uppercase }} : --></span>
+
+			</div>
+
+			<div class="col-xs-12 col-md-5 pull-left"> 
+
+				<div *ngIf="page == 0">
+					
+					<label class="control-label">{{'reports.gastroIngredients.typeExport' | translate}}<span class="required"> * </span></label>
+
+					<select class="form-control" (change)="exportTypeSelected($event.target.value)" name="exportSelected" required="" style="width: 93%;">
+						<option *ngFor="let export of exportTypes; let i=index;" [value]="i">{{'reports.gastroIngredients.'+ export.type | translate | uppercase }} </option>
+						<option [selected]="true" style="display: none;"><span style="color: #f0f0f0"></span>{{'reports.gastroIngredients.noExportTypeSelected' | translate | uppercase }} </option>
+					</select> 
+
+					<div class="margin pull-right">
+
+						<button type="follow" [disabled]="exportType.value == ''" (click)="page = 1; showRestart = false;" class="btn green pull-right">{{'reports.gastroIngredients.following' | translate }} </button>
+
+					</div>
+
+				</div>
+
+				<div *ngIf="page == 1">
+					
+					<label class="control-label">{{'reports.gastroIngredients.type' | translate}}<span class="required"> * </span></label>
+							
+					<select class="form-control" (change)="gastroTypeSelected($event.target.value)" name="gastroType" required="" style="width: 93%;">
+
+						<option *ngFor="let gastroOfferType of gastroOfferTypes; let i=index;" [value]="i">{{'reports.gastroIngredients.'+ gastroOfferType.type | translate | uppercase}} </option>
+						<option [selected]="true" style="display: none;"><span style="color: #f0f0f0"></span>{{'reports.gastroIngredients.noGastroTypeSelected' | translate | uppercase }} </option>
+
+					</select>
+
+					<div class="margin pull-right">
+
+						<button *ngIf="stepLocations == true " type="follow" [disabled]="gastroType == ''" (click)="page = 2; " class="btn green pull-right" >{{'reports.gastroIngredients.following' | translate }}
+		        </button>
+
+		        <button *ngIf="stepLocations == false && gastroType=='all'" type="submit" [disabled]="exportType.value == ''" (click)="downloadFile();" class="btn green pull-right" >{{'buttonGeneric.printBooks' | translate }}
+		        </button>
+
+						<button *ngIf="stepLocations == false && gastroType!='all'" type="follow" [disabled]="gastroType == ''" (click)="page = 3; " class="btn green pull-right" >{{'reports.gastroIngredients.following' | translate }}
+		        </button>
+
+						<button (click)="page = 0" class="btn pull-right" style="margin-right: 10px;">{{'reports.gastroIngredients.return'|translate}} </button>
+
+					</div>
+					
+
+				</div>
+
+				<div *ngIf="page == 2">
+					
+					<label  for="location" class="control-label">
+						{{'printBooks.location' | translate}}
+						<span class="required"> * </span>
+					</label>
+
+					<div style="width: 93%">
+						<location-filter (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+					</div>
+
+					<div class="margin pull-right">
+
+						<button type="follow" *ngIf="gastroType!='all'" [disabled]="exportType.value == '' || filterLocations.length == 0" (click)=" page = 3 " class="btn green pull-right">{{'reports.gastroIngredients.following' | translate }}
+				    </button>
+
+				    <button *ngIf="stepLocations == true && gastroType=='all'" type="submit" [disabled]="exportType.value == '' || filterLocations.length == 0" (click)="downloadFile();" class="btn green pull-right" >{{'buttonGeneric.printBooks' | translate }}
+		        </button>
+
+		 				<button (click)="page = 1" class="btn pull-right" style="margin-right: 10px;">{{'reports.gastroIngredients.return'|translate}} </button>	        
+
+					</div>
+
+	 			</div>
+
+				<div *ngIf="page == 3 && gastroType!='all'">
+					
+					<div class="col-md-12">
+
+							<label for="qty" class="control-label">{{'export.group' | translate}}</label> 
+			        <br/>
+			        <p-selectButton [options]="quantityOptions" [(ngModel)]="qty" name="qty" (onChange)="resetList()" [disabled]="gastroType=='all'"></p-selectButton>
+			    </div>
+
+					<div class="col-md-12" style="margin-top: 15px;">
+						<label for="gastroOffer" class="control-label">{{'printBooks.gastroOffer' | translate | uppercase}} <span class="required"> * </span></label>
+					</div>
+
+					<div class="col-md-12" style="width: 95%;">
+						<ng-select class="cd-select" 
+								[multiple]="true"
+								[allowClear]="true"
+								[disabled]="qty=='all'"
+								(selected)="gastroOfferSelected($event)" 
+								(typed)="gastroOfferSearchChanged($event)"
+								(removed)="gastroOfferRemoved($event)" #gastroOfferSelectElement>
+						</ng-select>
+					</div>
+					
+
+					<div class="margin pull-right">
+
+						<button *ngIf="stepLocations == false" type="submit" [disabled]="exportType.value == ''" (click)="downloadFile(); showRestart = true;" class="btn green pull-right" >{{'buttonGeneric.printBooks' | translate }}
+		        </button> 
+
+		        <button *ngIf="stepLocations == true" type="submit" [disabled]="exportType.value == '' || (gastroType!='' && !gastroOffer)|| filterLocations == [] || !gastroOffer" (click)="downloadFile(); showRestart = true;" class="btn green pull-right" >{{'buttonGeneric.printBooks' | translate }}
+		        </button>
+
+		        <button *ngIf="showRestart == true" (click)="page = 0; cleanStepValues();" class="btn pull-right" style="margin-right: 10px;">{{'reports.gastroIngredients.restart'|translate}} </button>
+						<button *ngIf="stepLocations == true && showRestart == false" (click)="page = 2" class="btn pull-right" style="margin-right: 10px;">{{'reports.gastroIngredients.return'|translate}} </button>
+						<button *ngIf="stepLocations == false && showRestart == false" (click)="page = 1;" class="btn pull-right" style="margin-right: 10px;">{{'reports.gastroIngredients.return'|translate}} </button>
+
+					</div>
+					<img class="pull-right" *ngIf="loadingData" src="../assets/img/preloader.gif"/>
+				</div>
+
+			</div>
+			
+		</form>
+
+	</div>
+
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>
+

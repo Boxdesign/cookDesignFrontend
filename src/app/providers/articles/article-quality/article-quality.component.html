@@ -1,0 +1,34 @@
+<div heading="Article">
+  <div class="ui-g">
+      <div class="ui-g-12 ui-g-nopad">
+          <h3 *ngIf="mode=='edit'" class="tab-box-title">{{'provider.article.form.editArticleQuality' | translate}}</h3>
+          <h3 *ngIf="mode=='view'" class="tab-box-title">{{'provider.article.form.viewArticleQuality' | translate}}</h3>
+          <h6 *ngIf="account&&article&&mode!='new'">{{'provider.article.form.latestUpdate' | translate}}&nbsp;{{article.updatedAt | date: 'medium'}}&nbsp;{{'provider.article.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+      </div>
+  </div>
+  <div class="ui-g">
+    <div class="ui-g-12 ui-md-12 ui-lg-9 ui-g-nopad">     	 	
+      <div class="form">     		
+          <div class="form-body" *ngIf="article">
+            <div class="ui-g"> 
+            	<label for="name" class="control-label">{{ 'provider.article.form.documents' | translate }}</label>         
+            	<div class="ui-g-12">
+                    	<!-- <image-listbox [options]="article.document" [uploadUrl]="uploadUrl" [document]="article.document" [disabled]="mode=='view'"></image-listbox> -->
+                <file-uploader [folderPath]="'article'" [id]="article._id" [status]="mode" (hasDataSheet)="compareDataSheet($event)"></file-uploader>
+            	</div>      
+            </div>
+          </div>
+          <div class="form-actions right">
+            <div class="ui-g">
+              <div class="ui-g-12">
+                <button type="submit" class="btn green" (click)="saveArticle()" [disabled]="mode=='view'">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>

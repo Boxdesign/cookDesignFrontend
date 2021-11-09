@@ -1,0 +1,248 @@
+<div heading="Utensils">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 class="tab-box-title">{{'library.tabs.utensil' | translate}}</h2>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchUtensils($event)" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addClick(); utensilModal.show()" class="btn default pull-right gold"> <i
+        class="fa fa-plus"></i> {{'buttonGeneric.add' | translate}}</a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table id="utensil-table" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;"> {{'library.utensil.tableHead.image' | translate}}</div></th>
+        <th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'library.utensil.tableHead.name'" [value]="'lang.name'" (onChange)="getUtensil()"></column-sorter>
+        </th>
+        <th><column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'library.utensil.tableHead.family'" [value]="'fam.lang.name'" (onChange)="getUtensil()"></column-sorter>
+        </th>
+<!--         <th> {{'library.utensil.tableHead.subfamily' | translate}}
+          <column-sorter (onSorterClicked)="sortColumn($event,'subfamily')"></column-sorter>
+        </th> -->
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let ute of utensils; let i = index; ">
+      <tr>
+        <td (click)="selectUtensilToEdit(ute); viewClick(); utensilModal.show()" class="pointer">
+          <div style="display: block; text-align:center;">
+            <img *ngIf="ute.gallery" [src]="ute.gallery.sizes[0].url" alt="">
+          </div>
+          <div *ngIf="!ute.gallery" style="display: block; text-align:center;">
+            <img src="../../../../../assets/img/noImageCircle.png" alt="">
+          </div>
+        </td>
+        <td (click)="selectUtensilToEdit(ute); viewClick(); utensilModal.show()" class="pointer">{{ute.lang.name}}</td>
+        <td (click)="selectUtensilToEdit(ute); viewClick(); utensilModal.show()" class="pointer"><span *ngIf="ute.family!=null && ute.family._id"> {{ute.family.lang[0]?.name}}</span><span *ngIf="ute.family == null"> --- </span></td>
+<!--         <td (click)="selectUtensilToEdit(ute); viewUtensilModal.show()" class="pointer"><span *ngFor="let subfam of families.subfamilies" [class.hidden]="!(subfam._id==ute.subfamily)">{{subfam.lang[0]?.name}}</span> </td> -->
+        <td>
+          <!-- <a href="javascript:;" (click)="selectUtensilToEdit(ute); viewUtensilModal.show()"
+             class="btn gold btn-sm btn-outline sbold table-row-button">
+            <i class="fa fa-eye" aria-hidden="true"></i> {{'buttonGeneric.view' | translate}} </a> -->
+          <a href="javascript:;" (click)="selectUtensilToEdit(ute);editClick(); utensilModal.show()"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+          <a href="javascript:;" (click)="deleteUtensil(ute._id)"
+             class="btn gold btn-sm btn-outline table-row-button">
+            <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10"
+                      (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage"
+                          [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage"
+                    [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'"
+                    [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" 
+                    (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>
+
+<!--MODALS-->
+
+<!--añadir -->
+<div bsModal #utensilModal="bs-modal" class="modal fade" tabindex="-1" role="dialog"
+     aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="utensilModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 *ngIf="this.status=='new'" class="modal-title">{{'library.utensil.new' | translate}}</h4>
+        <h4 *ngIf="this.status=='edit'" class="modal-title">{{'library.utensil.edit' | translate}}</h4>
+        <h4 *ngIf="this.status=='view'" class="modal-title">{{'library.utensil.view' | translate}}</h4>
+      </div>
+      <div class="modal-body" *ngIf="utensil">
+        <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="utensilTmp"
+                  [forceRefresh]="forceRefresh"></lang-tab>
+        <form (ngSubmit)="uploadImage()" class="form-horizontal" #utensilForm="ngForm">
+          <div class="row">
+            <div class="col-md-7">
+              <div class="form-body">
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.name' | translate}}<span
+                    class="required"> * </span></label>
+                  <div class="col-md-9">
+                    <input type="text" class="form-control" [(ngModel)]="utensilTmp.name" name="name" placeholder=""
+                           required [disabled]="status == 'view'">
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.family' | translate}}</label>
+                  <div class="col-md-9">
+                    <select *ngIf="families && utensil.family" class="form-control" [(ngModel)]="utensil.family._id" (change)="familySelected($event.target.value)" name="family" [disabled]="status == 'view'">
+                      <option [value]="null">---</option>
+                      <option *ngFor="let family of families" [value]="family._id">{{family.lang[0]?.name}}</option>
+                    </select>
+
+                    <select *ngIf="!families" class="bs-select form-control" name="family" disabled>
+                      <option>---</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.subfamily' | translate}}</label>
+                  <div class="col-md-9">
+
+                    <select *ngIf="subfamilies" class="bs-select form-control" [(ngModel)]="utensil.subfamily"
+                            (change)="subFamilySelected($event.target.value)" name="subfamily"
+                            [disabled]="subfamilies.length < 1 || status == 'view'">
+                      <option [value]="null">---</option>
+                      <option *ngFor="let subfam of subfamilies" [value]="subfam._id">{{subfam.lang.name}}</option>
+                    </select>
+
+                    <select *ngIf="!subfamilies" class="bs-select form-control" name="subfamily" disabled>
+                      <option>---</option>
+                    </select>
+
+                  </div>
+                </div>
+								<div class="form-group">
+		            	<label class="col-md-3 control-label">{{'library.family.tableHead.externalLink' | translate}}</label>
+									<div class="col-md-4">
+										<div class="mt-checkbox-inline">
+											<label class="mt-checkbox mt-checkbox-outline">
+	                        <input type="checkbox" [(ngModel)]="utensil.externalLink" name="externalLink" placeholder="" [disabled]="status=='view'">
+	                        <span class="green-form"></span>
+	                    </label>
+	                  </div>	              		
+		              </div>
+		            </div> 
+                <div *ngIf="utensil.externalLink" class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.externalFamily' | translate}}</label>
+                  <div class="col-md-9">
+                    <select *ngIf="externalFamilies && utensil.externalFamily" class="form-control" [(ngModel)]="utensil.externalFamily._id" (change)="externalFamilySelected($event.target.value)" name="externalFamily" [disabled]="status == 'view'">
+                      <option [value]="null">---</option>
+                      <option *ngFor="let extFam of externalFamilies" [value]="extFam._id">{{extFam.lang[0]?.name}}</option>
+                    </select>
+
+                    <select *ngIf="!externalFamilies" class="bs-select form-control" name="family" disabled>
+                      <option>---</option>
+                    </select>
+                  </div>
+                </div>
+                <div *ngIf="utensil.externalLink" class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.externalSubfamily' | translate}}</label>
+                  <div class="col-md-9">
+
+                    <select *ngIf="externalSubfamilies" class="bs-select form-control" [(ngModel)]="utensil.externalSubfamily"
+                            (change)="externalSubFamilySelected($event.target.value)" name="externalSubfamily"
+                            [disabled]="externalSubfamilies.length < 1 || status == 'view'">
+                      <option [value]="null">---</option>
+                      <option *ngFor="let extSubfam of externalSubfamilies" [value]="extSubfam._id">{{extSubfam.lang.name}}</option>
+                    </select>
+
+                    <select *ngIf="!externalSubfamilies" class="bs-select form-control" name="subfamily" disabled>
+                      <option>---</option>
+                    </select>
+
+                  </div>
+                </div>
+                <div class="form-group">
+                  <label class="col-md-3 control-label">{{'library.utensil.tableHead.access' | translate}}</label>
+                  <div class="col-md-9">
+                    <textarea class="form-control" name="desc" [(ngModel)]="utensilTmp.accessories" cols="30"
+                              rows="10"></textarea>
+                  </div>
+                </div>                
+              </div>
+            </div>
+            <div class="col-md-5">
+              <crop-and-upload [(gallery)]="imageObject" [folderPath]="'imgs/utensil/'" [upload]="upload" (uploadFinished)="saveUtensil()" [mode]="status" ></crop-and-upload>              
+            </div>
+          </div>
+          <div class="form-actions">
+            <div class="row">
+              <div class="col-md-offset-3 col-md-9">
+                <button type="submit" (click)="utensilModal.hide()" class="btn green"
+                        [disabled]="!utensilForm.form.valid || status =='view'">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="utensilModal.hide()" class="btn default">{{'buttonGeneric.cancel' |
+                  translate}}
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'articles.ingredients.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteImage()" class="form-horizontal" #deleteIngredientForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'articles.ingredients.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+

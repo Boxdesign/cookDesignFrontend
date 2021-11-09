@@ -1,0 +1,26 @@
+<div *ngIf="options?.length > 0">
+  <div class="ui-g-12 ui-md-12 ui-lg-4">
+    <p-listbox [options]="options" (onDblClick)="dblClick($event)" [(ngModel)]="selected" [style]="{'width': '100%'}">
+      <ng-template let-doc>
+          <div class="ui-helper-clearfix" style="background: #fff; color: #000;">
+              <img src="{{doc.value.thumbnail}}" style="display:inline-block; width: 80px; margin:5px 0 0 5px"/>
+              <span style="float:right;margin:15px 10px 0 0">{{doc.label}}</span>
+          </div>
+      </ng-template>
+    </p-listbox>
+  </div>
+  <p-panel class="ui-g-12 ui-md-12 ui-lg-8" *ngIf="selected.url">
+    <header>
+      <div class="ui-toolbar-group-right">
+        <a href="{{selected.url}}" target="_doc"><button pButton type="button" label="open" icon="fa-folder-open"></button></a>
+        <button pButton type="button" label="delete" (click)="confirm()" icon="fa-trash" [disabled]="disabled"></button>
+      </div>
+    </header>
+    <img src="{{selected.thumbnail || null}}" style="width: 100%;">
+    <p-confirmDialog header="confirmation" acceptLabel="{{'buttonGeneric.yes' | translate }}" icon="fa fa-question-circle" width="425"></p-confirmDialog>
+  </p-panel>
+</div>
+<div class="ui-g-12 ui-md-12 ui-lg-12">
+  <b>{{'imageListbox.upload' | translate}}</b><br>
+  <p-fileUpload name="file" url="{{uploadUrl}}" (onUpload)="onUploadIdDocument($event)" (onBeforeSend)="onBeforeSend($event)" multiple="false" maxFileSize="10000000" [disabled]="disabled" accept=".pdf" auto="auto"></p-fileUpload>
+</div>

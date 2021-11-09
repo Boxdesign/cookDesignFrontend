@@ -1,0 +1,86 @@
+<div class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
+  <app-header></app-header>
+  <div class="clearfix"></div>
+  <div class="page-container">
+    <menu style="padding:0px; margin: 0px" (showSideBarMenu)="showSideBarMenu($event)"></menu>
+    <div class="page-content-wrapper">
+      <!-- BEGIN CONTENT BODY -->
+      <div class="page-content marginTransition" [ngClass]="{'hideSideMenu': !showSideMenu}">
+        <!-- BEGIN PAGE HEADER-->
+        <h1 class="page-title"> {{'menu.import' | translate}} </h1>
+
+        <!-- END PAGE HEADER-->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="portlet box black">
+              <div class="portlet-body cd-portlet-body">
+                <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-pills cd-navs cd-nav-pills"> 
+                    <li routerLinkActive="active">
+                        <a href="javascript:;" routerLink="/import">{{'import.locations' | translate}}</a> 
+                    </li>
+                  </ul>
+                  <div class="tab-content cd-tab-content">
+                    
+                    <div heading="ImportNewProviders">
+
+                      <!-- LOCATIONS TABLE -->
+                      <div class="row">
+                        <div class="col-md-12">
+                          <h2 class="tab-box-title">{{'import.locations' | translate}}</h2>
+                        </div>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-6">
+                          <search-box (onSearchEntered)="filterLocations($event)" [label]="searchBoxLabel"></search-box>
+                        </div>
+                      </div>
+                      <div class="table-scrollable">
+                        <table class="table table-hover">
+                          <thead>
+                          <tr>
+                            <th><div style="display: block; text-align:center;">#</div></th>
+                            <th>{{'provider.provider.tableHead.name' | translate}}</th>
+                          </tr>
+                          </thead>
+                          <tbody *ngFor="let location of locations; let in=index" >
+                            <tr *ngIf="location.active" [class.rowDisabled]="(location.referenceNumber !== 'D600')">
+                              <td (click)="selectLocation(location)" class="pointer">
+                                <div style="display: block; text-align:center;">
+                                  {{(locationsCurrentPage-1)*locationsPerPage + in + 1}}
+                                </div>
+                              </td>
+                              <td (click)="selectLocation(location)" class="pointer">
+                                {{location.name}}
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div class="row">
+                        <div class="col-md-5">
+                          <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="10" (onItemSelected)="updateLocationsPerPage($event)"></items-per-page>
+                          <span class="pagination-separator">|</span>
+                          <pagination-snippet [itemsPerPage]="locationsPerPage" [currentPage]="locationsCurrentPage" [totalItems]="totalLocations"></pagination-snippet>
+                        </div>
+                        <div class="col-md-7">
+                          <div class="pull-right">
+                            <pagination *ngIf="locationsPerPage && locationsCurrentPage && totalLocations" class="cd-pagination" [totalItems]="totalLocations" [(ngModel)]="locationsCurrentPage" [itemsPerPage]="locationsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="locationPageHasChanged($event)" (numPages)="locationsNumPages = $event"></pagination>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END SAMPLE TABLE PORTLET-->
+      </div>
+      <!-- END CONTENT BODY -->
+    </div>
+  </div>
+  <footer></footer>
+</div>

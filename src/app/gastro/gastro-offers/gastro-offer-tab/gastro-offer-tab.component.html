@@ -1,0 +1,111 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div class="row">
+	<div class="col-md-12">
+		<div class="portlet light">
+			<div class="portlet-body" *ngIf="menuOnEdit && !loading">
+				<h2 *ngIf="userLang && menuType=='menu'&& !viewMode" class="tab-box-title">{{'gastro.menu.editMenu' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='dailyMenuCarte'&& !viewMode" class="tab-box-title">{{'gastro.menu.editDailyMenuCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='buffet'&& !viewMode" class="tab-box-title">{{'gastro.menu.editBuffet' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='carte'&& !viewMode" class="tab-box-title">{{'gastro.menu.editCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='fixedPriceCarte'&& !viewMode" class="tab-box-title">{{'gastro.menu.editFixedPriceCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='catalog'&& !viewMode" class="tab-box-title">{{'gastro.menu.editCatalog' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='menu'&& viewMode" class="tab-box-title">{{'gastro.menu.viewMenu' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='dailyMenuCarte'&& viewMode" class="tab-box-title">{{'gastro.menu.viewDailyMenuCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='buffet'&& viewMode" class="tab-box-title">{{'gastro.menu.viewBuffet' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='carte'&& viewMode" class="tab-box-title">{{'gastro.menu.viewCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='fixedPriceCarte'&& viewMode" class="tab-box-title">{{'gastro.menu.viewFixedPriceCarte' | translate:{value: userLang.name} }}</h2>
+				<h2 *ngIf="userLang && menuType=='catalog'&& viewMode" class="tab-box-title">{{'gastro.menu.viewCatalog' | translate:{value: userLang.name} }}</h2>
+	      <a (click)="redirect()"><img alt="" class="pull-right" src="../assets/img/close.png" /></a>
+			  <button *ngIf="viewMode" type="button" (click)="editGastroOffer()" class="btn green pointer">{{'buttonGeneric.edit' | translate}}</button>
+			  <button style="margin-left: 10px" *ngIf="viewMode" type="button" (click)="duplicateModal.show()" class="btn green pointer">{{'buttonGeneric.duplicate' | translate}}</button>
+				<tabset class="tabbable-line">
+					<tab *ngIf=" menuType=='menu'" heading="{{'gastro.menu.tabs.menu' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType=='dailyMenuCarte'" heading="{{'gastro.menu.tabs.dailyMenuCarte' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType=='buffet'" heading="{{'gastro.menu.tabs.buffet' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType=='carte'" heading="{{'gastro.menu.tabs.carte' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType=='fixedPriceCarte'" heading="{{'gastro.menu.tabs.fixedPriceCarte' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType=='catalog'" heading="{{'gastro.menu.tabs.catalog' | translate}}">
+						<gastro-offer-main *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit" [forceRefreshForEdit]="forceRefreshForEditMain"></gastro-offer-main>
+					</tab>
+					<tab *ngIf=" menuType" heading="{{'gastro.menu.tabs.composition' | translate}}">
+						<gastro-offer-composition *ngIf="menuOnEdit" [(menu)]="menuOnEdit"></gastro-offer-composition>
+					</tab>
+					<tab *ngIf=" ( menuType=='menu' && viewMode || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte' ) && viewMode" heading="{{'articles.ingredients.tabs.locationCost' | translate}}">
+							<location-cost-table [costs]="locationCost"></location-cost-table>
+					</tab>				
+					<tab *ngIf=" menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'">
+						<ng-template tabHeading>
+							<i class="fa fa-print fa-lg" aria-hidden="true"></i>
+				     	</ng-template>
+						<gastro-offer-print *ngIf="menuOnEdit" [(menuOnEdit)]="menuOnEdit"></gastro-offer-print>
+					</tab>
+				</tabset>
+				<form class="horizontal-form cd-form do-not-print" >
+					<div class="form-actions right">
+						<button *ngIf="menuOnEdit" type="submit" (click)="editMenu()" class="btn green" [class.hide-view-mode]="viewMode" [disabled]=" menuOnEdit.location.length==0">{{'buttonGeneric.save' | translate}}
+						</button>
+						<button (click)="redirect()" type="button" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+<simple-notifications [options]="notificationOptions"></simple-notifications>
+<p-confirmDialog acceptLabel="{{'buttonGeneric.yes' | translate }}" [closable]="false" width="425"></p-confirmDialog>
+
+<!--DUPLICATE MODAL-->
+<div bsModal #duplicateModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="duplicateModal.hide()" aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 >{{'recipes.dish.duplicate' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="duplicateGastroOffer()" class="form-horizontal" #duplicateForm="ngForm" *ngIf="userLang">
+					<div class="row">
+						<div class="col-md-9">
+							<div class="form-body">
+								<div class="form-group">
+					          <label class="col-md-5 control-label" id="duplicateName" >{{'messageGeneric.duplicateName' | translate}} </label>
+					          <div class="col-md-7">
+					          	<input for="duplicateName" placeholder="{{'COPY OF ' + userLang.name | uppercase}}" class="form-control"  [(ngModel)]="duplicateName" name="duplicateName">
+					          </div>
+					      </div>							
+								<div class="form-group">
+						      <label class="col-md-5 control-label" id="location">{{'export.location' | translate}}</label>
+									<location-filter class="col-md-7" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+								</div>
+							</div>
+							<div class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button type="submit" (click)="duplicateModal.hide()" class="btn green"
+											[disabled]="!duplicateForm.form.valid || duplicateLocation.length == 0">{{'buttonGeneric.duplicate' | translate}}
+										</button>									
+										<button type="button" (click)="duplicateModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+											translate}}
+										</button>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>

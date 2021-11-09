@@ -1,0 +1,40 @@
+<div heading="Provider" class="main">
+  <div class="ui-g">
+      <div class="ui-g-12 ui-g-nopad">
+          <h3 *ngIf="mode=='edit'" class="tab-box-title">{{'provider.provider.form.editProviderQuality' | translate}}</h3>
+          <h3 *ngIf="mode=='view'" class="tab-box-title">{{'provider.provider.form.viewProviderQuality' | translate}}</h3>
+          <h6 *ngIf="account&&provider&&mode!='new'">{{'provider.provider.form.latestUpdate' | translate}}&nbsp;{{provider.updatedAt | date: 'medium'}}&nbsp;{{'provider.provider.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+      </div>
+  </div>
+  <div class="ui-g">
+    <div class="ui-g-12 ui-md-12 ui-lg-9 ui-g-nopad">     	 	
+      <div class="form">     		
+          <div class="form-body" *ngIf="provider">
+            <div class="ui-g">               
+                  <div class="form-group">
+                    <label for="name" class="control-label">{{'provider.provider.form.approved' | translate}}</label>
+                    <br/>
+                    <p-toggleButton [(ngModel)]="provider.approved" name="approved" onLabel="{{'provider.provider.form.approved' | translate}}" offLabel="No" onIcon="fa-check-square" offIcon="fa-square" [style]="{'width':'130px'}" [disabled]="mode=='view'"></p-toggleButton>
+                  </div>              
+            </div>
+            <div class="ui-g"> 
+            	<label for="name" class="control-label">{{ 'provider.provider.form.documents' | translate }}</label>         
+            	<div class="ui-g-12">
+                <file-uploader [folderPath]="'provider'" [id]="provider._id" [status]="mode"></file-uploader>       
+              </div>      
+            </div>
+          </div>
+          <div class="form-actions right">
+            <div class="ui-g">
+              <div class="ui-g-12">
+                <button type="submit" class="btn green" (click)="saveProvider()" [disabled]="mode=='view'">{{'buttonGeneric.save' | translate}}
+                </button>
+                <button type="button" (click)="redirect()" class="btn default">{{'buttonGeneric.cancel' | translate}}</button>
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options" (onDestroy)="notificationDestroyed($event)"></simple-notifications>

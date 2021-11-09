@@ -1,0 +1,144 @@
+<loading-gif [loading]="loading"></loading-gif>
+<div *ngIf="!loading"  heading="SelentaImportProviders">
+  <div class="row">
+  	<div class="col-md-12">
+
+  	<!-- SELENTA PROVIDERS -->
+  		<div class="row">
+    		<div class="col-md-12">
+					<h2 class="tab-box-title">{{'selenta-import.sapProviders' | translate}}</h2>
+				</div>
+			</div>
+			<div class="row">
+		    <div class="col-md-6">
+		      <search-box (onSearchEntered)="filterSelentaProviders($event)" [label]="searchBoxLabel"></search-box>
+		    </div>
+		  </div>
+		  <div class="table-scrollable">
+		    <table class="table table-hover">
+		      <thead>
+		      <tr>
+		        <th><div style="display: block; text-align:center;">#</div></th>
+            <th>
+              <column-sorter [(sortField)]="selentaSortField" [(sortOrder)]="selentaSortOrder" [label]="'selenta-import.reference'" [value]="'LIFNR'" (onChange)="getSelentaSapProviders()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaSortField" [(sortOrder)]="selentaSortOrder" [label]="'provider.provider.tableHead.name'" [value]="'NAME1'" (onChange)="getSelentaSapProviders()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaSortField" [(sortOrder)]="selentaSortOrder" [label]="'provider.provider.tableHead.taxId'" [value]="'STCD1'" (onChange)="getSelentaSapProviders()" ></column-sorter>
+            </th>
+            <th>
+              <column-sorter [(sortField)]="selentaSortField" [(sortOrder)]="selentaSortOrder" [label]="'selenta-import.BLDAT'" [value]="'BLDAT'" (onChange)="getSelentaSapProviders()" ></column-sorter>
+            </th>
+            <th>{{'selenta-import.providerLinked' | translate}}</th>
+		      </tr>
+		      </thead>
+		      <tbody *ngFor="let selentaProvider of selentaProviders; let in=index" >
+		        <tr>
+		          <td height="70" width="5%" (click)="selentaProviderDetailModal.show(); selentaProviderSelected = selentaProvider" class="pointer">
+		            <div style="display: block; text-align:center;">
+		              {{(selentaProvidersCurrentPage-1)*selentaProvidersPerPage + in + 1}}
+		            </div>
+		          </td>
+              <td height="70" width="15%" (click)="selentaProviderDetailModal.show(); selentaProviderSelected = selentaProvider" class="pointer">
+                {{selentaProvider.LIFNR}}
+              </td>
+              <td height="70" width="35%" (click)="selentaProviderDetailModal.show(); selentaProviderSelected = selentaProvider" class="pointer">
+                {{selentaProvider.NAME1}}
+              </td>
+              <td height="70" width="15%" (click)="selentaProviderDetailModal.show(); selentaProviderSelected = selentaProvider" class="pointer">
+                {{selentaProvider.STCD1}}
+              </td>
+		          <td height="70" width="15%" (click)="selentaProviderDetailModal.show(); selentaProviderSelected = selentaProvider" class="pointer">
+		            {{selentaProvider.BLDAT}}
+		          </td>
+		          <td height="70" width="20%">
+                <a href="javascript:;" (click)="navigateTo(selentaProvider.cookDesignId);">{{selentaProvider.cookDesignId}}</a>
+		          </td>
+		        </tr>
+		      </tbody>
+		    </table>
+		  </div>
+		  <div class="row">
+		    <div class="col-md-5">
+		      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="5" (onItemSelected)="updateSelentaProvidersPerPage($event)"></items-per-page>
+		      <span class="pagination-separator">|</span>
+		      <pagination-snippet [itemsPerPage]="selentaProvidersPerPage" [currentPage]="selentaProvidersCurrentPage" [totalItems]="selentaTotalProviders"></pagination-snippet>
+		    </div>
+		    <div class="col-md-7">
+		      <div class="pull-right">
+		        <pagination *ngIf="selentaProvidersPerPage && selentaProvidersCurrentPage && selentaTotalProviders" class="cd-pagination" [totalItems]="selentaTotalProviders" [(ngModel)]="selentaProvidersCurrentPage" [itemsPerPage]="selentaProvidersPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="5" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="selentaPageHasChanged($event)" (numPages)="selentaProvidersNumPages = $event"></pagination>
+		      </div>
+		    </div>
+		  </div>
+  	</div>
+		
+	</div>
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-actions right">
+          <hr>
+          <button type="button" routerLink="../selenta-import-new-providers" class="btn default pull-right">{{'buttonGeneric.cancel' | translate}}</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!--LINK article MODAL -->
+<div bsModal #selentaProviderDetailModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog" style="width: 500px;">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="selentaProviderDetailModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'selenta-import.providerDetails' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <div class="col-md-12">
+            <div class="form-body">
+
+              <div class="row" *ngIf="selentaProviderSelected">
+                <div class="col-md-12">
+                  <h4 class="tab-box-title">{{'selenta-import.sapProvider' | translate}}</h4>
+                  <div class="col-md-3" style="padding: 0px; color: #666;">
+                    {{ 'selenta-import.IDNLF' | translate}}:<br>
+                    {{ 'selenta-import.LIFNR' | translate}}:<br>
+                    {{ 'selenta-import.NAME1' | translate}}:<br>
+                    {{ 'selenta-import.STCD1' | translate}}:<br>
+                    {{ 'selenta-import.DMBTR' | translate}}:<br>
+                    {{ 'selenta-import.BLDAT' | translate}}:<br>
+                    {{ 'selenta-import.ERFMG' | translate}}:<br>
+                    {{ 'selenta-import.ERFME' | translate}}:<br>
+                    {{ 'selenta-import.LOEVM' | translate}}:<br>
+                  </div>
+                  <div class="col-md-9" style="padding: 0px;"> 
+                    {{ selentaProviderSelected?.IDNLF }}<br>
+                    {{ selentaProviderSelected?.LIFNR }}<br>
+                    {{ selentaProviderSelected?.NAME1 }}<br>
+                    {{ selentaProviderSelected?.STCD1 }}<br>
+                    {{ selentaProviderSelected?.DMBTR }}<br>
+                    {{ selentaProviderSelected?.BLDAT }}<br>
+                    {{ selentaProviderSelected?.ERFMG }}<br>
+                    {{ selentaProviderSelected?.ERFME }}<br>
+                    {{ selentaProviderSelected?.LOEVM }}<br>
+                  </div>
+                </div>
+              </div>
+              <br>
+              <br>
+            </div>
+            <div class="form-actions">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<simple-notifications [options]="options"></simple-notifications>

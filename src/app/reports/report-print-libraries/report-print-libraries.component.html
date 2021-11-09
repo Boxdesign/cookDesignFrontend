@@ -1,0 +1,44 @@
+<div heading="Exports">
+  <div class="row">
+		<div class="col-md-5">
+			<h2 class="tab-box-title">{{'printLibrary.select' | translate}}</h2>
+			<div class="selector" style="margin-top: 20px;">
+
+				<div class="form-group">
+					<label for="type" class="control-label">{{'printLibrary.type' | translate}} </label>
+					<select id="type" class="form-control" name="type" required [(ngModel)]="template" (change)="templateSelected($event.target.value)">
+						<option *ngFor="let type of templateList; let i=index;" [ngValue]="type">{{ type.lang[0]?.name | translate | uppercase}} </option>
+						<option [ngValue]="null"><span style="color: #f0f0f0"></span>{{'reports.printLibrary.noTypeSelected' | translate | uppercase }} </option>
+					</select>
+				</div>
+
+	      <div class="form-group" *ngIf="familyCategoryToSelect == true">
+					<label for="type" class="control-label">{{'printLibrary.typeFamily' | translate}} </label>
+					<select id="type" class="form-control" name="type" required [(ngModel)]="familyCategory">
+						<option *ngFor="let family of familyCategories; let i=index;" [ngValue]="family">{{'reports.printLibrary.'+ family | translate | uppercase}} </option>
+						<option [ngValue]="null"><span style="color: #f0f0f0"></span>{{'reports.printLibrary.noFamilySelected' | translate | uppercase }} </option>
+					</select>
+				</div>
+
+				<div class="form-group" style="margin-left: -15px;">
+          <label for="format" class="col-md-2 control-label col-md-1-offset">{{'printLibrary.format' | translate}} <span class="required"> * </span></label>
+          <p-selectButton [options]="formatOptions" class="col-md-10" [(ngModel)]="format" name="format" (onChange)="onChangeFormat($event)"></p-selectButton><br>
+        </div>
+			</div>
+
+			<div class="form-actions">
+				<div class="row">
+					<div class="pull-right">
+						<img *ngIf="loadingData" src="../assets/img/preloader.gif"/>
+						<button *ngIf="familyCategoryToSelect == true" [disabled]="!template || !familyCategory || format=='.csv'" type="submit" (click)="downloadFile()" class="btn green right">{{'buttonGeneric.printBooks' | translate }}
+            </button> 
+            <button *ngIf="familyCategoryToSelect == false" [disabled]="!template || format=='.csv'" type="submit" (click)="downloadFile()" class="btn green right">{{'buttonGeneric.printBooks' | translate }}
+            </button>    
+          </div>
+        </div>
+			</div>
+
+		</div>
+	
+</div>
+<simple-notifications [options]="options"></simple-notifications>

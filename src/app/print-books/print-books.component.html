@@ -1,0 +1,37 @@
+<div class="page-header-fixed page-sidebar-closed-hide-logo page-container-bg-solid">
+  <app-header></app-header>
+  <div class="clearfix"></div>
+  <div class="page-container">
+    <menu style="padding:0px; margin: 0px" (showSideBarMenu)="showSideBarMenu($event)"></menu>
+    <div class="page-content-wrapper">
+      <!-- BEGIN CONTENT BODY -->
+      <div class="page-content marginTransition" [ngClass]="{'hideSideMenu': !showSideMenu}">
+        <!-- BEGIN PAGE HEADER-->
+        <h1 class="page-title"> {{'books.heading' | translate}} </h1>
+
+        <!-- END PAGE HEADER-->
+        <div class="row">
+          <div class="col-md-12">
+            <div class="portlet box black">
+              <div class="portlet-body cd-portlet-body">
+                <div class="tabbable tabbable-tabdrop">
+                  <ul class="nav nav-pills cd-navs cd-nav-pills"> 
+                    <li routerLinkActive="active"> 
+                        <a href="javascript:;" routerLink="print-books-selector">{{'printBooks.tabs.download' | translate}}</a> 
+                    </li>
+                  </ul>
+                  <div class="tab-content cd-tab-content">  
+                   <router-outlet></router-outlet>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- END SAMPLE TABLE PORTLET-->
+      </div>
+      <!-- END CONTENT BODY -->
+    </div>
+  </div>
+  <footer></footer>
+</div>

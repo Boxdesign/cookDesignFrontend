@@ -1,0 +1,241 @@
+<loading-gif [loading]="loading" [updating]="updating"></loading-gif>
+
+<div *ngIf="!loading"  heading="Menus">
+  <div class="row">
+    <div class="col-md-12">
+      <h2 *ngIf="menuType=='menu'" class="tab-box-title">{{'gastro.tabs.menus' | translate}}</h2>
+      <h2 *ngIf="menuType=='dailyMenuCarte'" class="tab-box-title">{{'gastro.tabs.dailyMenuCartes' | translate}}</h2>
+      <h2 *ngIf="menuType=='buffet'" class="tab-box-title">{{'gastro.tabs.buffets' | translate}}</h2>
+      <h2 *ngIf="menuType=='carte'" class="tab-box-title">{{'gastro.tabs.cartes' | translate}}</h2>
+      <h2 *ngIf="menuType=='fixedPriceCarte'" class="tab-box-title">{{'gastro.tabs.fixedPriceCartes' | translate}}</h2>
+      <h2 *ngIf="menuType=='catalog'" class="tab-box-title">{{'gastro.tabs.catalogs' | translate}}</h2>
+   </div>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <search-box (onSearchEntered)="searchMenus($event)" [inputText]="filterText" [label]="searchBoxLabel"></search-box>
+    </div>
+    <div class="col-md-6">
+      <a href="javascript:;" (click)="addMenu()" class="btn default pull-right gold"> <i class="fa fa-plus"></i>    
+        <span *ngIf="menuType=='menu'" >{{'gastro.menu.addMenu' | translate}}</span>
+        <span *ngIf="menuType=='dailyMenuCarte'" >{{'gastro.menu.addDailyMenuCarte' | translate}}</span>
+        <span *ngIf="menuType=='buffet'" >{{'gastro.menu.addBuffet' | translate}}</span>
+        <span *ngIf="menuType=='carte'" >{{'gastro.menu.addCarte' | translate}}</span>
+        <span *ngIf="menuType=='fixedPriceCarte'">{{'gastro.menu.addFixedPriceCarte' | translate}}</span>
+        <span *ngIf="menuType=='catalog'">{{'gastro.menu.addCatalog' | translate}}</span>
+      </a>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table [ngClass]="{'menu-list': menuType=='menu', 'dailyMenuCarte-list': menuType=='dailyMenuCarte', 'buffet-list': menuType=='buffet', 'carte-list': menuType=='carte', 'fixedPriceCarte-list': menuType=='fixedPriceCarte', 'catalog-list': menuType=='catalog'}" id="menu-list" class="table table-hover">
+      <thead>
+      <tr>
+        <th><div style="display: block; text-align:center;">#</div></th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.name'" [value]="'versions.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th *ngIf="menuType!='carte' && menuType!='catalog'">
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.pricePVP'" [value]="'versions.price'" (onChange)="saveFilters()" ></column-sorter>
+        </th>        
+        <th *ngIf="menuType!='carte' && menuType!='catalog'">
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.price'" [value]="'versions.price'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte'">
+          <column-sorter  *ngIf="menuType=='menu'" [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.cost'" [value]="'versions.totalCost'" (onChange)="saveFilters()" ></column-sorter>
+          <column-sorter  *ngIf="menuType!='menu'" [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.cost'" [value]="'versions.totalCost'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.type'" [value]="'versions.type.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>
+          <column-sorter [(sortField)]="sortField" [(sortOrder)]="sortOrder" [label]="'gastro.menu.tableHead.season'" [value]="'versions.season.lang.name'" (onChange)="saveFilters()" ></column-sorter>
+        </th>
+        <th>{{'gastro.menu.tableHead.location' | translate}}&nbsp;<i (click)="filterLocationModal.show()" class="fa fa-filter" aria-hidden="true"></i><span *ngIf="costFilterSet" (click)="resetFilterLocation();" class="pointer"><small><i class="fa fa-times" aria-hidden="true"></i></small></span>
+       </th>
+       <th (click)="toggleActiveState()" class="pointer">
+        	<span *ngIf="!filterActive"> <i class="fa fa-filter" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.state' | translate}} </span>
+        	<span *ngIf="filterActive&&active"> <i class="fa fa-check" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.active' | translate}} </span>
+        	<span *ngIf="filterActive&&!active"> <i class="fa fa-times" aria-hidden="true"></i>&nbsp;{{'articles.ingredients.tableHead.inactive' | translate}} </span>
+        </th>
+        <th> {{'buttonGeneric.actions' | translate}}</th>
+      </tr>
+      </thead>
+      <tbody *ngFor="let menu of allMenus;let i=index">
+        <tr [class.text-muted]="!menu.active" [class.active]="!menu.active">
+          <td (click)="viewSuproduct(menu._id, menu.versions._id)" class="pointer">
+            <div style="display: block; text-align:center;">
+              {{(currentPage-1)*itemsPerPage + i + 1}}
+            </div>
+          </td>
+          <td (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            {{menu.versions.lang.name}}
+          </td>
+          <td *ngIf="menuType!='carte' && menuType!='catalog'" (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            {{menu.versions.price * (1 + salesTax/100) | currency:'EUR':'symbol':'1.2-2'}}
+          </td>          
+          <td *ngIf="menuType!='carte' && menuType!='catalog'" (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            {{menu.versions.price | currency:'EUR':'symbol':'1.2-2'}}
+          </td>
+          <td *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte'" (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            <span *ngIf="menuType=='menu'">
+            	<span *ngIf="menu.versions.totalCost">{{menu.versions.totalCost | currency:'EUR':'symbol':'1.2-2'}}</span>
+            	<span *ngIf="!menu.versions.totalCost">---</span>
+            </span>
+            <span *ngIf="menuType!='menu'">
+            	<span *ngIf="menu.versions.totalCost">{{menu.versions.totalCost | currency:'EUR':'symbol':'1.2-2'}}</span>
+            	<span *ngIf="!menu.versions.totalCost">---</span>
+            </span>
+          </td>          
+          <td (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            {{menu.versions.type.lang.name}}
+          </td>
+          <td (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            {{menu.versions.season.lang.name}}
+          </td>
+          <td>
+            <a href="javascript:;" (click)="selectMenuToEdit(menu); viewLocationModal.show()" class="btn gold btn-sm btn-outline table-row-button" tooltip="{{menu.locationList}}"> <i class="fa fa-map-marker" aria-hidden="true"></i>&nbsp;{{'gastro.menu.form.location' | translate}}</a>
+          </td>
+          <td (click)="viewMenu(menu._id, menu.versions._id)" class="pointer">
+            <span *ngIf="menu.active">
+              <i class="fa fa-check cd-gold" aria-hidden="true"></i>
+            </span>
+            <span *ngIf="!menu.active">
+              <i class="fa fa-times cd-gold" aria-hidden="true"></i>
+            </span>
+          </td>
+          <td>
+            <a href="javascript:;" (click)="editMenu(menu._id, menu.versions._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-pencil"></i> {{'buttonGeneric.edit' | translate}} </a>
+            <a href="javascript:;" (click)="printMenu(menu, menuType)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-print"></i> {{'buttonGeneric.print' | translate}} </a>
+            <a href="javascript:;" (click)="selectMenuToEdit(menu); confirmDeleteModal.show()" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+            <a href="javascript:;" (click)="versionsMenu(menu._id)" class="btn gold btn-sm btn-outline table-row-button">
+              <i class="fa fa-history" aria-hidden="true"></i> {{'buttonGeneric.versions' | translate}} </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="row">
+    <div class="col-md-6">
+      <items-per-page [itemOptions]="[5,10,25,50,100]" [defaultOption]="itemsPerPage" (onItemSelected)="updateItemsPerPage($event)"></items-per-page>
+      <span class="pagination-separator">|</span>
+      <pagination-snippet [itemsPerPage]="itemsPerPage" [currentPage]="currentPage" [totalItems]="totalItems"></pagination-snippet>
+    </div>
+    <div class="col-md-6">
+      <div class="pull-right">
+        <pagination class="cd-pagination" [totalItems]="totalItems" [(ngModel)]="currentPage" [itemsPerPage]="itemsPerPage" [previousText]="'<'" [firstText]="'<<'" [lastText]="'>>'" [nextText]="'>'" [maxSize]="10" style="display: inline-block;" [boundaryLinks]="true" [rotate]="false" (pageChanged)="pageHasChanged($event)" (numPages)="numPages = $event"></pagination>
+      </div>
+    </div>
+  </div>
+</div>
+<simple-notifications [options]="options"></simple-notifications>
+
+<gastro-offer-print [printEvent]="print" [hidden]="true"></gastro-offer-print>
+
+
+
+<!--MODALS-->
+
+<!--location filter -->
+<div bsModal #filterLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="cancelSelection(); filterLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.setLocationFilter' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="filterListByLocation()" class="form-horizontal" #locationSelectorForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'gastro.menu.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-filter [savedLocations]="savedLocations" [expandedTree]="true" [refresh]="refresh" (onLocationChecked)="updateFilterLocations($event)"></location-filter>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="filterLocationModal.hide()" class="btn green"
+                    [disabled]="!locationSelectorForm.form.valid">{{'gastro.menu.form.saveLocationFilter' | translate}}
+                  </button>
+                  <button type="button" (click)="cancelSelection(); filterLocationModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+                    translate}}
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+<!--location view -->
+<div bsModal #viewLocationModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="viewLocationModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.viewLocations' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="viewLocation()" class="form-horizontal" #locationViewForm="ngForm" *ngIf="menuOnEdit">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  <label for="location" class="control-label">{{'gastro.menu.form.location' | translate}} <span class="required"> * </span></label>
+                  <location-view [savedLocations]="menuOnEdit.location"></location-view>
+              </div>
+              <div class="form-actions" style="margin-top:20px;">
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</div>
+
+
+<!--confirm delete -->
+<div bsModal #confirmDeleteModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+  <div class="modal-dialog modal-md">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" (click)="confirmDeleteModal.hide()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <h4 class="modal-title">{{'gastro.menu.form.confirmDelete' | translate}}</h4>
+      </div>
+      <div class="modal-body">
+        <form (ngSubmit)="deleteMenu()" class="form-horizontal" #deleteMenuForm="ngForm">
+          <div class="row">
+            <div class="col-md-12">
+              <div class="form-body">
+                  {{'gastro.menu.form.confirmDeleteQuestion' | translate}}
+              </div>
+              <div class="form-actions">
+                <div class="row">
+                  <div class="col-md-offset-5 col-md-7">
+                    <button type="submit" (click)="confirmDeleteModal.hide()" class="btn green">{{'buttonGeneric.delete' | translate}}
+                    </button>
+                    <button type="button" (click)="confirmDeleteModal.hide();" class="btn default">{{'buttonGeneric.cancel' | translate}}
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

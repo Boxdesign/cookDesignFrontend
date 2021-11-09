@@ -1,0 +1,98 @@
+
+<div heading="Menu Edit" class="main">
+  <h3 class="tab-box-title">{{'gastro.menu.form.mainEdit' | translate}}</h3>
+  <h6 *ngIf="account&&menuOnEdit">{{'gastro.menu.form.latestUpdate' | translate}}&nbsp;{{menuOnEdit.updatedAt | date: 'medium'}}&nbsp;{{'gastro.menu.form.by' | translate}}&nbsp;{{account.user.firstName + ' ' + account.user.lastName}} </h6>
+  <div class="row">
+    <div class="col-md-9">
+      <div class="form">
+        <lang-tab (langsObj)="langObjRefreshed($event)" [fieldsObj]="menuLang" [forceRefresh]="forceRefreshForEdit"></lang-tab>
+          <form (ngSubmit)="editMenu()" class="horizontal-form cd-form"  #menuMainEditForm="ngForm" *ngIf="menuOnEdit">
+          <div class="form-body">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="referenceNumber" class="control-label">{{'gastro.menu.form.referenceNumber' | translate}}</label>
+                      <input for="referenceNumber" disabled class="form-control"  [(ngModel)]="menuOnEdit.referenceNumber" name="referenceNumber" [disabled]=viewMode>
+                    </div>
+                  </div>
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="name" class="control-label">{{'gastro.menu.form.name' | translate}} <span class="required"> * </span></label>
+                      <input for="name" class="form-control"  [(ngModel)]="menuLang.name" name="name" [disabled]=viewMode>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="active" class="control-label">{{'gastro.menu.form.active' | translate}} <span class="required"> * </span></label>
+                      <select id="active" class="form-control" (change)="activeSelected($event.target.value)" name="active" required [disabled]=viewMode>
+                        <option [selected]="menuOnEdit.active" value="yes">{{'buttonGeneric.yes' | translate}}</option>
+                        <option [selected]="!menuOnEdit.active" value="no">{{'buttonGeneric.no' | translate}}</option>
+                      </select>
+                    </div>
+                  </div>
+                  <!-- <div class="col-md-6">
+                    <div class="form-group">
+                      <label for="price" class="control-label">{{'gastro.menu.form.price' | translate}} <span class="required"> * </span></label>
+                      <input for="price" class="form-control"  [(ngModel)]="menuOnEdit.price" name="price" required>
+                    </div>
+                  </div> -->
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="family" class="control-label">{{'gastro.menu.form.type' | translate}} <span class="required"> * </span> </label>
+                      <select *ngIf="menuTypes" id="type" class="form-control" (change)="menuTypeSelected($event.target.value)" name="type" required [disabled]=viewMode>
+ 												<option selected="selected" value="">---</option>
+                        <option *ngFor="let menuType of menuTypes; let i=index" [value]="i" [selected]="menuType._id == menuOnEdit.type._id">{{menuType.lang[0]?.name}}</option>
+                      </select>
+                      <select *ngIf="!menuTypes" id="type" class="form-control" disabled>
+                        <option>---</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+				        <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="season" class="control-label">{{'gastro.menu.form.season' | translate}} <span class="required"> * </span></label>
+                      <select *ngIf="menuSeasons" id="season" class="form-control" (change)="menuSeasonSelected($event.target.value)" name="season" required [disabled]=viewMode>
+ 												<option selected="selected" value="">---</option>
+                        <option *ngFor="let menuSeason of menuSeasons; let i=index" [value]="i" [selected]="menuSeason._id == menuOnEdit.season">{{menuSeason.lang[0]?.name}}</option>
+                      </select>
+                      <select *ngIf="!menuSeasons" id="season" class="form-control" disabled>
+                        <option>---</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="location" class="control-label">{{'gastro.menu.form.location' | translate}} <span class="required"> * </span></label>
+                      <location-selector *ngIf="userLocations&&!viewMode" [locations]="userLocations" [savedLocations]="menuOnEdit.location" (onLocationChecked)="updateSelectedLocations($event)" [editMode]="editMode"></location-selector>
+                      <location-view *ngIf="userLocations&&viewMode" [savedLocations]="menuOnEdit.location"></location-view>
+                   </div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="row">
+                  <div class="col-md-12">
+                    <div class="form-group">
+                      <label for="desc" class="control-label">{{'gastro.menu.form.desc' | translate}}</label>
+                      <textarea id="desc" class="form-control" [(ngModel)]="menuLang.description" name="desc" rows="10" [disabled]=viewMode></textarea>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+<div *ngIf="recipeKitchens">
+  <div *ngFor= "let recipeKit of recipeKitchens; let i = index " >  
+    <div class="form-control" style="height: auto !important;" [ngClass]="{'kitchen-select-border': i!=0, 'grey-backround': mode=='view'}">
+      <div *ngIf="mode!='view'" style="float: right; display: inline-block;" (click)= " deleteKitchen(i)">
+        <i class="fa fa-trash icon-button" aria-hidden="true"></i>
+      </div> 
+      <div class="kitchen-select">
+        <span>{{'recipes.subproduct.form.space' | translate}}: "<i>{{recipeKit.kitchen.lang[0]?.name}}</i>"</span>            
+        <span *ngIf="recipeKit.workRoom">- {{'recipes.subproduct.form.workRoom' | translate}}: "<i>{{recipeKit.workRoom.lang[0]?.name}}</i>"</span>       
+      </div>   
+    </div>
+  </div>
+</div> 
+<div *ngIf="!recipeKitchens.length && mode=='view'" class="form-control grey-backround">
+  <span style="font-style: italic;">{{'recipes.subproduct.form.spaceUndefined' | translate}}.</span>
+</div>
+
+<div *ngIf="addKitchen==false && mode!='view'" (click)="addKitchen=true">
+  <i class="fa fa-plus-circle icon-button" aria-hidden="true"></i>
+</div>
+<div *ngIf="addKitchen==true" [ngClass]="{'add-kitchen': recipeKitchens!=0}" >
+  <div class="row">
+    <div class="col-md-12">
+      <div class="form-group">  
+        <select id="kitchen" [(ngModel)]="kitchen"  (change)="kitchenSelected()" class="form-control" [disabled]="mode=='view'">
+          <option [value]="null">---</option>
+          <option *ngFor="let kit of kitchens; let i = index" [ngValue]="kit"> {{kit.lang[0]?.name}}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-12">
+      <div *ngIf="workRooms" class="form-group">
+        <label for="workRoom" >{{'recipes.subproduct.form.workRoom' | translate}}:</label>  
+        <select id="workRoom" [(ngModel)]="workRoom" class="bs-select form-control" name="workRoom" [disabled]="mode=='view'">
+          <option [value]="null">---</option>
+          <option *ngFor="let workRoom of workRooms; let i = index" [ngValue]="workRoom">
+            {{workRoom.lang[0]?.name}}
+          </option>                  
+        </select>   
+
+      </div>
+      <div (click)=" saveKitchen()">
+        <i class="fa fa-check-circle icon-button" aria-hidden="true"></i>
+      </div> 
+    </div>
+  </div>                
+</div>

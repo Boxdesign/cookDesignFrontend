@@ -1,0 +1,35 @@
+<div heading="Ingredient articles">
+  <div class="row">
+    <div class="col-md-12">
+      <h3 class="tab-box-title">{{'articles.ingredients.tabs.locationCost' | translate}}</h3>
+    </div>
+  </div>
+  <div class="table-scrollable">
+    <table class="table table-hover ingredient-location-cost">
+      <thead>
+	      <tr>
+        	<th><div style="display: block; text-align:center;">#</div></th>
+        	<th> 
+            {{'articles.ingredients.tableHead.location' | translate}} 
+          </th>
+          <th> 
+            {{'articles.ingredients.tableHead.cost' | translate}} 
+          </th>
+	      </tr>
+      </thead>
+      <tbody *ngFor="let cost of costs; let i=index">
+	      <tr>
+          <td><div style="display: block; text-align:center;">
+            {{i+1}} </div>
+          </td>
+          <td>
+            {{cost.location.name | uppercase}}
+          </td>
+          <td>
+            {{cost.unitCost | currency:'EUR':'symbol':'1.2-2'}}
+          </td>
+	      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

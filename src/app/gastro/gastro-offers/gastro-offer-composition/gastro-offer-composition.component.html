@@ -1,0 +1,375 @@
+<div heading="Composition">
+	<div class="row">
+		<div class="col-md-12" [ngSwitch]="menuType">
+			<h3 *ngSwitchCase="'menu'" class="tab-box-title">{{'gastro.menu.composition.titleMenu' | translate}}</h3>
+			<h3 *ngSwitchCase="'dailyMenuCarte'" class="tab-box-title">{{'gastro.menu.composition.titleDailyMenuCarte' | translate}}</h3>
+			<h3 *ngSwitchCase="'buffet'" class="tab-box-title">{{'gastro.menu.composition.titleBuffet' | translate}}</h3>
+			<h3 *ngSwitchCase="'carte'" class="tab-box-title">{{'gastro.menu.composition.titleCarte' | translate}}</h3>
+			<h3 *ngSwitchCase="'fixedPriceCarte'" class="tab-box-title">{{'gastro.menu.composition.titleFixedPriceCarte' | translate}}</h3>
+			<h3 *ngSwitchCase="'catalog'" class="tab-box-title">{{'gastro.menu.composition.titleCatalog' | translate}}</h3>
+		</div>
+	</div>
+	<div *ngIf="menu && (menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte')" class="row">
+		<div class="col-md-8">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">										
+										<label class="control-label">{{'gastro.menu.composition.price' | translate}}:</label>
+										<div class="input-group">
+											<input id="price" type="number" step="any" min="0" class="form-control" [(ngModel)]="menu.price" name="price" [disabled]="viewMode">
+											<span class="input-group-addon" id="addon1">€</span>
+										</div>	
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">										
+										<label class="control-label">{{'gastro.menu.composition.priceWithTax' | translate}}:</label>
+										<span class="form-control disabled" *ngIf="menu.price&&salesTax"> {{menu.price*(1+salesTax/100) | currency:'EUR':'symbol':'1.2-2'}}</span>
+										<span class="form-control disabled" *ngIf="!(menu.price&&salesTax)">---</span>	
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">
+										<label class="control-label">{{'gastro.menu.composition.cost' | translate}}:</label> <br>
+										<span class="form-control disabled" *ngIf="menu.totalCost"> {{menu.totalCost | currency:'EUR':'symbol':'1.2-2'}}</span>
+										<span class="form-control disabled" *ngIf="!menu.totalCost">---</span>
+									</div>
+								</div>
+								<div class="col-lg-3 col-md-6 col-sm-6 col-xs-12">
+									<div class="form-group">										
+										<label class="control-label">{{'gastro.menu.composition.costOverPricePercentage' | translate}}:</label>
+										<span *ngIf="menu.price&&menu.totalCost&&menu.maxCostOverPrice" class="form-control disabled" [class.text-danger]="((menu.totalCost / menu.price)*100) > menu.maxCostOverPrice"> {{ menu.totalCost / menu.price | percent:'1.2-2'}}</span>
+										<span *ngIf="menu.price&&menu.totalCost&&(!menu.maxCostOverPrice)" class="form-control disabled"> {{ menu.totalCost / menu.price | percent:'1.2-2'}}</span>
+										<span class="form-control disabled" *ngIf="!(menu.price&&menu.totalCost)">---</span>	
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<form class="horizontal-form cd-form">
+						<div class="form-body">
+							<div class="row">
+								<div class="col-lg-6 col-md-12 col-sm-6 col-xs-12">
+									<div class="form-group">										
+										<label class="control-label">{{'gastro.menu.composition.maxCostOverPricePercentage' | translate}}:</label>
+										<div class="input-group">
+											<input id="price" type="number" step="any" min="0" class="form-control" [(ngModel)]="menu.maxCostOverPrice" name="price" [disabled]=viewMode>
+											<span class="input-group-addon" id="addon1">%</span>
+										</div>	
+									</div>
+								</div>
+							</div>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-4 col-sm-4 col-xs-12">
+			<search-box (onSearchEntered)="searchMenus($event)" [label]="searchBoxLabel" class="do-not-print"></search-box >
+		</div>
+
+		<div class="col-md-7">
+			<div *ngIf="menuType!='catalog'"> 
+				<div *ngFor="let option of categoryOptions" style="display: inline-block;padding: 6px 20px;" class="pointer">
+					<label for="{{option.name}}" class="mt-checkbox control-label mt-checkbox-outline grey">
+	          <input type="checkbox" id="{{option.name}}" [(ngModel)]="option.active" (change)="onCategorySelectChange()">  
+	          <span class="green-form"></span>{{ option.name | translate }}
+	        </label>
+				</div>
+			</div>
+		</div>
+		
+		<div class="col-md-1 col-sm-2 col-xs-2">
+			<a href="javascript:;" (click)="addClick(); cleanAndResetFields(); compositionModal.show()" class="btn default pull-right gold do-not-print" [class.hide-view-mode]="viewMode"> <i class="fa fa-plus"></i>  {{'buttonGeneric.add' | translate}}</a>
+		</div>
+	</div>
+	<div class="table-scrollable table-full-print">
+		<table [class.menu-table]="menuType=='menu' || menuType=='buffet'" [class.menu-carte-table]="menuType=='dailyMenuCarte'" [class.carte-table]="menuType=='carte'" [class.fixed-price-carte-table]="menuType=='fixedPriceCarte'" [class.catalog-table]="menuType=='catalog'" class="table table-hover">
+			<thead>
+				<tr>
+					<th> {{'gastro.menu.composition.tableHead.id' | translate}} </th>
+					<th> {{'gastro.menu.composition.tableHead.structure' | translate}} </th>
+					<th class="do-not-print"></th> <!-- up arrow -->
+					<th class="do-not-print"></th> <!-- down arrow -->
+					<th> {{'gastro.menu.composition.tableHead.dish' | translate}} </th>
+					<th class="do-not-print"></th> <!-- up arrow -->
+					<th class="do-not-print"></th> <!-- down arrow -->
+					<th> {{'gastro.menu.composition.tableHead.numServings' | translate}} </th>
+					<th *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"> {{'gastro.menu.composition.tableHead.salesPrice' | translate}} </th>
+					<th *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"> {{'gastro.menu.composition.tableHead.salesPriceBeforeTax' | translate}} </th>
+					<th> 
+						<span *ngIf="menuType!='catalog'"> {{'gastro.menu.composition.tableHead.costPerServing' | translate}} </span>
+						<span *ngIf="menuType=='catalog'"> {{'gastro.menu.composition.tableHead.formatCost' | translate}} </span>
+					</th>
+					<th> {{'gastro.menu.composition.tableHead.dishCost' | translate}}</th>
+					<th *ngIf="menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte'"> {{'gastro.menu.composition.tableHead.meanCost' | translate}}</th>
+					<th> 
+						<span *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte' || menuType=='catalog'"> {{'gastro.menu.composition.tableHead.costPercentage' | translate}}</span>
+						<span *ngIf="menuType=='carte'"> {{'gastro.menu.composition.tableHead.costOverPrice' | translate}}</span>
+					</th>
+					<th class="do-not-print"> {{'buttonGeneric.actions' | translate}}</th>
+				</tr>
+			</thead>
+			<tbody *ngFor="let gastroElement of menu.composition | gastroCompositionFilter:selectedCategoryOptions  | compositionFilterTextDirty:filterText; let i = index;">
+				<tr *ngIf="gastroElement.familyInit">
+					<td><h5>{{gastroElement.familyId}}</h5></td>
+					<td *ngIf="familiesPopulated"><h3 >{{gastroElement.family.lang[0]?.name}} <!-- length: {{gastroElement.familyLength}} subfam: {{gastroElement.numSubfamilies}} --></h3></td>
+					<td class="do-not-print"><i (click)="moveFamilyUp(gastroElement, i)" *ngIf="gastroElement.familyUp && !viewMode && filterText.length==0" class="fa fa-chevron-up cd-gold pointer" aria-hidden="true"></i></td>
+					<td class="do-not-print"><i (click)="moveFamilyDown(gastroElement, i)" *ngIf="gastroElement.familyDown && !viewMode && filterText.length==0" class="fa fa-chevron-down cd-gold pointer" aria-hidden="true"></i></td>
+					<td></td>
+					<td class="do-not-print"></td>
+					<td class="do-not-print"></td>
+					<td></td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"></td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"></td>
+					<td></td>
+					<td></td>
+					<td *ngIf="menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte'"><h4>{{gastroElement.familyMeanCost | currency:'EUR':'symbol':'1.2-2'}}</h4></td>
+					<td>
+						<h5 *ngIf="(menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte')&&(menu.totalCost!=0)">{{gastroElement.familyMeanCost / menu.totalCost | percent:'1.2-2'}}</h5>
+						<h5 *ngIf="(menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte')&&(menu.totalCost==0)">---</h5>
+					</td>
+					<td class="do-not-print"></td>
+				</tr>
+				<tr *ngIf="gastroElement.subfamilyInit && gastroElement.subfamily && !(gastroElement.subfamily._id<0)">
+					<td><h5 *ngIf="gastroElement.subfamily.lang.name!='none'">{{gastroElement.subfamilyId}}</h5></td>
+					<td *ngIf="familiesPopulated"><h4 style="margin-left: 20%;" *ngIf="gastroElement.subfamily.lang.name!='none'">{{gastroElement.subfamily.lang.name}} <!-- length: {{gastroElement.subfamilyLength}} --></h4></td>
+					<td class="do-not-print"><i (click)="moveSubfamilyUp(gastroElement, i)" *ngIf="gastroElement.subfamilyUp && !viewMode" class="fa fa-chevron-up cd-gold pointer" aria-hidden="true"></i></td>
+					<td class="do-not-print"><i (click)="moveSubfamilyDown(gastroElement, i)" *ngIf="gastroElement.subfamilyDown && !viewMode" class="fa fa-chevron-down cd-gold pointer" aria-hidden="true"></i></td>
+					<td></td>
+					<td class="do-not-print"></td>
+					<td class="do-not-print"></td>
+					<td></td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"></td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'"></td>
+					<td></td>
+					<td></td>
+					<td *ngIf="menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte'"><h5>{{gastroElement.subfamilyMeanCost | currency:'EUR':'symbol':'1.2-2'}}</h5></td>
+					<td>
+						<h5 *ngIf="(menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte')&&(menu.totalCost!=0)">{{gastroElement.subfamilyMeanCost / menu.totalCost | percent:'1.2-2'}}</h5>
+						<h5 *ngIf="(menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte')&&(menu.totalCost==0)">---</h5>
+					</td>
+					<td class="do-not-print"></td>
+				</tr>
+				<tr>
+					<td></td>
+					<td (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					</td>
+					<td class="do-not-print"></td>
+					<td class="do-not-print"></td>					
+					<td (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{gastroElement.name}} 
+						<span *ngIf="!gastroElement.active" class="label label-sm label-cd label-mini pull-right"> {{'recipes.product.nonActive' | translate }}</span>
+					  <span *ngIf="gastroElement.locationWarning" class="label label-sm label-cd label-mini pull-right"> {{'messageGeneric.locationWarning' | translate }} </span>
+					  <span *ngIf="gastroElement.itemNull" class="label label-sm label-cd label-mini pull-right"> {{'messageGeneric.itemNull' | translate }} </span>
+					</td>
+					<td class="do-not-print"><i (click)="moveElementUp(gastroElement, i)" *ngIf="gastroElement.dishUp && !viewMode && filterText.length==0" class="fa fa-chevron-up cd-gold pointer" aria-hidden="true"></i></td>
+					<td class="do-not-print"><i (click)="moveElementDown(gastroElement, i)" *ngIf="gastroElement.dishDown && !viewMode && filterText.length==0" class="fa fa-chevron-down cd-gold pointer" aria-hidden="true"></i></td>
+					<td (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{gastroElement.numServings | number:'1.2-2'}}</td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'" (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer"> {{gastroElement.price * (1+ salesTax/100) * gastroElement.numServings | currency:'EUR':'symbol':'1.2-2'}}</td>
+					<td *ngIf="menuType=='carte' || menuType=='fixedPriceCarte' || menuType=='catalog'" (click)="selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">{{ gastroElement.price * gastroElement.numServings | currency:'EUR':'symbol':'1.2-2'}}</td>
+					
+					<td *ngIf="menuType=='catalog'" (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{ gastroElement.cost | currency:'EUR':'symbol':'1.2-2'}}</td>
+					<td *ngIf="menuType=='catalog'" (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{gastroElement.cost * gastroElement.numServings | currency:'EUR':'symbol':'1.2-2'}}</td>					
+					
+					<td *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='carte' || menuType=='fixedPriceCarte' " (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{gastroElement.cost | currency:'EUR':'symbol':'1.2-2'}}</td>
+					<td *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='carte' || menuType=='fixedPriceCarte' " (click)="viewClick(); selectElementToEdit(gastroElement, i); compositionModal.show()" class="pointer">
+					{{gastroElement.cost * gastroElement.numServings | currency:'EUR':'symbol':'1.2-2'}}</td>
+					
+					<td *ngIf="menuType=='dailyMenuCarte' || menuType=='fixedPriceCarte'"></td>
+					<td>
+						<span *ngIf="(menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte')&&menu.totalCost>0">{{gastroElement.totalCost / menu.totalCost | percent:'1.2-2'}}</span>
+						<span *ngIf="(menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet' || menuType=='fixedPriceCarte')&&menu.totalCost==0">---</span>
+						<span *ngIf="(menuType=='carte')&&(gastroElement.price!=0)&&(gastroElement.numServings!=0)">{{gastroElement.totalCost / (gastroElement.price*gastroElement.numServings) | percent:'1.2-2'}}</span>
+						<span *ngIf="(menuType=='catalog')&&(gastroElement.price!=0)&&(gastroElement.numServings!=0)">{{gastroElement.cost / (gastroElement.price*gastroElement.numServings) | percent:'1.2-2'}}</span>						
+						<span *ngIf="(menuType=='carte' || menuType=='catalog')&&(gastroElement.price==0 || gastroElement.numServings==0)">---</span>
+					</td>
+					<td class="do-not-print">
+						<span *ngIf="gastroElement.location_unavailable" class="label label-sm label-cd label-mini pull-right">{{'gastro.menu.tableHead.outOfLocation' | translate}}</span>
+					  	<a *ngIf="!gastroElement.location_unavailable && !viewMode" href="javascript:;" (click)="selectElementToEdit(gastroElement, i); editClick(); compositionModal.show(); "
+						 class="btn gold btn-sm btn-outline table-row-button">
+								  <i class="fa fa-pencil" ></i> {{'buttonGeneric.edit' | translate}} </a>
+					  	<a *ngIf="!viewMode" href="javascript:;" (click)="selectElementToDelete(gastroElement, i); deleteMenuElement()"
+						 class="btn gold btn-sm btn-outline table-row-button">
+								  <i class="fa fa-trash"></i> {{'buttonGeneric.delete' | translate}} </a>
+							<a *ngIf="!gastroElement.location_unavailable&& gastroElement.element.kind=='dish'" href="javascript:;" (click)="viewDish(gastroElement,i)"
+								 class="btn gold btn-sm btn-outline table-row-button">
+								 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							<a *ngIf="!gastroElement.location_unavailable&& gastroElement.element.kind=='drink'" href="javascript:;" (click)="viewDrink(gastroElement,i)"
+								 class="btn gold btn-sm btn-outline table-row-button">
+								 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+							<a *ngIf="!gastroElement.location_unavailable && gastroElement.element.kind=='product'" href="javascript:;" (click)="viewProduct(gastroElement,i)"
+								 class="btn gold btn-sm btn-outline table-row-button">
+								 <i class="fa fa-shopping-basket"></i>{{'buttonGeneric.view' | translate}}</a>
+					</td>
+				</tr>
+  			</tbody>
+		</table>
+	</div>
+</div>
+
+<!--MODAL-->
+
+<div bsModal #compositionModal="bs-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-xl">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" (click)="compositionModal.hide()" aria-label="Close">
+					<span aria-hidden="true">&times;</span>
+				</button>
+				<h4 class="modal-title">{{'gastro.menu.composition.new' | translate}}</h4>
+			</div>
+			<div class="modal-body">
+				<form (ngSubmit)="saveElement()" class="form-horizontal" #compositionForm="ngForm" *ngIf="gastroElement">
+					<div class="row">
+						<div class="col-md-10">
+							<div class="form-body">
+								<div *ngIf="menuType!='catalog'" class="form-group">
+				          <label for="category" class="col-md-2 control-label">{{'provider.article.form.category' | translate}} <span class="required"> * </span></label>
+				          <p-selectButton [options]="gastroElementCategories" class="col-md-10" [(ngModel)]="gastroElement.element.kind" name="kind" [disabled]="mode =='view' || status =='view'" (onChange)="onChangeCategory($event)"></p-selectButton> 
+				        </div>
+				        	<div *ngIf="(gastroElement.element.kind=='dish') && menuType!='catalog'" class="form-group">
+				            <label for="category" class="col-md-2 control-label">{{'gastro.menu.form.dish' | translate}} <span class="required"> * </span></label>
+				              <ng-select class="cd-select col-md-10 " [allowClear]="true"                    
+				                (selected)="dishSelected($event)" 
+				                (typed)="dishSearchChanged($event)"
+				                [active]="activeDish"
+				                [disabled]="mode =='view' || status =='view'" 
+				 								(removed)="elementRemoved($event)" 
+				                #selectDish>
+				              </ng-select>
+				          </div>
+				          <div *ngIf="(gastroElement.element.kind=='drink') && menuType!='catalog'" class="form-group">
+				            <label for="category" class=" col-md-2 control-label">{{'gastro.menu.form.drink' | translate}} <span class="required"> * </span></label>
+				            	<ng-select class="cd-select col-md-10" [allowClear]="true"                     	
+				               (selected)="drinkSelected($event)" 
+				               (typed)="drinkSearchChanged($event)"
+				               [active]="activeDrink"
+				               [disabled]="mode =='view' || status =='view'" 
+				   						 (removed)="elementRemoved($event)" 
+				               #selectDrink>
+				             </ng-select>
+				          </div>
+				        <div class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.family' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<select *ngIf="families&&families.length>0" class="form-control" (change)="familySelected($event.target.value, true)" name="family" [disabled]="mode =='view' || status =='view'">
+											<option selected="selected" value="">---</option>
+											<option *ngFor="let family of families; let i = index" [value]="i" [selected]="gastroElement.family._id == family._id">{{family.lang[0]?.name | uppercase}} </option>
+										</select>
+										<select *ngIf="!families || families.length==0" class="form-control" name="family"  disabled="">
+											<option>---</option>
+										</select>
+									</div>
+								</div>
+								<div class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.subfamily' | translate}}</label>
+									<div *ngIf="gastroElement.subfamily" class="col-md-10">
+										<select *ngIf="subfamilies&&subfamilies.length>0" class="form-control" (change)="subFamilySelected($event.target.value, true)" name="element" [disabled]="mode =='view' || status =='view'">
+											<option [value]="-1">--{{'none' | translate | uppercase}}--</option>
+											<option *ngFor="let subfamily of subfamilies; let i = index" [value]="i" [selected]="gastroElement.subfamily._id == subfamily._id"> {{subfamily.lang.name | uppercase}} </option>
+										</select>
+										<select *ngIf="!subfamilies || subfamilies.length==0" class="form-control" name="family"  disabled="">
+											<option>---</option>
+										</select>
+									</div>
+								</div>
+								<!-- <div *ngIf="menuType!='catalog'" class="form-group">
+									<label class="col-md-5 control-label">{{'gastro.menu.composition.tableHead.dish' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-7">
+										<select class="form-control" (change)="menuDishSelected($event.target.value, true);" name="element" >
+											<option [selected]="i==0" *ngFor="let dish of dishesList; let i = index" [value]="i">{{dish.versions.lang.name | uppercase}} </option>
+										</select>
+									</div>
+								</div> -->
+								<div *ngIf="menuType=='catalog'" class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.product' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<ng-select class="cd-select" [allowClear]="true"                     	
+					                      (selected)="productSelected($event)" 
+					                      (typed)="productSearchChanged($event)"
+					                      [active]="activeProduct"
+					                      [disabled]="mode =='view' || status =='view'" 
+										  (removed)="elementRemoved($event)"
+	                      #selectProduct>
+	                  </ng-select>
+	                </div>
+								</div>
+								<div *ngIf="(menuType=='carte' || menuType =='fixedPriceCarte') && gastroElement.element.kind=='dish'" class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.dishPricingRate' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<select *ngIf="dishPricingRates&&dishPricingRates.length>0" class="form-control" (change)="dishPricingRateSelected($event.target.value, true)" name="pricingRate" [disabled]="mode =='view' || status =='view'">
+											<option *ngFor="let pricingRate of dishPricingRates; let i = index" [value]="i" [selected]="gastroElement.pricingRate == pricingRate._id">{{pricingRate.name | uppercase}} | {{pricingRate.price | currency:'EUR':'symbol':'1.2-2'}} </option>
+										</select>
+										<select *ngIf="!dishPricingRates || dishPricingRates.length==0" class="form-control" name="pricingRate"  disabled="">
+											<option>---</option>
+										</select>
+									</div>
+								</div>
+								<div *ngIf="(menuType=='carte' || menuType =='fixedPriceCarte') && gastroElement.element.kind=='drink'" class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.dishPricingRate' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<select *ngIf="drinkPricingRates&&drinkPricingRates.length>0" class="form-control" (change)="drinkPricingRateSelected($event.target.value, true)" name="pricingRate" [disabled]="mode =='view' || status =='view'">
+											<option *ngFor="let pricingRate of drinkPricingRates; let i = index" [value]="i" [selected]="gastroElement.pricingRate == pricingRate._id">{{pricingRate.name | uppercase}} | {{pricingRate.price | currency:'EUR':'symbol':'1.2-2'}} </option>
+										</select>
+										<select *ngIf="!drinkPricingRates || drinkPricingRates.length==0" class="form-control" name="pricingRate"  disabled="">
+											<option>---</option>
+										</select>
+									</div>
+								</div>
+								<div *ngIf="menuType=='catalog'" class="form-group">
+									<label class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.productPricingRate' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<select *ngIf="productPricingRates&&productPricingRates.length>0" class="form-control" (change)="productPricingRateSelected($event.target.value, true)" name="pricingRate" [disabled]="mode =='view' || status =='view'">
+											<option *ngFor="let pricingRate of productPricingRates; let i = index" [value]="i" [selected]="gastroElement.pricingRate == pricingRate._id">{{pricingRate.name | uppercase}} | {{pricingRate.price | currency:'EUR':'symbol':'1.2-2'}}</option>
+										</select>
+										<select *ngIf="!productPricingRates || productPricingRates.length==0" class="form-control" name="pricingRate"  disabled="">
+											<option>---</option>
+										</select>
+									</div>
+								</div>								
+								<div class="form-group">
+									<label for="servings" class="col-md-2 control-label">{{'gastro.menu.composition.tableHead.numServings' | translate}}<span class="required"> * </span></label>
+									<div class="col-md-10">
+										<input id="servings" class="form-control" type="number" step="any" min="0" [(ngModel)]="gastroElement.numServings" name="numServings" [disabled]="mode =='view' || status =='view'" required>
+									</div>
+								</div>									
+							</div>
+							<div class="form-actions">
+								<div class="row">
+									<div class="col-md-offset-5 col-md-7">
+										<button *ngIf="menuType=='menu' || menuType=='dailyMenuCarte' || menuType=='buffet'" type="submit" (click)="compositionModal.hide()" class="btn green" [disabled]="!compositionForm.form.valid || ((dishesList&&dishesList.length==0) && (drinksList&&drinksList.length==0)) || (families&&families.length==0) || gastroElement.element.item == null">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button *ngIf="menuType=='carte' || menuType=='fixedPriceCarte'" type="submit" (click)="compositionModal.hide()" class="btn green" [disabled]="!compositionForm.form.valid || ((dishesList&&dishesList.length==0) && (drinksList&&drinksList.length==0)) || (families&&families.length==0) || ((dishPricingRates&&dishPricingRates.length==0) && (drinkPricingRates&&drinkPricingRates.length==0)) || gastroElement.element.item == null">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button *ngIf="menuType=='catalog'" type="submit" (click)="compositionModal.hide()" class="btn green" [disabled]="!compositionForm.form.valid || (productsList&&productsList.length==0) || (families&&families.length==0) || (productPricingRates&&productPricingRates.length==0) || gastroElement.element.item == null">{{'buttonGeneric.save' | translate}}
+										</button>
+										<button type="button" (click)="cleanAndResetFields(); compositionModal.hide();" class="btn default">{{'buttonGeneric.cancel' |
+											translate}}
+										</button>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>

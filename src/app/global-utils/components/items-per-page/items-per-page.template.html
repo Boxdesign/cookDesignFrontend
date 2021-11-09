@@ -1,0 +1,7 @@
+<div class="items-per-page">
+	<label>{{'itemsPerPage.beginText' | translate}}</label>
+	<select class="items-select" (change)="onChange($event.target.value)">
+		<option *ngFor="let item of itemOptions" [selected]="item == defaultOption" [value]="item">{{item}}</option>
+	</select>
+	{{'itemsPerPage.endText' | translate}}
+</div>
